@@ -1,0 +1,160 @@
+// Reusable plugin layout: toolbar with cog + settings drawer (right-hand panel)
+.plugin-with-settings {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.plugin-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  > .page-header {
+    flex-shrink: 0;
+  }
+}
+
+.reader-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.plugin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0 1rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.plugin-toolbar.page-header-style {
+  align-items: flex-start;
+  padding-bottom: 1rem;
+
+  .plugin-toolbar-heading {
+    flex: 0 1 auto;
+  }
+
+  .plugin-toolbar-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .plugin-toolbar-subtitle {
+    margin: 0.25rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+  }
+}
+
+.plugin-toolbar-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.plugin-toolbar-spacer {
+  flex: 1;
+}
+
+.plugin-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.settings-cog-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  font-size: 1.25rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.settings-cog-btn:hover {
+  color: var(--text);
+  border-color: var(--accent);
+  background: rgba(88, 166, 255, 0.08);
+}
+
+// Settings drawer panel (right-hand side)
+.settings-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+}
+
+.settings-drawer {
+  width: 100%;
+  max-width: 22rem;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
+}
+
+.settings-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.settings-drawer-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.settings-drawer-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.settings-drawer-close:hover {
+  color: var(--text);
+}
+
+.settings-drawer-body {
+  flex: 1;
+  padding: 1.25rem;
+  overflow: auto;
+}

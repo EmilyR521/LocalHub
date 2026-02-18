@@ -1,0 +1,27 @@
+<app-settings-drawer-host
+  title="Calendar"
+  subtitle="View and manage events. Connect your Google Calendar in settings.">
+  <ng-container main>
+    @if (oauthError(); as msg) {
+      <section class="welcome">
+        <p class="error-msg">{{ msg }}</p>
+      </section>
+    }
+    @if (calendarGoogle.connection(); as conn) {
+      @if (conn.connected) {
+        <app-calendar-month-view />
+      } @else {
+        <section class="welcome">
+          <p>Connect your Google Calendar in settings (⚙️) to see your events here.</p>
+        </section>
+      }
+    } @else {
+      <section class="welcome">
+        <p>Loading…</p>
+      </section>
+    }
+  </ng-container>
+  <ng-container settings>
+    <app-calendar-settings />
+  </ng-container>
+</app-settings-drawer-host>

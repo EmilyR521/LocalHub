@@ -1,0 +1,14 @@
+<div class="dashboard-widget dashboard-widget-last-run">
+  <h2 class="dashboard-widget-title">Last run</h2>
+  @if (lastRun(); as run) {
+    <a [routerLink]="['/plugins/runner', 'recent']" class="dashboard-widget-link">
+      <span class="widget-last-run-date">{{ formatDate(run) }}</span>
+      <span class="widget-last-run-name">{{ run.name || 'Run' }}</span>
+      <span class="widget-last-run-meta">{{ formatDistance(run) }} · {{ formatDuration(run) }}</span>
+    </a>
+  } @else if (!connected()) {
+    <p class="hint">Connect Strava in <a routerLink="/plugins/runner">Runner settings</a> to see your last run.</p>
+  } @else {
+    <p class="hint">No activities yet. <a routerLink="/plugins/runner/recent">Recent runs</a> to refresh.</p>
+  }
+</div>

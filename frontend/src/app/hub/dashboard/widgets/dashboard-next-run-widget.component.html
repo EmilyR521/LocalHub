@@ -1,0 +1,11 @@
+<div class="dashboard-widget dashboard-widget-next-run">
+  <h2 class="dashboard-widget-title">Next run</h2>
+  @if (nextRun(); as run) {
+    <a [routerLink]="['/plugins/runner', 'planner']" class="dashboard-widget-link">
+      <span class="widget-next-run-date">{{ run.date }}</span>
+      <span class="widget-next-run-distance">{{ run.distanceKm }} km</span>
+    </a>
+  } @else {
+    <p class="hint">No upcoming run. <a routerLink="/plugins/runner/planner">Open Run Planner</a> to create a plan.</p>
+  }
+</div>

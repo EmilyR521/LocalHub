@@ -1,0 +1,39 @@
+<div class="card" style="margin: 0;">
+  <h2 class="card-title">Strava</h2>
+  <p class="hint">Connect your Strava account to see your recent activities in the Recent runs view.</p>
+  @if (strava.connection(); as conn) {
+    @if (conn.connected) {
+      @if (conn.athlete) {
+        <div class="strava-connected">
+          @if (conn.athlete.profile) {
+            <img
+              [src]="conn.athlete.profile"
+              alt=""
+              class="strava-profile-img"
+              width="64"
+              height="64"
+              referrerpolicy="no-referrer" />
+          }
+          <div class="strava-profile-info">
+            <p class="strava-logged-in-as">Logged in as:</p>
+            @if (conn.athlete.firstname || conn.athlete.lastname) {
+              <p class="strava-name">{{ conn.athlete.firstname }} {{ conn.athlete.lastname }}</p>
+            }
+            @if (conn.athlete.username) {
+              <p class="strava-username">&#64;{{ conn.athlete.username }}</p>
+            }
+            @if (!conn.athlete.firstname && !conn.athlete.lastname && !conn.athlete.username) {
+              <p class="strava-name">Strava athlete</p>
+            }
+          </div>
+        </div>
+      }
+      <button type="button" class="btn secondary" (click)="strava.disconnect().subscribe()">Disconnect Strava</button>
+    } @else {
+      <button type="button" class="btn primary" (click)="strava.connectToStrava()">Connect to Strava</button>
+      @if (strava.authUrlError(); as err) {
+        <p class="error-msg" style="margin-top: 0.5rem;">{{ err }}</p>
+      }
+    }
+  }
+</div>

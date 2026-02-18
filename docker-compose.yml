@@ -1,0 +1,22 @@
+# LocalHub – run API + frontend in one container.
+# Create backend/.env from backend/.env.example and set secrets, then: docker compose up -d
+services:
+  localhub:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: backend/.env
+        required: false
+    environment:
+      PORT: 3000
+      LOCALHUB_DATA: /data
+      LOCALHUB_BASE_URL: http://localhost:3000
+      CORS_ORIGIN: http://localhost:3000
+      PUBLIC_DIR: /app/public
+    volumes:
+      - localhub-data:/data
+    restart: unless-stopped
+
+volumes:
+  localhub-data:

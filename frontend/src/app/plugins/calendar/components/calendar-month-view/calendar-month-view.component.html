@@ -1,0 +1,53 @@
+<div class="calendar-month-view">
+  <div class="calendar-month-nav">
+    <button type="button" class="btn secondary" (click)="prevMonth()" aria-label="Previous month">‹</button>
+    <h2 class="calendar-month-title">{{ monthLabel() }}</h2>
+    <button type="button" class="btn secondary" (click)="nextMonth()" aria-label="Next month">›</button>
+  </div>
+  @if (loadError(); as err) {
+    <p class="error-msg">{{ err }}</p>
+  }
+  @if (loading()) {
+    <p class="hint">Loading events…</p>
+  }
+  <div class="calendar-grid">
+    <div class="calendar-row calendar-row-head">
+      @for (day of dayNames; track day) {
+        <div class="calendar-cell calendar-cell-head">{{ day }}</div>
+      }
+    </div>
+    @for (row of rows(); track $index) {
+      <div class="calendar-row">
+        @for (cell of row; track cell.date.getTime()) {
+          <div class="calendar-cell calendar-day" [class.other-month]="!cell.isCurrentMonth">
+            <span class="day-num">{{ cell.dayOfMonth }}</span>
+            <div class="day-events">
+              @for (event of cell.events; track event.id || event.summary) {
+                @if (event.htmlLink) {
+                  <a
+                    [href]="event.htmlLink"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="day-event"
+                    [title]="event.summary">
+                    @if (eventTimeLabel(event); as time) {
+                      <span class="event-time">{{ time }}</span>
+                    }
+                    <span class="event-summary">{{ event.summary }}</span>
+                  </a>
+                } @else {
+                  <span class="day-event" [title]="event.summary">
+                    @if (eventTimeLabel(event); as time) {
+                      <span class="event-time">{{ time }}</span>
+                    }
+                    <span class="event-summary">{{ event.summary }}</span>
+                  </span>
+                }
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

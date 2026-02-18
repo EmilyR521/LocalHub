@@ -1,0 +1,27 @@
+<div class="timeline-container">
+  <app-reader-timeline-header [books]="books()" />
+
+  @if (timelineGroups().length > 0) {
+    <div class="timeline-list">
+      @for (group of timelineGroups(); track group.monthKey) {
+        <div class="timeline-month-group">
+          <div class="timeline-month-divider">
+            <span class="timeline-month-label">{{ group.monthLabel }}</span>
+            @if (group.finishedCount > 0) {
+              <span class="timeline-month-finished">{{ group.finishedCount }}</span>
+            }
+          </div>
+          @for (book of group.books; track book.id) {
+            <app-reader-timeline-book-item
+              [book]="book"
+              (viewBook)="onViewBook($event)" />
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="timeline-empty">
+      <p>Add books with a &quot;Started&quot; date to see them on the timeline.</p>
+    </div>
+  }
+</div>

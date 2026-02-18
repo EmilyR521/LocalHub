@@ -1,0 +1,17 @@
+<div class="card" style="margin: 0;">
+  <h2 class="card-title">Google Calendar</h2>
+  <p class="hint">Connect your Google account to show your calendar events in LocalHub.</p>
+  @if (calendarGoogle.connection(); as conn) {
+    @if (conn.connected) {
+      @if (conn.email) {
+        <p class="connected-as">Connected as <strong>{{ conn.email }}</strong></p>
+      }
+      <button type="button" class="btn secondary" (click)="calendarGoogle.disconnect()">Disconnect</button>
+    } @else {
+      <button type="button" class="btn primary" (click)="calendarGoogle.getAuthUrl()">Connect to Google Calendar</button>
+      @if (calendarGoogle.authUrlError(); as err) {
+        <p class="error-msg" style="margin-top: 0.5rem;">{{ err }}</p>
+      }
+    }
+  }
+</div>

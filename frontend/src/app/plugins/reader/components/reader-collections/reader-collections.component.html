@@ -1,0 +1,100 @@
+<div class="collections-header actions">
+  <h2 class="card-title" style="margin: 0;">Collections</h2>
+  <button type="button" class="btn primary" (click)="openCreateModal()">New collection</button>
+</div>
+
+@if (collectionsWithBooks().length === 0) {
+  <p class="hint">No collections yet. Create one to group books into reading lists.</p>
+} @else {
+  <div class="collection-list">
+    @for (c of collectionsWithBooks(); track c.id) {
+      <div class="card collection-card">
+        <div class="collection-card-header">
+          @if (editingId() !== c.id) {
+            <h3 class="card-title" style="margin: 0;">{{ c.name }}</h3>
+            <span class="hint">({{ c.books.length }} {{ c.books.length === 1 ? 'book' : 'books' }})</span>
+            <div class="plugin-actions" style="margin: 0 0 0 auto;">
+              <button type="button" class="btn secondary" (click)="startEdit(c)">Rename</button>
+              <button type="button" class="btn secondary" (click)="deleteCollection(c.id)">Delete</button>
+            </div>
+          } @else {
+            <input
+              type="text"
+              [value]="editingName()"
+              (input)="editingName.set($any($event.target).value)"
+              (keyup.enter)="saveEdit(c.id)"
+              (keyup.escape)="cancelEdit()"
+              class="field" />
+            <div class="plugin-actions" style="margin: 0 0 0 auto;">
+              <button type="button" class="btn primary" (click)="saveEdit(c.id)">Save</button>
+              <button type="button" class="btn secondary" (click)="cancelEdit()">Cancel</button>
+            </div>
+          }
+        </div>
+        <ul class="collection-books-list">
+          @for (book of c.books; track book.id) {
+            <li class="collection-book-row">
+              <button type="button" class="collection-book-link" (click)="onViewBook(book)">
+                {{ book.title }} <span class="hint">by {{ book.author }}</span>
+              </button>
+              <span class="status-badge">{{ book.status }}</span>
+              <button type="button" class="btn secondary collection-remove-btn" (click)="removeBookFromCollection(c.id, book.id)" title="Remove from collection">×</button>
+            </li>
+          }
+        </ul>
+        @if (c.books.length === 0) {
+          <p class="hint">No books in this collection.</p>
+        }
+        <div class="add-book-row">
+          @if (addBookOpenId() === c.id) {
+            <input
+              type="text"
+              placeholder="Search by title or author..."
+              [value]="addBookSearch()"
+              (input)="addBookSearch.set($any($event.target).value)"
+              (keydown.escape)="closeAddBook()"
+              class="field"
+              style="max-width: 100%; margin: 0;" />
+            <div class="add-book-dropdown">
+              @for (book of filteredAvailableBooks(c); track book.id) {
+                <button type="button" class="add-book-option" (click)="addBookToCollection(c.id, book.id)">
+                  {{ book.title }} <span class="hint">by {{ book.author }}</span>
+                </button>
+              }
+              @if (filteredAvailableBooks(c).length === 0) {
+                <div class="hint" style="padding: 0.5rem;">{{ availableBooks(c).length === 0 ? 'All books are in this collection' : 'No matches' }}</div>
+              }
+            </div>
+            <button type="button" class="btn secondary" (click)="closeAddBook()">Cancel</button>
+          } @else {
+            <button type="button" class="btn secondary" (click)="openAddBook(c.id)" [disabled]="availableBooks(c).length === 0">
+              + Add book
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@if (showCreateModal()) {
+  <div class="panel-overlay" (click)="closeCreateModal()">
+    <div class="card panel" style="max-width: 20rem;" (click)="$event.stopPropagation()">
+      <h2 class="card-title">New collection</h2>
+      <div class="field">
+        <label for="new-collection-name">Name</label>
+        <input
+          id="new-collection-name"
+          type="text"
+          [value]="newCollectionName()"
+          (input)="newCollectionName.set($any($event.target).value)"
+          (keyup.enter)="createCollection()"
+          placeholder="e.g. To read in 2025" />
+      </div>
+      <div class="panel-actions">
+        <button type="button" class="btn primary" (click)="createCollection()" [disabled]="!newCollectionName().trim()">Create</button>
+        <button type="button" class="btn secondary" (click)="closeCreateModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,17 @@
+<app-settings-drawer-host
+  title="Dashboard"
+  subtitle="Your homelab hub. Add plugin apps from the sidebar.">
+  <ng-container main>
+    <section class="dashboard-widgets">
+      @for (widget of selectedWidgets(); track widget.id) {
+        <ng-container *ngComponentOutlet="widget.component" />
+      }
+      @if (selectedWidgets().length === 0) {
+        <p class="hint">No widgets selected. Open dashboard settings (⚙️) to add some.</p>
+      }
+    </section>
+  </ng-container>
+  <ng-container settings>
+    <app-dashboard-settings />
+  </ng-container>
+</app-settings-drawer-host>

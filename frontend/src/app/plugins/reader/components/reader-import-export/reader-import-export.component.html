@@ -1,0 +1,40 @@
+<div class="card" style="margin-top: 1rem; margin-bottom: 0;">
+  <h2 class="card-title">CSV</h2>
+  <p class="hint">Export or import books as CSV. Download a template to see the required columns (Title, Author, Status, dates, Notes, Tags).</p>
+  <div class="plugin-actions actions-column">
+    <button type="button" class="btn secondary" (click)="exportCSVTemplate()" [disabled]="csvLoading()">
+      Download template
+    </button>
+    <button type="button" class="btn secondary" (click)="exportCSV()" [disabled]="booksCount === 0 || csvLoading()">
+      Export CSV ({{ booksCount }} books)
+    </button>
+    <label class="btn secondary" [class.disabled]="csvLoading()">
+      {{ csvLoading() ? 'Importing…' : 'Import from CSV' }}
+      <input
+        type="file"
+        accept=".csv,text/csv"
+        (change)="onCSVFile($event)"
+        style="display: none;"
+        [disabled]="csvLoading()" />
+    </label>
+  </div>
+</div>
+
+<div class="card" style="margin-top: 1rem; margin-bottom: 0;">
+  <h2 class="card-title">JSON</h2>
+  <p class="hint">Full backup: export or import all books and collections as JSON. On import you can replace existing data or merge.</p>
+  <div class="plugin-actions actions-column">
+    <button type="button" class="btn secondary" (click)="exportJSON()" [disabled]="jsonLoading()">
+      Export JSON
+    </button>
+    <label class="btn secondary" [class.disabled]="jsonLoading()">
+      {{ jsonLoading() ? 'Importing…' : 'Import from JSON' }}
+      <input
+        type="file"
+        accept=".json,application/json"
+        (change)="onJSONFile($event)"
+        style="display: none;"
+        [disabled]="jsonLoading()" />
+    </label>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<div class="dashboard-widget dashboard-widget-currently-reading">
+  <h2 class="dashboard-widget-title">Currently reading</h2>
+  @if (currentlyReading().length > 0) {
+    <ul class="dashboard-widget-list">
+      @for (book of currentlyReading(); track book.id) {
+        <li>
+          <a [routerLink]="['/plugins/reader']" class="dashboard-widget-link">
+            <span class="widget-book-title">{{ book.title }}</span>
+            <span class="widget-book-author">by {{ book.author }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="hint">No books in progress. <a routerLink="/plugins/reader">Open Reader</a> to add some.</p>
+  }
+</div>

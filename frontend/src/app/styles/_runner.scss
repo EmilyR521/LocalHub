@@ -1,0 +1,44 @@
+// Runner plugin – uses .reader-tabs (same as Reader) for view navigation
+.reader-tabs a.btn {
+  text-decoration: none;
+}
+
+.runner-outlet {
+  margin-top: 0;
+}
+
+// Runner settings – Strava connected profile
+.strava-connected {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.strava-profile-img {
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.strava-profile-info {
+  margin: 0;
+}
+
+.strava-logged-in-as {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.strava-name {
+  margin: 0.25rem 0 0;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.strava-username {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}

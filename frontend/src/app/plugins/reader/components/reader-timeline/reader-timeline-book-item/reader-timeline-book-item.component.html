@@ -1,0 +1,56 @@
+<div
+  class="timeline-book-item"
+  [class.timeline-book-finished]="book.status === BookStatus.Finished"
+  [class.timeline-book-reading]="book.status === BookStatus.Reading"
+  [class.timeline-book-on-hold]="book.status === BookStatus.OnHold"
+  [class.timeline-book-abandoned]="book.status === BookStatus.Abandoned"
+  (click)="onItemClick()">
+  <div class="timeline-book-cover-wrap">
+    <div class="timeline-book-cover" [class.has-image]="book.imageUrl && !imageError">
+      @if (book.imageUrl && !imageError) {
+        <img
+          [src]="book.imageUrl"
+          [alt]="book.title + ' cover'"
+          (error)="onImageError()" />
+      }
+      @if (!book.imageUrl || imageError) {
+        <div class="timeline-cover-placeholder">
+          <span class="placeholder-icon">📚</span>
+          <span class="placeholder-text">No Cover</span>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="timeline-book-info">
+    <h3 class="timeline-book-title">{{ book.title }}</h3>
+    <p class="timeline-book-author">by {{ book.author }}</p>
+    <div class="timeline-book-dates">
+      @if (book.readingStartDate) {
+        <p class="detail-item"><strong>Started:</strong> {{ book.readingStartDate | date:'mediumDate' }}</p>
+      }
+      @if (book.readingEndDate) {
+        <p class="detail-item"><strong>Finished:</strong> {{ book.readingEndDate | date:'mediumDate' }}</p>
+      }
+    </div>
+    @if (book.tags && book.tags.length > 0) {
+      <div class="timeline-book-tags">
+        @for (tag of book.tags; track tag) {
+          <span class="tag-display">{{ tag }}</span>
+        }
+      </div>
+    }
+  </div>
+  <div class="timeline-book-meta">
+    <span class="timeline-status-badge" [class]="'status-' + book.status">{{ book.status }}</span>
+    @if (book.rating && book.rating !== BookRating.None) {
+      <span
+        class="timeline-rating-icon"
+        [class]="'rating-' + book.rating"
+        [title]="getRatingLabel(book.rating)">
+        @if (book.rating === BookRating.Positive) { 👍 }
+        @if (book.rating === BookRating.Negative) { 👎 }
+        @if (book.rating === BookRating.Favourite) { ❤️ }
+      </span>
+    }
+  </div>
+</div>

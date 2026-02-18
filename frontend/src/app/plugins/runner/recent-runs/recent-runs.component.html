@@ -1,0 +1,58 @@
+<section class="card">
+  <h2 class="card-title">Recent runs</h2>
+  <p class="hint">Activities from your connected Strava account appear here.</p>
+
+  @if (queryMessage(); as msg) {
+    <p class="hint" [class.error-msg]="queryIsError()" style="margin-top: 0.5rem;">{{ msg }}</p>
+  }
+  @if (stravaError(); as err) {
+    <p class="hint error-msg">{{ err }}</p>
+  }
+
+  @if (!connected()) {
+    <p class="hint" style="margin-top: 1rem;">
+      Open Runner settings (⚙️) to connect your Strava account and see your recent activities here.
+    </p>
+  } @else {
+    <div class="actions" style="margin-top: 1rem;">
+      <button
+        type="button"
+        class="btn secondary"
+        (click)="loadActivities()"
+        [disabled]="loading()">
+        {{ loading() ? 'Loading…' : 'Refresh' }}
+      </button>
+    </div>
+
+    @if (loading() && activities().length === 0) {
+      <p class="hint" style="margin-top: 1rem;">Loading activities…</p>
+    } @else if (activities().length > 0) {
+      <div class="data-table-wrap" style="margin-top: 1rem;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Distance</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of activities(); track a.id) {
+              <tr>
+                <td>{{ formatDate(a.start_date_local ?? a.start_date) }}</td>
+                <td>{{ a.name }}</td>
+                <td>{{ a.sport_type ?? a.type ?? '—' }}</td>
+                <td>{{ formatDistance(a.distance) }}</td>
+                <td>{{ formatDuration(a.moving_time ?? a.elapsed_time) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="hint" style="margin-top: 1rem;">No activities yet, or Strava returned none. Try refreshing after a run.</p>
+    }
+  }
+</section>

@@ -1,0 +1,15 @@
+<div class="card" style="margin: 0;">
+  <h2 class="card-title">Widgets</h2>
+  <p class="hint">Choose which widgets appear on your dashboard, in order.</p>
+  <div class="lookup-options" style="margin-top: 0.75rem;">
+    @for (widget of widgets; track widget.id) {
+      <label class="lookup-option">
+        <input
+          type="checkbox"
+          [checked]="isSelected(widget.id)"
+          (change)="toggle(widget.id)" />
+        <span>{{ widget.name }}</span>
+      </label>
+    }
+  </div>
+</div>

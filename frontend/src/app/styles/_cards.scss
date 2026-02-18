@@ -1,0 +1,142 @@
+// Card and surface blocks
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.welcome {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  color: var(--text-muted);
+}
+
+// Dashboard widgets
+.dashboard-widgets {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 0.5rem;
+}
+
+.dashboard-widget {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+}
+
+.dashboard-widget-title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dashboard-widget-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-widget-list li {
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-widget-list li:last-child {
+  margin-bottom: 0;
+}
+
+.dashboard-widget-link {
+  display: block;
+  color: var(--text);
+  text-decoration: none;
+  padding: 0.25rem 0;
+
+  &:hover {
+    color: var(--accent);
+  }
+}
+
+.dashboard-widget-link .widget-book-title {
+  font-weight: 500;
+}
+
+.dashboard-widget-link .widget-book-author {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.125rem;
+}
+
+.dashboard-widget-next-run .widget-next-run-date {
+  display: block;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.dashboard-widget-next-run .widget-next-run-distance {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.125rem;
+}
+
+.dashboard-widget-last-run .widget-last-run-date {
+  display: block;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.dashboard-widget-last-run .widget-last-run-name {
+  display: block;
+  font-size: 0.9375rem;
+  margin-top: 0.125rem;
+}
+
+.dashboard-widget-last-run .widget-last-run-meta {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.125rem;
+}
+
+// User management – connected applications
+.connected-apps-list {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.connected-app-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.connected-app-label {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8125rem;
+}

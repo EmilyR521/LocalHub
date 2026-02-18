@@ -1,0 +1,26 @@
+// Global styles – variables are in app/styles; load all shared partials
+@use './app/styles/index';
+
+:root {
+  --sidebar-width: 12rem;
+  --header-height: 3rem;
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --border: #2d3a4d;
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --accent: #58a6ff;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}

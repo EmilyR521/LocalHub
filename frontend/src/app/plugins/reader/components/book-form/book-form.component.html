@@ -1,0 +1,83 @@
+<div class="card">
+  <h2 class="card-title">{{ isEdit ? 'Edit book' : 'Add book' }}</h2>
+  <form (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="book-title">Title</label>
+      <input id="book-title" type="text" [(ngModel)]="title" name="title" placeholder="Book title" required />
+    </div>
+    <div class="field">
+      <label for="book-author">Author</label>
+      <input id="book-author" type="text" [(ngModel)]="author" name="author" placeholder="Author" required />
+    </div>
+    <div class="field">
+      <label for="book-status">Status</label>
+      <select id="book-status" [(ngModel)]="status" name="status">
+        @for (s of statusOptions; track s) {
+          <option [value]="s">{{ s }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label>Rating</label>
+      <div class="emoji-row">
+        <button type="button" class="emoji-btn" [class.active]="rating === BookRating.Positive" (click)="rating = rating === BookRating.Positive ? BookRating.None : BookRating.Positive" [title]="ratingLabel(BookRating.Positive)">👍</button>
+        <button type="button" class="emoji-btn" [class.active]="rating === BookRating.Negative" (click)="rating = rating === BookRating.Negative ? BookRating.None : BookRating.Negative" [title]="ratingLabel(BookRating.Negative)">👎</button>
+        <button type="button" class="emoji-btn" [class.active]="rating === BookRating.Favourite" (click)="rating = rating === BookRating.Favourite ? BookRating.None : BookRating.Favourite" [title]="ratingLabel(BookRating.Favourite)">❤️</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="book-start">Started</label>
+      <input id="book-start" type="date" [(ngModel)]="readingStartDate" name="readingStartDate" />
+    </div>
+    <div class="field">
+      <label for="book-end">Finished</label>
+      <input id="book-end" type="date" [(ngModel)]="readingEndDate" name="readingEndDate" />
+    </div>
+    <div class="field">
+      <label>Metadata</label>
+      <div class="plugin-actions">
+        <button
+          type="button"
+          class="btn secondary"
+          (click)="lookupMetadata()"
+          [disabled]="isLookingUp || !title.trim() || !author.trim()">
+          {{ isLookingUp ? 'Looking up…' : '🔍 Lookup from Open Library' }}
+        </button>
+      </div>
+      <p class="hint" style="margin-top: 0.25rem;">Fetches cover image and publication date by title and author.</p>
+    </div>
+    <div class="field">
+      <label for="book-published">Published</label>
+      <input id="book-published" type="date" [(ngModel)]="publishedDate" name="publishedDate" />
+    </div>
+    <div class="field">
+      <label for="book-cover">Cover image URL</label>
+      <input id="book-cover" type="url" [(ngModel)]="imageUrl" name="imageUrl" placeholder="https://…" />
+    </div>
+    <div class="field">
+      <label for="book-notes">Notes</label>
+      <textarea id="book-notes" [(ngModel)]="notes" name="notes" rows="3" placeholder="Notes"></textarea>
+    </div>
+    <div class="field">
+      <label for="book-tag">Tags</label>
+      <div class="plugin-actions">
+        <input id="book-tag" type="text" [(ngModel)]="newTag" name="newTag" placeholder="Add tag" (keyup.enter)="addTag(); $event.preventDefault()" />
+        <button type="button" class="btn secondary" (click)="addTag()">Add</button>
+      </div>
+      @if (tags.length > 0) {
+        <div class="plugin-list" style="margin-top: 0.5rem;">
+          @for (t of tags; track t) {
+            <span class="tag-chip">{{ t }} <button type="button" class="tag-remove" (click)="removeTag(t)">×</button></span>
+          }
+        </div>
+      }
+    </div>
+    <div class="panel-actions">
+      <button type="submit" class="btn primary">Save</button>
+      <button type="button" class="btn secondary" (click)="onCancel()">Cancel</button>
+      @if (isEdit) {
+        <button type="button" class="btn secondary" (click)="onDelete()">Delete</button>
+      }
+    </div>
+  </form>
+</div>

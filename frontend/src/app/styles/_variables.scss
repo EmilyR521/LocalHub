@@ -1,0 +1,24 @@
+// Design tokens – use in components and shared styles
+:root {
+  --sidebar-width: 12rem;
+  --header-height: 3rem;
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --border: #2d3a4d;
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --accent: #58a6ff;
+  --error: #f85149;
+  --radius: 6px;
+  --radius-lg: 8px;
+}
+
+:root[data-theme='light'] {
+  --bg: #f6f8fa;
+  --surface: #ffffff;
+  --border: #d0d7de;
+  --text: #1f2328;
+  --text-muted: #656d76;
+  --accent: #0969da;
+  --error: #cf222e;
+}

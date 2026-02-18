@@ -1,0 +1,29 @@
+<div class="card" style="margin-top: 1rem; margin-bottom: 0;">
+  <h2 class="card-title">Lookup Data</h2>
+  <p class="hint">Fetch cover images and publication dates from Open Library for books that are missing them.</p>
+  <div class="lookup-options">
+    <label class="lookup-option">
+      <input
+        type="checkbox"
+        [checked]="lookupOptions().covers"
+        (change)="toggleCovers()" />
+      <span>Covers</span>
+    </label>
+    <label class="lookup-option">
+      <input
+        type="checkbox"
+        [checked]="lookupOptions().publicationDates"
+        (change)="togglePublicationDates()" />
+      <span>Publication dates</span>
+    </label>
+  </div>
+  <div class="plugin-actions actions-column" style="margin-top: 0.75rem;">
+    <button
+      type="button"
+      class="btn secondary"
+      (click)="runLookup()"
+      [disabled]="isLookingUp() || (!lookupOptions().covers && !lookupOptions().publicationDates)">
+      {{ isLookingUp() ? '⏳ Looking up…' : '🔍 Lookup' }}
+    </button>
+  </div>
+</div>

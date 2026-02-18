@@ -1,0 +1,26 @@
+<div class="layout">
+  <aside class="sidebar">
+    <a routerLink="/" class="brand" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      LocalHub
+    </a>
+    <nav class="nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+        Dashboard
+      </a>
+      @for (plugin of plugins(); track plugin.id) {
+        <a [routerLink]="['/plugins', plugin.path]" routerLinkActive="active" class="nav-link">
+          {{ plugin.name }}
+        </a>
+      }
+    </nav>
+    @if (userName() || userEmoji()) {
+      <a routerLink="/plugins/user-management" class="user" routerLinkActive="active">
+        <span class="user-emoji">{{ userEmoji() }}</span>
+        <span class="user-name">{{ userName() || 'User' }}</span>
+      </a>
+    }
+  </aside>
+  <main class="main">
+    <router-outlet />
+  </main>
+</div>

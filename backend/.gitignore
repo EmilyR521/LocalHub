@@ -1,0 +1,6 @@
+node_modules/
+dist/
+data/*.json
+data/plugins/**/*.json
+!data/.gitkeep
+!data/plugins/.gitkeep

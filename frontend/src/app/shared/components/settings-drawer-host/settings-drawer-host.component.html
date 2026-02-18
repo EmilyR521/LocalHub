@@ -1,0 +1,45 @@
+<div class="plugin-with-settings">
+  <header class="plugin-toolbar page-header-style">
+    @if (title()) {
+      <div class="plugin-toolbar-heading">
+        <h1 class="plugin-toolbar-title">{{ title() }}</h1>
+        @if (subtitle()) {
+          <p class="plugin-toolbar-subtitle">{{ subtitle() }}</p>
+        }
+      </div>
+    }
+    <span class="plugin-toolbar-spacer"></span>
+    <div class="plugin-toolbar-actions">
+      <button
+        type="button"
+        class="settings-cog-btn"
+        (click)="openDrawer()"
+        title="Settings"
+        aria-label="Open settings">
+        ⚙️
+      </button>
+    </div>
+  </header>
+  <div class="plugin-main">
+    <ng-content select="[main]" />
+  </div>
+  @if (drawerOpen()) {
+    <div class="settings-drawer-overlay" (click)="closeDrawer()">
+      <aside class="settings-drawer" (click)="$event.stopPropagation()" role="dialog" aria-label="Settings">
+        <div class="settings-drawer-header">
+          <h3 class="settings-drawer-title">Settings</h3>
+          <button
+            type="button"
+            class="settings-drawer-close"
+            (click)="closeDrawer()"
+            aria-label="Close settings">
+            ×
+          </button>
+        </div>
+        <div class="settings-drawer-body">
+          <ng-content select="[settings]" />
+        </div>
+      </aside>
+    </div>
+  }
+</div>
