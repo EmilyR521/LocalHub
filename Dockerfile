@@ -21,7 +21,7 @@ RUN npm run build
 FROM node:22-alpine
 WORKDIR /app
 COPY --from=backend-build /app/package.json /app/package-lock.json* ./
-RUN npm ci --omit=dev 2>/dev/null || npm install --omit=dev
+RUN npm ci 2>/dev/null || npm install
 COPY --from=backend-build /app/dist ./dist
 COPY --from=frontend /app/frontend/dist/localhub/browser ./public
 ENV NODE_ENV=production
