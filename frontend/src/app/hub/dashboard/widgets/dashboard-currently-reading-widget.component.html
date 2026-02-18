@@ -1,5 +1,5 @@
 <div class="dashboard-widget dashboard-widget-currently-reading">
-  <h2 class="dashboard-widget-title">Currently reading</h2>
+  <h2 class="dashboard-widget-title"><span class="dashboard-widget-title-emoji" aria-hidden="true">📖</span> Currently reading</h2>
   @if (currentlyReading().length > 0) {
     <ul class="dashboard-widget-list">
       @for (book of currentlyReading(); track book.id) {

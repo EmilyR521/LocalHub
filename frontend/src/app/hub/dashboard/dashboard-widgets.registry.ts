@@ -7,6 +7,8 @@ export interface DashboardWidgetDef {
   id: string;
   name: string;
   component: Type<unknown>;
+  /** Plugin that provides this widget's data (for source emoji in header). */
+  pluginId: string;
 }
 
 export const DASHBOARD_WIDGETS: DashboardWidgetDef[] = [
@@ -14,16 +16,19 @@ export const DASHBOARD_WIDGETS: DashboardWidgetDef[] = [
     id: 'currently-reading',
     name: 'Currently reading',
     component: DashboardCurrentlyReadingWidgetComponent,
+    pluginId: 'reader',
   },
   {
     id: 'next-run',
     name: 'Next run',
     component: DashboardNextRunWidgetComponent,
+    pluginId: 'runner',
   },
   {
     id: 'last-run',
     name: 'Last run',
     component: DashboardLastRunWidgetComponent,
+    pluginId: 'runner',
   },
 ];
 

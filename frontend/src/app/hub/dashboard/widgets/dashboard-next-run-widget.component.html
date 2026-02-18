@@ -1,8 +1,9 @@
 <div class="dashboard-widget dashboard-widget-next-run">
-  <h2 class="dashboard-widget-title">Next run</h2>
+  <h2 class="dashboard-widget-title"><span class="dashboard-widget-title-emoji" aria-hidden="true">🏃</span> Next run</h2>
   @if (nextRun(); as run) {
     <a [routerLink]="['/plugins/runner', 'planner']" class="dashboard-widget-link">
-      <span class="widget-next-run-date">{{ run.date }}</span>
+      <span class="widget-next-run-date">{{ formatDate(run.date) }}</span>
+      <span class="widget-next-run-when">{{ inDays(run.date) }}</span>
       <span class="widget-next-run-distance">{{ run.distanceKm }} km</span>
     </a>
   } @else {

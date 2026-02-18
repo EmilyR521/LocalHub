@@ -197,6 +197,7 @@ router.get('/google/events', async (req: Request, res: Response) => {
         start?: { dateTime?: string; date?: string };
         end?: { dateTime?: string; date?: string };
         htmlLink?: string;
+        colorId?: string;
       }>;
     };
     const items = data.items ?? [];
@@ -206,6 +207,7 @@ router.get('/google/events', async (req: Request, res: Response) => {
       start: e.start?.dateTime ?? e.start?.date,
       end: e.end?.dateTime ?? e.end?.date,
       htmlLink: e.htmlLink,
+      colorId: e.colorId,
     }));
     res.json({ events });
   } catch (e) {

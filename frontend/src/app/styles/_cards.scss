@@ -1,8 +1,12 @@
-// Card and surface blocks
-.card {
+// Card and surface blocks (shared surface style)
+%card-surface {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+}
+
+.card {
+  @extend %card-surface;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -14,33 +18,50 @@
 }
 
 .welcome {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  @extend %card-surface;
   padding: 1.5rem;
   color: var(--text-muted);
 }
 
-// Dashboard widgets
+// Dashboard widgets – three columns; widgets stack in a column and overflow into the next
 .dashboard-widgets {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  column-count: 1;
+  column-gap: 1.5rem;
   padding-top: 0.5rem;
+
+  @media (min-width: 32rem) {
+    column-count: 2;
+  }
+  @media (min-width: 56rem) {
+    column-count: 3;
+  }
 }
 
 .dashboard-widget {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  @extend %card-surface;
+  break-inside: avoid;
+  min-height: 15rem;
+  margin-bottom: 1.5rem;
   padding: 1.25rem 1.5rem;
 }
 
+.dashboard-widgets > *:last-child .dashboard-widget {
+  margin-bottom: 0;
+}
+
 .dashboard-widget-title {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
   margin: 0 0 0.75rem;
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
+}
+
+.dashboard-widget-title-emoji {
+  font-size: 1.125rem;
+  line-height: 1;
 }
 
 .dashboard-widget-list {
@@ -79,35 +100,27 @@
   margin-top: 0.125rem;
 }
 
-.dashboard-widget-next-run .widget-next-run-date {
-  display: block;
-  font-weight: 500;
-  font-size: 1rem;
-}
-
-.dashboard-widget-next-run .widget-next-run-distance {
-  display: block;
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  margin-top: 0.125rem;
-}
-
+// Run widgets: shared line styles (date = primary, when/meta = muted)
+.dashboard-widget-next-run .widget-next-run-date,
 .dashboard-widget-last-run .widget-last-run-date {
   display: block;
   font-weight: 500;
   font-size: 1rem;
 }
 
-.dashboard-widget-last-run .widget-last-run-name {
-  display: block;
-  font-size: 0.9375rem;
-  margin-top: 0.125rem;
-}
-
+.dashboard-widget-next-run .widget-next-run-when,
+.dashboard-widget-next-run .widget-next-run-distance,
+.dashboard-widget-last-run .widget-last-run-when,
 .dashboard-widget-last-run .widget-last-run-meta {
   display: block;
   font-size: 0.875rem;
   color: var(--text-muted);
+  margin-top: 0.125rem;
+}
+
+.dashboard-widget-last-run .widget-last-run-name {
+  display: block;
+  font-size: 0.9375rem;
   margin-top: 0.125rem;
 }
 

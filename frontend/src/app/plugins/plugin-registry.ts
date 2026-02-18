@@ -10,8 +10,8 @@ export interface PluginManifest {
 }
 
 export const PLUGINS: PluginManifest[] = [
-  { id: 'reader', name: 'Reader', path: 'reader', order: 1 },
-  { id: 'runner', name: 'Runner', path: 'runner', order: 2 },
-  { id: 'calendar', name: 'Calendar', path: 'calendar', order: 3 },
-  { id: 'user-management', name: 'User management', path: 'user-management', order: 99 },
+  { id: 'reader', name: 'Reader', path: 'reader', icon: '📖', order: 1 },
+  { id: 'runner', name: 'Runner', path: 'runner', icon: '🏃', order: 2 },
+  { id: 'calendar', name: 'Calendar', path: 'calendar', icon: '📅', order: 3 },
+  { id: 'user-management', name: 'User management', path: 'user-management', icon: '👤', order: 99 },
 ];

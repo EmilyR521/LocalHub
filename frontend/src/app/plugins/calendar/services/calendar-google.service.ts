@@ -21,6 +21,8 @@ export interface CalendarEvent {
   start?: string;
   end?: string;
   htmlLink?: string;
+  /** Google Calendar event colorId ("1"–"11"). */
+  colorId?: string;
 }
 
 @Injectable({ providedIn: 'root' })

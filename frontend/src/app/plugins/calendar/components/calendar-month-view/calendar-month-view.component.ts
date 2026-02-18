@@ -1,8 +1,24 @@
+import { NgStyle } from '@angular/common';
 import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CalendarGoogleService, type CalendarEvent } from '../../services/calendar-google.service';
 
 /** British standard: week starts on Monday */
 const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+/** Google Calendar event colorId "1"–"11" → background and foreground (from Calendar API palette). */
+const EVENT_COLORS: Record<string, { bg: string; fg: string }> = {
+  '1': { bg: '#a4bdfc', fg: '#1d1d1d' },
+  '2': { bg: '#7ae7bf', fg: '#1d1d1d' },
+  '3': { bg: '#dbadff', fg: '#1d1d1d' },
+  '4': { bg: '#ff887c', fg: '#1d1d1d' },
+  '5': { bg: '#fbd75b', fg: '#1d1d1d' },
+  '6': { bg: '#ffb878', fg: '#1d1d1d' },
+  '7': { bg: '#46d6db', fg: '#1d1d1d' },
+  '8': { bg: '#e1e1e1', fg: '#1d1d1d' },
+  '9': { bg: '#5484ed', fg: '#fff' },
+  '10': { bg: '#51b749', fg: '#1d1d1d' },
+  '11': { bg: '#dc2127', fg: '#fff' },
+};
 
 interface DayCell {
   date: Date;
@@ -14,6 +30,7 @@ interface DayCell {
 @Component({
   selector: 'app-calendar-month-view',
   standalone: true,
+  imports: [NgStyle],
   templateUrl: './calendar-month-view.component.html',
 })
 export class CalendarMonthViewComponent {
@@ -160,5 +177,12 @@ export class CalendarMonthViewComponent {
     if (event.start.length <= 10) return 'All day';
     const t = event.start.slice(11, 16);
     return t ? t : '';
+  }
+
+  /** Styles for event block from colorId (defaults to accent if no colorId). */
+  eventStyles(event: CalendarEvent): { backgroundColor: string; color: string } {
+    const c = event.colorId ? EVENT_COLORS[event.colorId] : null;
+    if (c) return { backgroundColor: c.bg, color: c.fg };
+    return { backgroundColor: 'var(--accent)', color: 'var(--accent-contrast, #fff)' };
   }
 }

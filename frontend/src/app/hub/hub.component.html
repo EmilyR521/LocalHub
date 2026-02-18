@@ -9,7 +9,10 @@
       </a>
       @for (plugin of plugins(); track plugin.id) {
         <a [routerLink]="['/plugins', plugin.path]" routerLinkActive="active" class="nav-link">
-          {{ plugin.name }}
+          @if (plugin.icon) {
+            <span class="nav-link-icon" aria-hidden="true">{{ plugin.icon }}</span>
+          }
+          <span>{{ plugin.name }}</span>
         </a>
       }
     </nav>

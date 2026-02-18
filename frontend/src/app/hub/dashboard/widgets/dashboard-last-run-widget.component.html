@@ -1,8 +1,9 @@
 <div class="dashboard-widget dashboard-widget-last-run">
-  <h2 class="dashboard-widget-title">Last run</h2>
+  <h2 class="dashboard-widget-title"><span class="dashboard-widget-title-emoji" aria-hidden="true">🏃</span> Last run</h2>
   @if (lastRun(); as run) {
     <a [routerLink]="['/plugins/runner', 'recent']" class="dashboard-widget-link">
       <span class="widget-last-run-date">{{ formatDate(run) }}</span>
+      <span class="widget-last-run-when">{{ daysAgoLabel(run) }}</span>
       <span class="widget-last-run-name">{{ run.name || 'Run' }}</span>
       <span class="widget-last-run-meta">{{ formatDistance(run) }} · {{ formatDuration(run) }}</span>
     </a>

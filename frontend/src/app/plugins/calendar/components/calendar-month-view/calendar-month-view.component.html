@@ -29,6 +29,7 @@
                     target="_blank"
                     rel="noopener noreferrer"
                     class="day-event"
+                    [ngStyle]="eventStyles(event)"
                     [title]="event.summary">
                     @if (eventTimeLabel(event); as time) {
                       <span class="event-time">{{ time }}</span>
@@ -36,7 +37,7 @@
                     <span class="event-summary">{{ event.summary }}</span>
                   </a>
                 } @else {
-                  <span class="day-event" [title]="event.summary">
+                  <span class="day-event" [ngStyle]="eventStyles(event)" [title]="event.summary">
                     @if (eventTimeLabel(event); as time) {
                       <span class="event-time">{{ time }}</span>
                     }

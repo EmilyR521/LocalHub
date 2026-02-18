@@ -1,6 +1,8 @@
 import { Component, OnInit, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { formatMonDayMonth, daysAgoLabel as formatDaysAgo } from '../../../core/utils/date-format';
 import { StravaService, type StravaActivity } from '../../../plugins/runner/services/strava.service';
+import { formatDistance as formatDist, formatDuration as formatDur } from '../../../plugins/runner/utils/activity-format';
 
 @Component({
   selector: 'app-dashboard-last-run-widget',
@@ -27,24 +29,27 @@ export class DashboardLastRunWidgetComponent implements OnInit {
     const iso = activity.start_date_local ?? activity.start_date;
     if (!iso) return '—';
     try {
-      return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'medium' });
+      return formatMonDayMonth(new Date(iso));
     } catch {
       return iso;
     }
   }
 
+  daysAgoLabel(activity: StravaActivity): string {
+    const iso = activity.start_date_local ?? activity.start_date;
+    if (!iso) return '';
+    try {
+      return formatDaysAgo(new Date(iso));
+    } catch {
+      return '';
+    }
+  }
+
   formatDistance(activity: StravaActivity): string {
-    const m = activity.distance;
-    if (m == null) return '—';
-    const km = m / 1000;
-    return km >= 1 ? `${km.toFixed(1)} km` : `${m} m`;
+    return formatDist(activity.distance);
   }
 
   formatDuration(activity: StravaActivity): string {
-    const seconds = activity.moving_time ?? activity.elapsed_time;
-    if (seconds == null) return '—';
-    const min = Math.floor(seconds / 60);
-    const sec = seconds % 60;
-    return sec > 0 ? `${min}:${String(sec).padStart(2, '0')}` : `${min} min`;
+    return formatDur(activity.moving_time ?? activity.elapsed_time);
   }
 }
