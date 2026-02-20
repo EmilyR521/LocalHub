@@ -1,0 +1,119 @@
+@if (list(); as list) {
+  <section class="card">
+    <div class="plugin-actions list-detail-actions">
+      <a routerLink="/plugins/lists" class="btn secondary">← Back to lists</a>
+      <button type="button" class="btn secondary" (click)="deleteList()" title="Delete this list">Delete list</button>
+    </div>
+    <div class="list-detail-header">
+      <app-emoji-grid [value]="list.icon || '📋'" (valueChange)="setIcon($event)" />
+      <div class="list-detail-title-wrap">
+        @if (editingTitle()) {
+          <input
+            #titleInput
+            type="text"
+            class="list-detail-title-input"
+            [value]="list.title"
+            (blur)="finishEditTitle($event)"
+            (keydown.enter)="$event.preventDefault(); $any($event.target).blur()"
+            placeholder="List title" />
+        } @else {
+          <button type="button" class="list-detail-title-display" (click)="startEditTitle()">
+            {{ list.title || 'Untitled list' }}
+          </button>
+        }
+      </div>
+      <div class="list-detail-type-toggle" role="group" aria-label="List type">
+        <button
+          type="button"
+          class="list-detail-type-toggle-btn"
+          [class.list-detail-type-toggle-btn--active]="list.type === 'bulleted'"
+          (click)="setType('bulleted')">
+          Bulleted
+        </button>
+        <button
+          type="button"
+          class="list-detail-type-toggle-btn"
+          [class.list-detail-type-toggle-btn--active]="list.type === 'checklist'"
+          (click)="setType('checklist')">
+          Checklist
+        </button>
+      </div>
+    </div>
+    <div class="list-detail-items-section">
+      <span class="list-detail-items-label">Items</span>
+      <ul class="lists-plugin-items" [class.lists-plugin-checklist]="list.type === 'checklist'">
+        @for (item of list.items; track item.id) {
+          <li class="lists-plugin-item">
+              @if (editingItemId() === item.id) {
+                <div class="lists-plugin-item-edit-block">
+                  @if (list.type === 'checklist') {
+                    <input
+                      type="checkbox"
+                      [checked]="item.checked ?? false"
+                      (change)="toggleItem(item)"
+                      class="lists-plugin-item-checkbox-edit" />
+                  } @else {
+                    <span class="lists-plugin-bullet" aria-hidden="true">•</span>
+                  }
+                  <div class="lists-plugin-item-edit-fields">
+                    <input
+                      #itemInput
+                      type="text"
+                      class="lists-plugin-item-edit lists-plugin-item-edit-title"
+                      [value]="item.title"
+                      (blur)="finishEditTitleField(item, $event)"
+                      (keydown.enter)="$event.preventDefault(); $any($event.target).blur()"
+                      placeholder="Title" />
+                    <textarea
+                      class="lists-plugin-item-edit lists-plugin-item-edit-details"
+                      [value]="item.details ?? ''"
+                      (blur)="finishEditDetailsField(item, $event)"
+                      placeholder="Details (optional)"
+                      rows="2"></textarea>
+                  </div>
+                  <button type="button" class="btn secondary lists-plugin-item-done" (click)="closeEditItem()">Done</button>
+                </div>
+              } @else {
+                @if (list.type === 'checklist') {
+                  <label class="lists-plugin-item-row lists-plugin-checklist-row" [class.lists-plugin-item-checked]="item.checked">
+                    <input
+                      type="checkbox"
+                      [checked]="item.checked ?? false"
+                      (change)="toggleItem(item)" />
+                    <div class="lists-plugin-item-display" (click)="startEditItem(item)">
+                      <span class="lists-plugin-item-text">{{ item.title || 'Empty' }}</span>
+                      @if (item.details) {
+                        <span class="lists-plugin-item-details">{{ item.details }}</span>
+                      }
+                    </div>
+                  </label>
+                } @else {
+                  <div class="lists-plugin-item-row" (click)="startEditItem(item)">
+                    <span class="lists-plugin-bullet" aria-hidden="true">•</span>
+                    <div class="lists-plugin-item-display">
+                      <span class="lists-plugin-item-text">{{ item.title || 'Empty' }}</span>
+                      @if (item.details) {
+                        <span class="lists-plugin-item-details">{{ item.details }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+              @if (editingItemId() !== item.id) {
+                <button type="button" class="lists-plugin-item-remove" (click)="removeItem(item)" title="Remove item" aria-label="Remove item">×</button>
+              }
+            </li>
+        }
+        <li class="lists-plugin-item lists-plugin-item-new">
+          <span class="lists-plugin-item-new-placeholder" (click)="addItem()">
+            <span class="lists-plugin-bullet" aria-hidden="true">•</span>
+            <span class="lists-plugin-item-new-text">Add item…</span>
+          </span>
+        </li>
+      </ul>
+    </div>
+  </section>
+} @else {
+  <p class="hint">List not found.</p>
+  <a routerLink="/plugins/lists" class="btn secondary">Back to lists</a>
+}

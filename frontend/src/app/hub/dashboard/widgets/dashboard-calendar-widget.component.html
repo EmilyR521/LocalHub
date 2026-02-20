@@ -1,0 +1,16 @@
+<div class="dashboard-widget dashboard-widget-calendar">
+  <h2 class="dashboard-widget-title">
+    <span class="dashboard-widget-title-emoji" aria-hidden="true">📅</span>
+    Calendar
+    <a [routerLink]="['/plugins/calendar']" class="dashboard-widget-title-link">Open calendar</a>
+  </h2>
+  @if (calendarGoogleConnection(); as conn) {
+    @if (conn.connected || displayShowCalendarWithoutGoogle()) {
+      <app-calendar-month-view />
+    } @else {
+      <p class="hint">Connect Google Calendar in <a routerLink="/plugins/calendar">Calendar settings</a> to see events here.</p>
+    }
+  } @else {
+    <p class="hint">Loading…</p>
+  }
+</div>

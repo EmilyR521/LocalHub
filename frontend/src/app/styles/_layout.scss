@@ -16,20 +16,65 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  transition: width 0.2s ease;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 0.5rem;
+  padding: 0 0.5rem 0.5rem;
+  min-height: 0;
+}
+
+.sidebar-toggle {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+
+  &:hover {
+    color: var(--text);
+    background: rgba(88, 166, 255, 0.1);
+  }
+}
+
+.sidebar-toggle-icon {
+  display: block;
 }
 
 .brand {
-  display: block;
-  flex-shrink: 0;
-  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  padding: 0.75rem 0.5rem;
   font-weight: 700;
   font-size: 1.125rem;
   color: var(--text);
+  text-decoration: none;
 
   &:hover {
-    text-decoration: none;
     color: var(--accent);
   }
+}
+
+.brand-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .nav {
@@ -89,6 +134,7 @@
   &:hover {
     color: var(--text);
     background: rgba(88, 166, 255, 0.06);
+    text-decoration: none;
   }
 
   &.active {
@@ -105,4 +151,55 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+// Collapsed sidebar: narrow strip, icons only
+.layout.sidebar-collapsed {
+  .sidebar {
+    width: var(--sidebar-width-collapsed);
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .sidebar-header {
+    flex-direction: column;
+    padding: 0.5rem;
+  }
+
+  .brand {
+    padding: 0.25rem 0;
+    justify-content: center;
+  }
+
+  .brand-text {
+    display: none;
+  }
+
+  .sidebar-toggle {
+    width: 100%;
+  }
+
+  .nav-link {
+    justify-content: center;
+    padding: 0.5rem;
+  }
+
+  .nav-link-text {
+    display: none;
+  }
+
+  .nav-link-icon {
+    margin: 0;
+  }
+
+  .user {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 0.5rem;
+    justify-content: center;
+  }
+
+  .user-name {
+    display: none;
+  }
 }

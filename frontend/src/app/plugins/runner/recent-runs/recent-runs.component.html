@@ -26,7 +26,7 @@
 
     @if (loading() && activities().length === 0) {
       <p class="hint" style="margin-top: 1rem;">Loading activities…</p>
-    } @else if (activities().length > 0) {
+    } @else if (currentYearActivities().length > 0) {
       <div class="data-table-wrap" style="margin-top: 1rem;">
         <table class="data-table">
           <thead>
@@ -39,7 +39,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (a of activities(); track a.id) {
+            @for (a of currentYearActivities(); track a.id) {
               <tr>
                 <td>{{ formatDate(a.start_date_local ?? a.start_date) }}</td>
                 <td>{{ a.name }}</td>
@@ -51,6 +51,8 @@
           </tbody>
         </table>
       </div>
+    } @else if (activities().length > 0) {
+      <p class="hint" style="margin-top: 1rem;">No runs from this year. Only activities from {{ currentYear }} are shown.</p>
     } @else {
       <p class="hint" style="margin-top: 1rem;">No activities yet, or Strava returned none. Try refreshing after a run.</p>
     }

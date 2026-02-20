@@ -37,6 +37,19 @@
   }
 }
 
+.dashboard-widget-wrapper {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-widgets > .dashboard-widget-wrapper:last-child {
+  margin-bottom: 0;
+}
+
+.dashboard-widget-span-3 {
+  column-span: all;
+}
+
 .dashboard-widget {
   @extend %card-surface;
   break-inside: avoid;
@@ -45,7 +58,7 @@
   padding: 1.25rem 1.5rem;
 }
 
-.dashboard-widgets > *:last-child .dashboard-widget {
+.dashboard-widgets > .dashboard-widget-wrapper:last-child .dashboard-widget {
   margin-bottom: 0;
 }
 
@@ -62,6 +75,18 @@
 .dashboard-widget-title-emoji {
   font-size: 1.125rem;
   line-height: 1;
+}
+
+.dashboard-widget-title-link {
+  margin-left: auto;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .dashboard-widget-list {

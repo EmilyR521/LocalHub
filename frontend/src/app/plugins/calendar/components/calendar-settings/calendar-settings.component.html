@@ -1,4 +1,50 @@
 <div class="card" style="margin: 0;">
+  <h2 class="card-title">Display options</h2>
+  <p class="hint">Choose what to show on the calendar.</p>
+  <ul class="plugin-list" style="margin: 0;">
+    <li>
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          [checked]="displayOptions.displayHabits()"
+          (change)="displayOptions.setDisplayHabits($any($event.target).checked)" />
+        <span>Display habits</span>
+      </label>
+    </li>
+    <li>
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          [checked]="displayOptions.displayGoogleCalendar()"
+          (change)="displayOptions.setDisplayGoogleCalendar($any($event.target).checked)" />
+        <span>Display Google Calendar events</span>
+      </label>
+    </li>
+    <li>
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          [checked]="displayOptions.displayReading()"
+          (change)="displayOptions.setDisplayReading($any($event.target).checked)" />
+        <span>Display reading</span>
+      </label>
+    </li>
+  </ul>
+  <p class="hint" style="margin-top: 0.75rem;">Theme colour (today highlight, event blocks)</p>
+  <div class="calendar-theme-row">
+    <input
+      type="color"
+      class="calendar-theme-input"
+      [value]="displayOptions.themeColor() || defaultThemeHex"
+      (input)="onThemeColorInput($event)"
+      aria-label="Calendar theme colour" />
+    @if (displayOptions.themeColor()) {
+      <button type="button" class="btn secondary btn-sm" (click)="displayOptions.setThemeColor('')">Use default</button>
+    }
+  </div>
+</div>
+
+<div class="card" style="margin: 0;">
   <h2 class="card-title">Google Calendar</h2>
   <p class="hint">Connect your Google account to show your calendar events in LocalHub.</p>
   @if (calendarGoogle.connection(); as conn) {

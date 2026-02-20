@@ -1,4 +1,4 @@
-<div class="calendar-month-view">
+<div class="calendar-month-view" [style.--calendar-accent]="themeColor() || null">
   <div class="calendar-month-nav">
     <button type="button" class="btn secondary" (click)="prevMonth()" aria-label="Previous month">‹</button>
     <h2 class="calendar-month-title">{{ monthLabel() }}</h2>
@@ -19,30 +19,55 @@
     @for (row of rows(); track $index) {
       <div class="calendar-row">
         @for (cell of row; track cell.date.getTime()) {
-          <div class="calendar-cell calendar-day" [class.other-month]="!cell.isCurrentMonth">
-            <span class="day-num">{{ cell.dayOfMonth }}</span>
+          <div class="calendar-cell calendar-day" [class.other-month]="!cell.isCurrentMonth" [class.calendar-day-today]="isToday(cell)">
+            <div class="calendar-day-header">
+              <span class="day-num">{{ cell.dayOfMonth }}</span>
+              @if (displayHabits() && cell.habitItems.length > 0) {
+                <span class="calendar-day-habit-dots" aria-label="Habits completed">
+                  @for (habit of cell.habitItems; track habit.name) {
+                    <span
+                      class="calendar-day-habit-dot"
+                      [style.background]="habit.color"
+                      [title]="habit.name"
+                      [attr.aria-label]="habit.name"></span>
+                  }
+                </span>
+              }
+            </div>
             <div class="day-events">
-              @for (event of cell.events; track event.id || event.summary) {
-                @if (event.htmlLink) {
-                  <a
-                    [href]="event.htmlLink"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="day-event"
-                    [ngStyle]="eventStyles(event)"
-                    [title]="event.summary">
-                    @if (eventTimeLabel(event); as time) {
-                      <span class="event-time">{{ time }}</span>
-                    }
-                    <span class="event-summary">{{ event.summary }}</span>
-                  </a>
-                } @else {
-                  <span class="day-event" [ngStyle]="eventStyles(event)" [title]="event.summary">
-                    @if (eventTimeLabel(event); as time) {
-                      <span class="event-time">{{ time }}</span>
-                    }
-                    <span class="event-summary">{{ event.summary }}</span>
-                  </span>
+              @if (displayReading() && cell.readingItems.length > 0) {
+                @for (item of cell.readingItems; track item.title + item.start) {
+                  <span
+                    class="day-event day-event-reading"
+                    [class.day-reading-first]="dateKey(cell.date) === item.start"
+                    [class.day-reading-mid]="dateKey(cell.date) !== item.start && dateKey(cell.date) !== item.end"
+                    [class.day-reading-last]="dateKey(cell.date) === item.end"
+                    [title]="'Reading: ' + item.title">{{ dateKey(cell.date) === item.start ? item.title : '' }}</span>
+                }
+              }
+              @if (displayGoogleCalendar()) {
+                @for (event of cell.events; track event.id || event.summary) {
+                  @if (event.htmlLink) {
+                    <a
+                      [href]="event.htmlLink"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="day-event"
+                      [ngStyle]="eventStyles(event)"
+                      [title]="event.summary">
+                      @if (eventTimeLabel(event); as time) {
+                        <span class="event-time">{{ time }}</span>
+                      }
+                      <span class="event-summary">{{ event.summary }}</span>
+                    </a>
+                  } @else {
+                    <span class="day-event" [ngStyle]="eventStyles(event)" [title]="event.summary">
+                      @if (eventTimeLabel(event); as time) {
+                        <span class="event-time">{{ time }}</span>
+                      }
+                      <span class="event-summary">{{ event.summary }}</span>
+                    </span>
+                  }
                 }
               }
             </div>

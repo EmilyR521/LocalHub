@@ -1,0 +1,21 @@
+<section class="card">
+  <div class="plugin-actions" style="margin-bottom: 1rem;">
+    <button type="button" class="btn primary" (click)="createList()">New list</button>
+  </div>
+  @if (lists().length === 0) {
+    <p class="hint">No lists yet. Click "New list" to create one.</p>
+  } @else {
+    <ul class="plugin-list" style="list-style: none; padding: 0; margin: 0;">
+      @for (list of lists(); track list.id) {
+        <li style="margin-bottom: 0.5rem;">
+            <div class="list-row" style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius);">
+            <span class="list-row-icon" aria-hidden="true">{{ list.icon || '📋' }}</span>
+            <a [routerLink]="['/plugins/lists', list.id]" style="flex: 1; min-width: 0; font-weight: 500; text-decoration: none; color: var(--text);">{{ list.title }}</a>
+            <span class="hint" style="margin: 0; font-size: 0.875rem; flex-shrink: 0;">{{ listTypeLabel(list.type) }}</span>
+            <button type="button" class="btn secondary" (click)="deleteList(list, $event)" title="Delete list">Delete</button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

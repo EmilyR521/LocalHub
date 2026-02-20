@@ -3,8 +3,8 @@
   subtitle="Plan runs, add to Google Calendar, and see Strava activities. Connect Strava in settings.">
   <ng-container main>
     <div class="reader-tabs" aria-label="Runner views">
-      <a routerLink="planner" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="btn secondary">Run Planner</a>
-      <a routerLink="recent" routerLinkActive="active" class="btn secondary">Recent runs</a>
+      <a routerLink="recent" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="btn secondary">Recent runs</a>
+      <a routerLink="planner" routerLinkActive="active" class="btn secondary">Run Planner</a>
     </div>
     <main class="runner-outlet">
       <router-outlet />

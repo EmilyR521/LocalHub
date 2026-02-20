@@ -8,7 +8,7 @@
       </section>
     }
     @if (calendarGoogle.connection(); as conn) {
-      @if (conn.connected) {
+      @if (conn.connected || displayShowCalendarWithoutGoogle()) {
         <app-calendar-month-view />
       } @else {
         <section class="welcome">

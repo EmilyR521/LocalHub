@@ -1,0 +1,313 @@
+// Lists plugin – list home row icon, list detail items, checklist strikethrough
+.list-row-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+// List detail – inline title/icon, click-to-edit items
+.list-detail-actions {
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.list-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.list-detail-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-detail-title-display {
+  display: block;
+  width: 100%;
+  padding: 0.25rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--accent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+.list-detail-title-input {
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+}
+
+.list-detail-type-toggle {
+  display: flex;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.list-detail-type-toggle-btn {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.875rem;
+  background: var(--bg);
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &:hover {
+    color: var(--text);
+  }
+
+  &.list-detail-type-toggle-btn--active {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+    font-weight: 500;
+  }
+}
+
+.list-detail-items-section {
+  margin-top: 1rem;
+}
+
+.list-detail-items-header {
+  margin-bottom: 0.5rem;
+}
+
+.list-detail-items-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.lists-plugin-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lists-plugin-item-new {
+  list-style: none;
+}
+
+.lists-plugin-item-new-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0.25rem 0;
+  cursor: pointer;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+
+  &:hover {
+    color: var(--accent);
+  }
+
+  .lists-plugin-bullet {
+    color: var(--text-muted);
+  }
+}
+
+.lists-plugin-item-new-text {
+  font-style: italic;
+}
+
+.lists-plugin-item-text {
+  flex: 1;
+  min-width: 0;
+  padding: 0.25rem 0;
+  cursor: text;
+  color: var(--text);
+  border-radius: var(--radius);
+
+  &:hover {
+    color: var(--accent);
+  }
+}
+
+.lists-plugin-item-checked .lists-plugin-item-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.lists-plugin-item-display {
+  flex: 1;
+  min-width: 0;
+  cursor: text;
+}
+
+.lists-plugin-item-details {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.lists-plugin-item-checked .lists-plugin-item-details {
+  text-decoration: line-through;
+}
+
+.lists-plugin-item-edit-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0.35rem 0;
+}
+
+.lists-plugin-item-checkbox-edit {
+  flex-shrink: 0;
+  margin-top: 0.5rem;
+}
+
+.lists-plugin-item-edit-fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.lists-plugin-item-edit-title {
+  padding: 0.35rem 0.5rem;
+  font-size: 1rem;
+}
+
+.lists-plugin-item-edit-details {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.875rem;
+  resize: vertical;
+  min-height: 2.5rem;
+}
+
+.lists-plugin-item-done {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.lists-plugin-item-remove {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+}
+
+.lists-plugin-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.lists-plugin-item-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.lists-plugin-checklist-row {
+  .lists-plugin-item-edit {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid transparent;
+    padding: 0.25rem 0;
+    font-size: 1rem;
+    color: var(--text);
+
+    &:focus {
+      outline: none;
+      border-bottom-color: var(--border);
+    }
+  }
+
+  &.lists-plugin-item-checked .lists-plugin-item-edit {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+}
+
+.lists-plugin-bullet {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.lists-plugin-item-edit {
+  max-width: 24rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  &.lists-plugin-item-edit-inline {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.lists-plugin-item-remove {
+  flex-shrink: 0;
+}

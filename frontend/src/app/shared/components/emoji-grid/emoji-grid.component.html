@@ -1,0 +1,27 @@
+<div class="emoji-grid-host">
+  <button
+    type="button"
+    class="emoji-grid-trigger"
+    (click)="toggle()"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="grid"
+    aria-label="Choose icon">
+    <span class="emoji-grid-trigger-icon" aria-hidden="true">{{ displayValue }}</span>
+  </button>
+  @if (open()) {
+    <div class="emoji-grid-panel" role="grid" aria-label="Emoji selection">
+      @for (emoji of emojis; track emoji) {
+        <button
+          type="button"
+          class="emoji-grid-cell"
+          role="gridcell"
+          (click)="select(emoji)"
+          [class.emoji-grid-cell-active]="displayValue === emoji"
+          [attr.aria-selected]="displayValue === emoji"
+          [title]="emoji">
+          {{ emoji }}
+        </button>
+      }
+    </div>
+  }
+</div>

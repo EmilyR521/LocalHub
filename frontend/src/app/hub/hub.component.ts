@@ -3,6 +3,8 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { PLUGINS } from '../plugins/plugin-registry';
 import { UserProfileService } from '../core/services/user-profile.service';
 
+const SIDEBAR_COLLAPSED_KEY = 'localhub-sidebar-collapsed';
+
 @Component({
   selector: 'app-hub',
   standalone: true,
@@ -13,6 +15,8 @@ export class HubComponent implements OnInit {
   private allPlugins = signal(
     [...PLUGINS].sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
   );
+
+  readonly sidebarCollapsed = signal(false);
 
   readonly plugins = computed(() => {
     const visible = this.userProfile.visiblePluginIds();
@@ -29,5 +33,20 @@ export class HubComponent implements OnInit {
 
   ngOnInit(): void {
     this.userProfile.load();
+    try {
+      const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+      if (stored !== null) this.sidebarCollapsed.set(stored === 'true');
+    } catch {
+      // ignore
+    }
+  }
+
+  toggleSidebar(): void {
+    this.sidebarCollapsed.update((c) => !c);
+    try {
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(this.sidebarCollapsed()));
+    } catch {
+      // ignore
+    }
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, effect } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { UserProfileService } from '../../../core/services/user-profile.service';
@@ -142,7 +142,11 @@ export class StravaService {
         if (res.url) window.location.href = res.url;
         else this.authUrlError.set(res.error ?? 'Strava is not configured.');
       },
-      error: () => this.authUrlError.set('Could not get Strava authorization URL.'),
+      error: (err: HttpErrorResponse) => {
+        const body = err.error as { error?: string } | null;
+        const msg = body?.error ?? err.message ?? 'Could not get Strava authorization URL.';
+        this.authUrlError.set(msg);
+      },
     });
   }
 

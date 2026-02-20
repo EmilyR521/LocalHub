@@ -28,6 +28,16 @@ export const routes: Routes = [
           import('./plugins/calendar/calendar.routes').then((m) => m.calendarRoutes),
       },
       {
+        path: 'plugins/lists',
+        loadChildren: () =>
+          import('./plugins/lists/lists.routes').then((m) => m.listsRoutes),
+      },
+      {
+        path: 'plugins/habits',
+        loadChildren: () =>
+          import('./plugins/habits/habits.routes').then((m) => m.habitsRoutes),
+      },
+      {
         path: 'plugins/user-management',
         loadChildren: () =>
           import('./plugins/user-management/user-management.routes').then((m) => m.userManagementRoutes),

@@ -1,18 +1,24 @@
-<div class="layout">
+<div class="layout" [class.sidebar-collapsed]="sidebarCollapsed()">
   <aside class="sidebar">
-    <a routerLink="/" class="brand" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-      LocalHub
-    </a>
+    <div class="sidebar-header">
+      <a routerLink="/" class="brand" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="brand-text">HobbyHub</span>
+      </a>
+      <button type="button" class="sidebar-toggle" (click)="toggleSidebar()" [attr.aria-label]="sidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'" title="{{ sidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar' }}">
+        <span class="sidebar-toggle-icon" aria-hidden="true">{{ sidebarCollapsed() ? '›' : '‹' }}</span>
+      </button>
+    </div>
     <nav class="nav">
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-        Dashboard
+        <span class="nav-link-icon" aria-hidden="true">⌂</span>
+        <span class="nav-link-text">Dashboard</span>
       </a>
       @for (plugin of plugins(); track plugin.id) {
         <a [routerLink]="['/plugins', plugin.path]" routerLinkActive="active" class="nav-link">
           @if (plugin.icon) {
             <span class="nav-link-icon" aria-hidden="true">{{ plugin.icon }}</span>
           }
-          <span>{{ plugin.name }}</span>
+          <span class="nav-link-text">{{ plugin.name }}</span>
         </a>
       }
     </nav>

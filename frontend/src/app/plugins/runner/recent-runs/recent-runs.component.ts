@@ -1,7 +1,7 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserProfileService } from '../../../core/services/user-profile.service';
-import { StravaService } from '../services/strava.service';
+import { StravaService, type StravaActivity } from '../services/strava.service';
 import { formatDistance as formatDist, formatDuration as formatDur } from '../utils/activity-format';
 
 @Component({
@@ -20,6 +20,17 @@ export class RecentRunsComponent implements OnInit {
   readonly loading = this.strava.loading.asReadonly();
   readonly stravaError = this.strava.error.asReadonly();
 
+  /** Activities from the current year only. */
+  readonly currentYearActivities = computed(() => {
+    const year = new Date().getFullYear();
+    return this.activities().filter((a: StravaActivity) => {
+      const iso = a.start_date_local ?? a.start_date;
+      if (!iso || iso.length < 4) return false;
+      return parseInt(iso.slice(0, 4), 10) === year;
+    });
+  });
+
+  readonly currentYear = new Date().getFullYear();
   readonly queryMessage = signal<string | null>(null);
   readonly queryIsError = signal(false);
 

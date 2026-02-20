@@ -3,102 +3,11 @@
   <p class="subtitle">Set your display name, emoji, and which plugin apps appear in the sidebar.</p>
 </header>
 
-<section class="card">
-  <h2 class="card-title">User</h2>
-  <p class="hint">Switch user or add a new one. Changing user logs that user out of Strava and Google Calendar on this device.</p>
-  <div class="user-select-row">
-    <select
-      class="user-select"
-      [ngModel]="currentUserId()"
-      (ngModelChange)="onUserSelect($event)"
-      [disabled]="switchingUser()"
-      aria-label="Select user">
-      @for (u of usersForSelect(); track u.id) {
-        <option [value]="u.id">{{ u.emoji }} {{ u.name || 'Unnamed' }}</option>
-      }
-    </select>
-    <button type="button" class="btn primary" (click)="addUser()">Add user</button>
-  </div>
-  @if (switchingUser()) {
-    <p class="hint">Switching user and disconnecting external apps…</p>
-  }
-</section>
-
-<section class="card">
-  <h2 class="card-title">Profile</h2>
-  <div class="field">
-    <label for="name">Display name</label>
-    <input id="name" type="text" [ngModel]="name()" (ngModelChange)="name.set($event)" placeholder="Your name" />
-  </div>
-  <div class="field">
-    <label>Emoji icon</label>
-    <div class="emoji-row">
-      @for (e of emojiPresets; track e) {
-        <button type="button" class="emoji-btn" [class.active]="emoji() === e" (click)="setEmojiPreset(e)">
-          {{ e }}
-        </button>
-      }
-    </div>
-    <input type="text" class="emoji-input" [ngModel]="emoji()" (ngModelChange)="emoji.set($event)" placeholder="👤" maxlength="4" />
-  </div>
-  <div class="field">
-    <label>Theme</label>
-    <div class="theme-toggle">
-      <button type="button" class="btn secondary" [class.active]="theme() === 'light'" (click)="setTheme('light')">Light</button>
-      <button type="button" class="btn secondary" [class.active]="theme() === 'dark'" (click)="setTheme('dark')">Dark</button>
-    </div>
-  </div>
-</section>
-
-<section class="card">
-  <h2 class="card-title">Visible plugins</h2>
-  <p class="hint">Choose which apps appear in the sidebar. If none are selected, all are shown.</p>
-  <div class="plugin-actions">
-    <button type="button" class="btn secondary" (click)="selectAll()">Show all</button>
-    <button type="button" class="btn secondary" (click)="selectNone()">Hide all</button>
-  </div>
-  <ul class="plugin-list">
-    @for (plugin of plugins(); track plugin.id) {
-      <li>
-        <label class="checkbox-label">
-          <input type="checkbox" [checked]="isSelected(plugin.id)" (change)="togglePlugin(plugin.id)" />
-          <span>{{ plugin.name }}</span>
-        </label>
-      </li>
-    }
-  </ul>
-</section>
-
-@if (connectedApps().length > 0) {
-  <section class="card">
-    <h2 class="card-title">Connected applications</h2>
-    <p class="hint">These plugins have external API authorisation. Disconnect here or in the plugin’s settings.</p>
-    <ul class="connected-apps-list">
-      @for (appId of connectedApps(); track appId) {
-        <li class="connected-app-item">
-          <span class="connected-app-label">{{ getConnectedAppLabel(appId) }}</span>
-          <button
-            type="button"
-            class="btn secondary btn-sm"
-            (click)="disconnectApp(appId)"
-            [disabled]="disconnectingAppId() === appId">
-            {{ disconnectingAppId() === appId ? 'Disconnecting…' : 'Disconnect' }}
-          </button>
-        </li>
-      }
-    </ul>
-  </section>
-}
-
-<div class="actions">
-  <button type="button" class="btn primary" (click)="save()" [disabled]="saveStatus() === 'saving'">
-    @switch (saveStatus()) {
-      @case ('saving') { Saving… }
-      @case ('saved') { Saved }
-      @default { Save }
-    }
-  </button>
-  @if (saveStatus() === 'error') {
-    <span class="error-msg">Save failed. Try again.</span>
-  }
+<div class="reader-tabs" aria-label="User management views">
+  <a routerLink="profile" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="btn secondary">My profile</a>
+  <a routerLink="users" routerLinkActive="active" class="btn secondary">All users</a>
 </div>
+
+<main>
+  <router-outlet />
+</main>

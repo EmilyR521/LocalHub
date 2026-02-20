@@ -1,0 +1,217 @@
+<section class="habits-page">
+  <div class="habits-add">
+    <input
+      type="text"
+      class="habits-add-input"
+      [value]="newHabitName()"
+      (input)="newHabitName.set($any($event.target).value)"
+      (keydown.enter)="addHabit()"
+      placeholder="New habit name" />
+    <button type="button" class="btn primary" (click)="addHabit()" [disabled]="!newHabitName().trim()">Add habit</button>
+  </div>
+
+  <div class="habits-cards-grid">
+    @for (habit of habits(); track habit.id) {
+      <article
+        class="habit-card"
+        [class.habit-card--dragging]="draggedHabitId() === habit.id"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop(habit, $event)">
+        <div class="habit-card-header">
+          <span
+            class="habit-card-drag-handle"
+            draggable="true"
+            (dragstart)="onDragStart(habit, $event)"
+            (dragend)="onDragEnd()"
+            title="Drag to reorder"
+            aria-label="Drag to reorder habit">⋮⋮</span>
+          <button
+            type="button"
+            class="habit-card-header-trigger"
+            (click)="openConfig(habit, $event)"
+            title="Open habit detail">
+            <span class="habit-card-icon" aria-hidden="true">{{ habit.icon || '✓' }}</span>
+            <h3 class="habit-card-title">{{ habit.name }}</h3>
+          </button>
+        </div>
+        <div class="habit-card-dots-matrix" aria-label="Last four weeks">
+          @for (row of dotMatrixRows(); track $index) {
+            <div class="habit-card-dots-row">
+              @for (cell of row; track cell.key) {
+                @if (cell.date) {
+                  <button
+                    type="button"
+                    class="habit-dot"
+                    [class.habit-dot--checked]="isCompleted(dateKey(cell.date), habit.id)"
+                    [style.--habit-color]="habit.color ?? '#58a6ff'"
+                    (click)="toggleDot(habit, dateKey(cell.date))"
+                    [attr.title]="formatDotTitle(cell.date) + ': ' + (isCompleted(dateKey(cell.date), habit.id) ? 'Done' : 'Not done')"
+                    [attr.aria-pressed]="isCompleted(dateKey(cell.date), habit.id)">
+                    <span class="habit-dot-letter" aria-hidden="true">{{ dayLetter(cell.date) }}</span>
+                  </button>
+                } @else {
+                  <span class="habit-dot-placeholder" aria-hidden="true"></span>
+                }
+              }
+              @if (habit.target) {
+                <span class="habit-dots-divider" aria-hidden="true"></span>
+                <span
+                  class="habit-dot habit-dot-summary"
+                  [class.habit-dot--checked]="weekGoalMet(habit, $index)"
+                  [style.--habit-color]="habit.color ?? '#58a6ff'"
+                  [attr.title]="weekGoalMet(habit, $index) ? 'Week goal met' : 'Week goal not met'"
+                  [attr.aria-label]="'Week goal ' + (weekGoalMet(habit, $index) ? 'met' : 'not met')"></span>
+              }
+            </div>
+          }
+        </div>
+        @if (targetLabel(habit)) {
+          <div class="habit-card-meta">
+            <span class="habit-card-target">{{ targetLabel(habit) }}</span>
+            @if (habit.target?.type === 'every_day' && streak(habit.id) > 0) {
+              <span class="habit-card-streak">{{ streak(habit.id) }} day streak</span>
+            }
+          </div>
+        }
+      </article>
+    }
+  </div>
+
+  @if (editingHabit(); as habit) {
+    <div class="habit-config-overlay" (click)="closeConfig()">
+      <div class="habit-detail-panel" (click)="$event.stopPropagation()" role="dialog" aria-labelledby="habit-detail-title">
+        <div class="habit-config-header">
+          <h3 id="habit-detail-title">{{ habit.name }}</h3>
+          <button type="button" class="habit-config-close" (click)="closeConfig()" aria-label="Close">×</button>
+        </div>
+        <div class="habit-config-body habit-detail-body">
+          <div class="habit-detail-layout">
+            <section class="habit-detail-section habit-detail-settings">
+              <h4 class="habit-detail-section-title">Settings</h4>
+            <div class="field">
+              <label for="habit-config-name">Name</label>
+              <input
+                id="habit-config-name"
+                type="text"
+                [value]="configName()"
+                (input)="configName.set($any($event.target).value)"
+                placeholder="Habit name" />
+            </div>
+            <div class="field">
+              <label>Icon</label>
+              <app-emoji-grid [value]="configIcon()" (valueChange)="configIcon.set($event)" />
+            </div>
+            <div class="field">
+              <label>Colour</label>
+              <div class="habit-config-colors">
+                @for (c of defaultColors; track c) {
+                  <button
+                    type="button"
+                    class="habit-config-color-swatch"
+                    [class.habit-config-color-swatch--selected]="configColor() === c"
+                    [style.background]="c"
+                    (click)="configColor.set(c)"
+                    [attr.aria-pressed]="configColor() === c"
+                    [attr.title]="c">
+                  </button>
+                }
+              </div>
+              <input
+                type="color"
+                class="habit-config-color-input"
+                [value]="configColor()"
+                (input)="configColor.set($any($event.target).value)" />
+            </div>
+            <div class="field">
+              <label>Target</label>
+              <div class="habit-config-target-options">
+                <label class="habit-config-target-option">
+                  <input
+                    type="radio"
+                    name="habitTarget"
+                    [checked]="!configTarget()"
+                    (change)="clearConfigTarget()" />
+                  No target
+                </label>
+                <label class="habit-config-target-option">
+                  <input
+                    type="radio"
+                    name="habitTarget"
+                    [checked]="configTarget()?.type === 'every_day'"
+                    (change)="setConfigTargetEveryDay()" />
+                  Every day
+                </label>
+                <label class="habit-config-target-option habit-config-target-days">
+                  <input
+                    type="radio"
+                    name="habitTarget"
+                    [checked]="configTarget()?.type === 'days_per_week'"
+                    (change)="setConfigTargetDaysPerWeek(configTargetDays())" />
+                  <span>Days per week:</span>
+                  <input
+                    type="number"
+                    class="habit-config-days-input"
+                    min="1"
+                    max="7"
+                    [value]="configTargetDays()"
+                    (input)="setConfigTargetDaysPerWeek($any($event.target).value)"
+                    (change)="setConfigTargetDaysPerWeek($any($event.target).value)" />
+                </label>
+              </div>
+            </div>
+            </section>
+            <section class="habit-detail-section habit-detail-year">
+              <div class="habit-detail-year-header">
+                <h4 class="habit-detail-section-title">Calendar</h4>
+                @if (yearsWithData(habit).length > 0) {
+                  <select
+                    class="habit-year-select"
+                    [value]="selectedDetailYear()"
+                    (change)="selectedDetailYear.set(+$any($event.target).value)"
+                    aria-label="Select year">
+                    @for (y of yearsWithData(habit); track y) {
+                      <option [value]="y">{{ y }}</option>
+                    }
+                  </select>
+                }
+              </div>
+              <div class="habit-year-matrix" [attr.aria-label]="'Year ' + selectedDetailYear() + ' by month'">
+                @for (block of yearMonthBlocks(); track block.month) {
+                <div class="habit-year-month-block">
+                  <span class="habit-year-month-label">{{ block.monthLabel }}</span>
+                  <div class="habit-year-month-grid">
+                    @for (row of block.rows; track $index) {
+                      <div class="habit-year-month-row">
+                        @for (cell of row; track $index) {
+                          @if (cell) {
+                            <button
+                              type="button"
+                              class="habit-dot habit-dot-year"
+                              [class.habit-dot--checked]="isCompleted(dateKey(cell), habit.id)"
+                              [style.--habit-color]="habit.color ?? '#58a6ff'"
+                              (click)="toggleDot(habit, dateKey(cell))"
+                              [attr.title]="formatDotTitle(cell) + ': ' + (isCompleted(dateKey(cell), habit.id) ? 'Done' : 'Not done')"
+                              [attr.aria-pressed]="isCompleted(dateKey(cell), habit.id)">
+                              <span class="habit-dot-letter" aria-hidden="true">{{ dayLetter(cell) }}</span>
+                            </button>
+                          } @else {
+                            <span class="habit-dot-placeholder" aria-hidden="true"></span>
+                          }
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+                }
+              </div>
+            </section>
+          </div>
+          <div class="habit-config-actions">
+            <button type="button" class="btn primary" (click)="saveConfig()">Save</button>
+            <button type="button" class="btn secondary" (click)="deleteHabit(habit, $event)">Delete habit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</section>

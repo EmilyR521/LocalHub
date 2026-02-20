@@ -6,7 +6,7 @@ export const runnerRoutes: Routes = [
     loadComponent: () =>
       import('./runner.component').then((m) => m.RunnerComponent),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'planner' },
+      { path: '', pathMatch: 'full', redirectTo: 'recent' },
       {
         path: 'planner',
         loadComponent: () =>

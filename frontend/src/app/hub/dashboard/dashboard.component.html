@@ -4,7 +4,9 @@
   <ng-container main>
     <section class="dashboard-widgets">
       @for (widget of selectedWidgets(); track widget.id) {
-        <ng-container *ngComponentOutlet="widget.component" />
+        <div class="dashboard-widget-wrapper" [class.dashboard-widget-span-3]="widget.columns === 3">
+          <ng-container *ngComponentOutlet="widget.component" />
+        </div>
       }
       @if (selectedWidgets().length === 0) {
         <p class="hint">No widgets selected. Open dashboard settings (⚙️) to add some.</p>

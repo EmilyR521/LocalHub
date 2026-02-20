@@ -1,0 +1,20 @@
+<section class="card">
+  <h2 class="card-title">User</h2>
+  <p class="hint">Switch user or add a new one. Changing user logs that user out of Strava and Google Calendar on this device.</p>
+  <div class="user-select-row">
+    <select
+      class="user-select"
+      [ngModel]="currentUserId()"
+      (ngModelChange)="onUserSelect($event)"
+      [disabled]="switchingUser()"
+      aria-label="Select user">
+      @for (u of usersForSelect(); track u.id) {
+        <option [value]="u.id">{{ u.emoji }} {{ u.name || 'Unnamed' }}</option>
+      }
+    </select>
+    <button type="button" class="btn primary" (click)="addUser()">Add user</button>
+  </div>
+  @if (switchingUser()) {
+    <p class="hint">Switching user and disconnecting external apps…</p>
+  }
+</section>
