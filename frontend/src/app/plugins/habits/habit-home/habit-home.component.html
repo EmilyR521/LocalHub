@@ -165,7 +165,7 @@
                 <h4 class="habit-detail-section-title">Calendar</h4>
                 @if (yearsWithData(habit).length > 0) {
                   <select
-                    class="habit-year-select"
+                    class="form-select"
                     [value]="selectedDetailYear()"
                     (change)="selectedDetailYear.set(+$any($event.target).value)"
                     aria-label="Select year">

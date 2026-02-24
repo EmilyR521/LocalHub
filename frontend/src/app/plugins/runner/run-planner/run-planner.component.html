@@ -185,6 +185,7 @@
       <label for="event-colour">Event colour</label>
       <select
         id="event-colour"
+        class="form-select"
         [ngModel]="runnerPlan.eventColorId()"
         (ngModelChange)="runnerPlan.setEventColorId($event)">
         @for (opt of calendarEventColors; track opt.id) {

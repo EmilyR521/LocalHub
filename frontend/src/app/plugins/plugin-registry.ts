@@ -15,5 +15,6 @@ export const PLUGINS: PluginManifest[] = [
   { id: 'calendar', name: 'Calendar', path: 'calendar', icon: '📅', order: 3 },
   { id: 'lists', name: 'Lists', path: 'lists', icon: '📋', order: 4 },
   { id: 'habits', name: 'Habits', path: 'habits', icon: '✔️', order: 5 },
+  { id: 'vocabulist', name: 'Vocabulist', path: 'vocabulist', icon: '📚', order: 6 },
   { id: 'user-management', name: 'User management', path: 'user-management', icon: '👤', order: 99 },
 ];

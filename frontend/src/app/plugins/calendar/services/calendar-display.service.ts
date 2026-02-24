@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { PluginStoreService } from '../../../core/services/plugin-store.service';
 import { UserProfileService } from '../../../core/services/user-profile.service';
 
@@ -48,6 +48,18 @@ export class CalendarDisplayService {
   readonly themeColor = computed(() => this.optionsSignal().themeColor);
 
   private userId = computed(() => this.userProfile.profile().id);
+  private previousUserId: string | undefined;
+
+  constructor() {
+    effect(() => {
+      const id = this.userProfile.profile().id;
+      if (id !== this.previousUserId) {
+        this.previousUserId = id;
+        this.optionsSignal.set({ ...DEFAULTS });
+        if (id) this.load();
+      }
+    });
+  }
 
   load(): void {
     const id = this.userId();

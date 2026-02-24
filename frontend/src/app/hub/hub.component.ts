@@ -1,9 +1,13 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { PLUGINS } from '../plugins/plugin-registry';
+import { PLUGINS, type PluginManifest } from '../plugins/plugin-registry';
 import { UserProfileService } from '../core/services/user-profile.service';
 
 const SIDEBAR_COLLAPSED_KEY = 'localhub-sidebar-collapsed';
+
+const DEFAULT_ORDERED = [...PLUGINS].sort(
+  (a, b) => (a.order ?? 99) - (b.order ?? 99)
+);
 
 @Component({
   selector: 'app-hub',
@@ -12,15 +16,23 @@ const SIDEBAR_COLLAPSED_KEY = 'localhub-sidebar-collapsed';
   templateUrl: './hub.component.html',
 })
 export class HubComponent implements OnInit {
-  private allPlugins = signal(
-    [...PLUGINS].sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
-  );
-
   readonly sidebarCollapsed = signal(false);
 
   readonly plugins = computed(() => {
     const visible = this.userProfile.visiblePluginIds();
-    const all = this.allPlugins();
+    const orderIds = this.userProfile.pluginOrderIds();
+    let all: PluginManifest[];
+    if (orderIds.length > 0) {
+      const orderMap = new Map(orderIds.map((id, i) => [id, i]));
+      all = [...PLUGINS].sort((a, b) => {
+        const ai = orderMap.get(a.id) ?? 9999;
+        const bi = orderMap.get(b.id) ?? 9999;
+        if (ai !== bi) return ai - bi;
+        return (a.order ?? 99) - (b.order ?? 99);
+      });
+    } else {
+      all = DEFAULT_ORDERED;
+    }
     if (visible.length === 0) return all;
     const set = new Set(visible);
     return all.filter((p) => set.has(p.id));

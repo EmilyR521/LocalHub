@@ -3,7 +3,7 @@
   <p class="hint">Switch user or add a new one. Changing user logs that user out of Strava and Google Calendar on this device.</p>
   <div class="user-select-row">
     <select
-      class="user-select"
+      class="form-select user-select"
       [ngModel]="currentUserId()"
       (ngModelChange)="onUserSelect($event)"
       [disabled]="switchingUser()"

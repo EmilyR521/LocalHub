@@ -15,6 +15,8 @@ export interface UserProfile {
   theme?: ThemeMode;
   /** Plugin IDs that have external API authorisation (e.g. 'calendar', 'strava'). */
   connectedApps?: string[];
+  /** Plugin IDs in sidebar order. When set, sidebar uses this order; otherwise default registry order. */
+  pluginOrderIds?: string[];
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -62,6 +64,11 @@ export class UserProfileService {
   readonly connectedApps = computed(() => {
     const apps = this.profileSignal().connectedApps;
     return Array.isArray(apps) ? apps : [];
+  });
+
+  readonly pluginOrderIds = computed(() => {
+    const ids = this.profileSignal().pluginOrderIds;
+    return Array.isArray(ids) && ids.length > 0 ? ids : [];
   });
 
   constructor(private store: PluginStoreService) {}
@@ -155,6 +162,9 @@ export class UserProfileService {
       connectedApps: Array.isArray(p.connectedApps)
         ? p.connectedApps.filter((id) => typeof id === 'string')
         : DEFAULT_PROFILE.connectedApps,
+      pluginOrderIds: Array.isArray(p.pluginOrderIds)
+        ? p.pluginOrderIds.filter((id) => typeof id === 'string')
+        : undefined,
     };
   }
 }

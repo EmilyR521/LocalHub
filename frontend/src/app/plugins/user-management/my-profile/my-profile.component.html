@@ -38,6 +38,42 @@
   </ul>
   </section>
 
+  <section class="card">
+    <h2 class="card-title">Plugin order</h2>
+    <p class="hint">Change the order of apps in the sidebar. Use the buttons to move items up or down.</p>
+    <ul class="plugin-order-list" aria-label="Plugin order">
+      @for (id of orderedPluginIds(); track id; let i = $index) {
+        @if (getPluginById(id); as plugin) {
+          <li class="plugin-order-row">
+            <span class="plugin-order-name">{{ plugin.icon }} {{ plugin.name }}</span>
+            <div class="plugin-order-actions">
+              <button
+                type="button"
+                class="btn icon-btn"
+                [disabled]="i === 0"
+                (click)="movePlugin(i, -1)"
+                title="Move up"
+                [attr.aria-label]="'Move ' + plugin.name + ' up'"
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                class="btn icon-btn"
+                [disabled]="i === orderedPluginIds().length - 1"
+                (click)="movePlugin(i, 1)"
+                title="Move down"
+                [attr.aria-label]="'Move ' + plugin.name + ' down'"
+              >
+                ↓
+              </button>
+            </div>
+          </li>
+        }
+      }
+    </ul>
+  </section>
+
   @if (connectedApps().length > 0) {
     <section class="card">
     <h2 class="card-title">Connected applications</h2>

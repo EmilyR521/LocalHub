@@ -169,12 +169,23 @@ export class RunnerPlanService {
   private loadRequested = signal(false);
 
   readonly schedule = signal<ScheduledRun[]>([]);
+  private previousUserId: string | undefined;
 
   constructor() {
     effect(() => {
       const p = this.plan();
       if (p) this.schedule.set(buildSchedule(p));
       else this.schedule.set([]);
+    });
+    effect(() => {
+      const id = this.userProfile.profile().id;
+      if (id !== this.previousUserId) {
+        this.previousUserId = id;
+        this.plan.set(null);
+        this.schedule.set([]);
+        this.calendarEventIds.set([]);
+        this.loaded = false;
+      }
     });
     effect(() => {
       const id = this.userProfile.profile().id;

@@ -38,3 +38,43 @@ Use this if:
 
 - The backend returns **403 Forbidden** with body `{ "error": "Not connected to Google Calendar", "code": "calendar_not_connected" }` when it has no valid tokens for the requesting user.
 - The frontend shows a message asking you to disconnect and connect again in Calendar settings.
+
+## Architecture
+
+### Component and service interaction
+
+```
+CalendarComponent (shell)
+├── CalendarGoogleService.load(); CalendarDisplayService.load()
+├── queryParams: connected=1 → refreshConnection; error → oauthError message
+├── Template: oauthError | connection ? (month-view or “connect in settings”) | “Loading…”
+└── Settings drawer: CalendarSettingsComponent
+
+CalendarMonthViewComponent
+├── CalendarGoogleService: connection, getEvents(year, month)
+├── CalendarDisplayService: displayHabits, displayGoogleCalendar, displayReading, themeColor
+├── HabitsService.habits + completions (when displayHabits); ReaderService.books (when displayReading)
+├── effect: connection?.connected && displayGoogleCalendar → fetchEvents(viewYear, viewMonth)
+├── effect: displayHabits → habitsService.load(); displayReading → readerService.load()
+├── viewYear, viewMonth; grid/rows computed from events + habitsByDay + readingByDay
+├── prevMonth/nextMonth; eventStyles, dateKey, isToday
+└── Single responsibility: compose month grid and fetch events; date logic in component
+
+CalendarGoogleService
+├── connection (signal); authUrlError; loaded, loadRequested, previousUserId
+├── effect: profile().id change → clear connection, set loaded=false
+├── effect: id && loadRequested && !loaded → loadConnection(id) (store.get)
+├── load(), getAuthUrl(), disconnect(), getEvents(year, month), refreshConnection()
+└── Single responsibility: Google Calendar connection state and API per user
+
+CalendarDisplayService
+├── optionsSignal → displayHabits, displayGoogleCalendar, displayReading, themeColor
+├── effect: profile().id change → clear optionsSignal to defaults; next load() for new user
+├── load() → store.get display-options; setDisplayHabits/setDisplayGoogleCalendar/setDisplayReading/setThemeColor → updateOptions → store.put
+└── Single responsibility: calendar view options per user
+```
+
+### Data flow
+
+- **User switch**: CalendarGoogleService and CalendarDisplayService clear state when profile().id changes; load() fetches for new user.
+- **Month view**: Depends on Reader and Habits when display options are on; those services load their own data (and respect user id).

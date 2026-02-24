@@ -1,7 +1,7 @@
-<div class="card" style="margin-top: 1rem; margin-bottom: 0;">
+<div class="card settings-import-card">
   <h2 class="card-title">CSV</h2>
   <p class="hint">Export or import books as CSV. Download a template to see the required columns (Title, Author, Status, dates, Notes, Tags).</p>
-  <div class="plugin-actions actions-column">
+  <div class="settings-import-actions">
     <button type="button" class="btn secondary" (click)="exportCSVTemplate()" [disabled]="csvLoading()">
       Download template
     </button>
@@ -20,10 +20,10 @@
   </div>
 </div>
 
-<div class="card" style="margin-top: 1rem; margin-bottom: 0;">
+<div class="card settings-import-card">
   <h2 class="card-title">JSON</h2>
   <p class="hint">Full backup: export or import all books and collections as JSON. On import you can replace existing data or merge.</p>
-  <div class="plugin-actions actions-column">
+  <div class="settings-import-actions">
     <button type="button" class="btn secondary" (click)="exportJSON()" [disabled]="jsonLoading()">
       Export JSON
     </button>

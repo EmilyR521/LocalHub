@@ -17,6 +17,7 @@ export class ReaderPersistenceService {
   private booksSignal = signal<Book[]>([]);
   private collectionsSignal = signal<Collection[]>([]);
   private loaded = false;
+  private loadedUserId: string | undefined;
   private loadRequested = signal(false);
 
   readonly books = this.booksSignal.asReadonly();
@@ -25,8 +26,21 @@ export class ReaderPersistenceService {
   constructor() {
     effect(() => {
       const id = this.userProfile.profile().id;
+      if (!id) {
+        this.booksSignal.set([]);
+        this.collectionsSignal.set([]);
+        this.loaded = false;
+        this.loadedUserId = undefined;
+        return;
+      }
+      if (this.loadedUserId !== id) {
+        this.booksSignal.set([]);
+        this.collectionsSignal.set([]);
+        this.loaded = false;
+        this.loadedUserId = id;
+      }
       const requested = this.loadRequested();
-      if (id && requested && !this.loaded) {
+      if (requested && !this.loaded) {
         this.loaded = true;
         this.fetchBooksAndCollections(id);
       }
@@ -34,7 +48,6 @@ export class ReaderPersistenceService {
   }
 
   load(): void {
-    if (this.loaded) return;
     this.userProfile.load();
     this.loadRequested.set(true);
   }

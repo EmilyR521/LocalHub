@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { PluginStoreService } from '../../../core/services/plugin-store.service';
@@ -83,6 +83,19 @@ export class HabitsService {
   readonly completions = this.completionsSignal.asReadonly();
 
   private userId = computed(() => this.userProfile.profile().id);
+  private previousUserId: string | undefined;
+
+  constructor() {
+    effect(() => {
+      const id = this.userProfile.profile().id;
+      if (id !== this.previousUserId) {
+        this.previousUserId = id;
+        this.habitsSignal.set([]);
+        this.completionsSignal.set({});
+        if (id) this.load();
+      }
+    });
+  }
 
   load(): void {
     const id = this.userId();

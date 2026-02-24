@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { PluginStoreService } from '../../../core/services/plugin-store.service';
 import { UserProfileService } from '../../../core/services/user-profile.service';
 import type { List, ListItem } from '../models/list.model';
@@ -19,6 +19,18 @@ export class ListsService {
   readonly lists = this.listsSignal.asReadonly();
 
   private userId = computed(() => this.userProfile.profile().id);
+  private previousUserId: string | undefined;
+
+  constructor() {
+    effect(() => {
+      const id = this.userProfile.profile().id;
+      if (id !== this.previousUserId) {
+        this.previousUserId = id;
+        this.listsSignal.set([]);
+        if (id) this.fetchLists(id);
+      }
+    });
+  }
 
   load(): void {
     const id = this.userId();
@@ -26,6 +38,10 @@ export class ListsService {
       this.listsSignal.set([]);
       return;
     }
+    this.fetchLists(id);
+  }
+
+  private fetchLists(id: string): void {
     this.store.get<List[]>(PLUGIN_ID, STORE_KEY, id).subscribe({
       next: (data) => {
         const arr = Array.isArray(data) ? data : [];

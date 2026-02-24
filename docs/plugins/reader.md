@@ -104,9 +104,51 @@ No custom backend routes; all persistence via the shared plugin store. The front
 
 Use shared app styles: `.page-header`, `.card`, `.btn`, `.field`, `.checkbox-label`, `.data-table`, etc.
 
+## Architecture
+
+### Component and service interaction
+
+```
+ReaderComponent (shell)
+├── Calls ReaderService.load() on init
+├── Holds: panelOpen, editingBook, activeTab, statusFilter, sortField/sortDir
+├── Uses: ReaderService.books, filteredAndSortedBooks (computed from helper)
+├── Books tab: table + BookForm in overlay; openEdit → panel
+├── Collections tab: ReaderCollectionsComponent → (viewBook) → openEdit
+├── Timeline tab: ReaderTimelineComponent → (viewBook) → openEdit
+└── Settings drawer: ReaderSettingsComponent (import/export)
+
+ReaderService (facade)
+├── Exposes: books, collections (from ReaderPersistenceService)
+├── load() → ReaderPersistenceService.load()
+├── addBook / updateBook / removeBook → persistence.saveBooks (and collections when removing)
+├── createCollection, addBookToCollection, removeBookFromCollection, updateCollection, deleteCollection
+├── replaceAll, mergeFromExport (delegate to reader-merge.helper)
+└── No UI; single responsibility: coordinate CRUD and bulk operations
+
+ReaderPersistenceService
+├── booksSignal, collectionsSignal (readonly exposed)
+├── effect: on profile().id change → clear signals, set loaded=false; on loadRequested && !loaded → fetchBooksAndCollections(id)
+├── load() → sets loadRequested; user switch clears state so next load fetches new user
+├── saveBooks / saveCollections → PluginStoreService.put with current user id
+└── Single responsibility: load/persist per user; no domain logic
+
+ReaderTimelineComponent → ReaderService.books, TimelineService.buildTimeline(); (viewBook) → parent
+ReaderCollectionsComponent → ReaderService.collections/books, CRUD; (viewBook) → parent
+BookFormComponent → presentational; (save)/(cancel)/(delete) → parent
+ReaderSettingsComponent → ReaderImportExportService, ReaderService.replaceAll/mergeFromExport
+TimelineService → pure: buildTimeline(books) → TimelineGroup[]
+```
+
+### Data flow
+
+- **Load**: ReaderComponent.ngOnInit → ReaderService.load() → ReaderPersistenceService.loadRequested = true; effect runs when profile().id is set and fetches books/collections from PluginStoreService.
+- **User switch**: UserProfileService.profile().id changes → ReaderPersistenceService effect clears books/collections and loadedUserId; next load() triggers fetch for new user.
+- **Mutate**: Component → ReaderService.addBook/updateBook/… → ReaderPersistenceService.saveBooks/saveCollections → PluginStoreService.put.
+
 ## Plugin registry
 
 - **id**: `reader`
 - **path**: `reader`
 - **name**: `Reader`
-- **order**: 2 (after Example, before User management)
+- **order**: 1

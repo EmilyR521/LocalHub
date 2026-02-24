@@ -1,0 +1,183 @@
+<div class="card settings-import-card">
+  <h2 class="card-title">Languages</h2>
+  <p class="hint">Reorder the language tabs and choose which list opens by default when you open Vocabulist.</p>
+
+  @if (languages().length > 0) {
+    <div class="field vocabulist-lang-order">
+      <label class="vocabulist-settings-label">Order</label>
+      <ul class="vocabulist-lang-order-list" aria-label="Language order">
+        @for (lang of languages(); track lang; let i = $index) {
+          <li class="vocabulist-lang-order-row">
+            <span class="vocabulist-lang-order-name">{{ languageLabel(lang) }}</span>
+            <div class="vocabulist-lang-order-actions">
+              <button
+                type="button"
+                class="btn icon-btn"
+                [disabled]="i === 0"
+                (click)="moveLanguage(i, -1)"
+                title="Move up"
+                [attr.aria-label]="'Move ' + languageLabel(lang) + ' up'"
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                class="btn icon-btn"
+                [disabled]="i === languages().length - 1"
+                (click)="moveLanguage(i, 1)"
+                title="Move down"
+                [attr.aria-label]="'Move ' + languageLabel(lang) + ' down'"
+              >
+                ↓
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="field">
+      <label for="vocabulist-default-lang">Default language (opens on load)</label>
+      <select
+        id="vocabulist-default-lang"
+        class="form-select"
+        [value]="defaultLanguage() ?? ''"
+        (change)="setDefaultLanguage($any($event.target).value || null)"
+      >
+        <option value="">— First in list —</option>
+        @for (lang of languages(); track lang) {
+          <option [value]="lang">{{ languageLabel(lang) }}</option>
+        }
+      </select>
+    </div>
+  } @else {
+    <p class="hint">Add a language by importing vocabulary below.</p>
+  }
+</div>
+
+<div class="card settings-import-card">
+  <h2 class="card-title">Import vocabulary</h2>
+  <p class="hint">Import words from a Duolingo export JSON file. Choose an existing language or enter a new language code (e.g. de, el).</p>
+
+  <div class="settings-import-actions">
+    <div class="field">
+      <label>Import for language</label>
+      @if (languages().length > 0) {
+        <select
+          class="form-select"
+          [value]="importDropdownValue()"
+          (change)="setImportDropdown($any($event.target).value)"
+        >
+          <option value="">— Select language —</option>
+          @for (lang of languages(); track lang) {
+            <option [value]="lang">{{ languageLabel(lang) }}</option>
+          }
+          <option value="__new__">New language (enter below)</option>
+        </select>
+        @if (importDropdownValue() === '__new__') {
+          <input
+            type="text"
+            class="form-input"
+            placeholder="e.g. de, el"
+            [value]="newLanguageCode()"
+            (input)="setNewLanguageCode($any($event.target).value)"
+          />
+        }
+      } @else {
+        <input
+          type="text"
+          class="form-input"
+          placeholder="e.g. de, el"
+          [value]="newLanguageCode()"
+          (input)="setNewLanguageCode($any($event.target).value)"
+        />
+      }
+    </div>
+
+    <label
+      class="btn secondary"
+      [class.disabled]="importStatus() === 'importing' || importStatus() === 'enriching'"
+    >
+      @switch (importStatus()) {
+        @case ('importing') {
+          Importing…
+        }
+        @case ('enriching') {
+          Fetching grammar…
+        }
+        @default {
+          Import from Duolingo JSON
+        }
+      }
+      <input
+        type="file"
+        accept=".json"
+        (change)="onFileSelected($event)"
+        style="display: none;"
+        [disabled]="importStatus() === 'importing' || importStatus() === 'enriching'"
+      />
+    </label>
+  </div>
+
+  @if (importStatus() === 'importing' || importStatus() === 'enriching') {
+    <p class="hint import-progress">
+      <span class="spinner" aria-hidden="true"></span>
+      @if (importStatus() === 'enriching' && importEnrichProgress(); as p) {
+        Fetching grammar… ({{ p.done }}/{{ p.total }})
+      } @else {
+        Preparing import…
+      }
+    </p>
+  }
+  @if (importStatus() === 'done' || importStatus() === 'error') {
+    <p [class.error-msg]="importStatus() === 'error'" class="hint">
+      {{ importMessage() }}
+    </p>
+  }
+</div>
+
+<div class="card settings-import-card">
+  <h2 class="card-title">Export &amp; restore</h2>
+  <p class="hint">Export a language's vocabulary as JSON (your backup file). Restore replaces that language's data with the backup.</p>
+
+  <div class="settings-import-actions">
+    <div class="field">
+      <label>Export language</label>
+      <select
+        class="form-select"
+        [value]="exportLanguageCode()"
+        (change)="setExportLanguage($any($event.target).value)"
+      >
+        <option value="">— Select language —</option>
+        @for (lang of languages(); track lang) {
+          <option [value]="lang">{{ languageLabel(lang) }}</option>
+        }
+      </select>
+    </div>
+    <button
+      type="button"
+      class="btn secondary"
+      [disabled]="!exportLanguageCode()"
+      (click)="exportVocabulary()"
+    >
+      Download JSON
+    </button>
+
+    <label class="btn secondary" [class.disabled]="restoreStatus() === 'restoring'">
+      {{ restoreStatus() === 'restoring' ? 'Restoring…' : 'Restore from backup' }}
+      <input
+        type="file"
+        accept=".json"
+        (change)="onRestoreFile($event)"
+        style="display: none;"
+        [disabled]="restoreStatus() === 'restoring'"
+      />
+    </label>
+  </div>
+
+  @if (restoreStatus() === 'done' || restoreStatus() === 'error') {
+    <p [class.error-msg]="restoreStatus() === 'error'" class="hint">
+      {{ restoreMessage() }}
+    </p>
+  }
+</div>

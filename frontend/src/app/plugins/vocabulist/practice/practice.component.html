@@ -1,0 +1,46 @@
+<section class="card vocabulist-practice">
+  <div class="vocabulist-practice-header">
+    <a
+      [routerLink]="['/plugins/vocabulist']"
+      [queryParams]="lang() ? { lang: lang() } : {}"
+      class="btn secondary"
+    >
+      ← Back to {{ languageLabel(lang()) }}
+    </a>
+    <span class="vocabulist-practice-progress">{{ progressLabel() }}</span>
+  </div>
+
+  @if (isDone()) {
+    <div class="vocabulist-practice-done">
+      <p>Session complete. You reviewed {{ reviewed() }} word(s), {{ correctCount() }} correct.</p>
+      <button type="button" class="btn primary" (click)="backToList()">
+        Back to {{ languageLabel(lang()) }}
+      </button>
+    </div>
+  } @else if (currentWord()) {
+    @if (currentWord(); as w) {
+      <div class="vocabulist-practice-card">
+        <p class="vocabulist-practice-prompt">Translation:</p>
+        <p class="vocabulist-practice-word">{{ wordDisplay(w, lang() ?? '') }}</p>
+        @if (showBack()) {
+          <p class="vocabulist-practice-back">{{ w.translation }}</p>
+          <div class="vocabulist-practice-actions">
+            <button type="button" class="btn secondary" (click)="record(false)">
+              Wrong
+            </button>
+            <button type="button" class="btn primary" (click)="record(true)">
+              Correct
+            </button>
+          </div>
+        } @else {
+          <button type="button" class="btn primary" (click)="toggleBack()">
+            Show translation
+          </button>
+        }
+      </div>
+    }
+  } @else {
+    <p class="hint">No words due. Select a language and import vocabulary, or come back later.</p>
+    <a routerLink="/plugins/vocabulist" class="btn secondary">Back to list</a>
+  }
+</section>

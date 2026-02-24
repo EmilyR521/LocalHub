@@ -11,7 +11,7 @@
     </div>
     <div class="field">
       <label for="book-status">Status</label>
-      <select id="book-status" [(ngModel)]="status" name="status">
+      <select id="book-status" class="form-select" [(ngModel)]="status" name="status">
         @for (s of statusOptions; track s) {
           <option [value]="s">{{ s }}</option>
         }

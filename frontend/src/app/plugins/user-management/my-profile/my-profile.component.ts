@@ -35,9 +35,17 @@ export class MyProfileComponent implements OnInit {
   readonly saveStatus = signal<'idle' | 'saving' | 'saved' | 'error'>('idle');
   readonly disconnectingAppId = signal<string | null>(null);
 
+  private defaultPluginOrder = [...PLUGINS]
+    .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
+    .map((p) => p.id);
+
   readonly plugins = computed(() =>
     [...PLUGINS].sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
   );
+
+  /** Plugin IDs in display order (sidebar order). Edited by user and saved as pluginOrderIds. */
+  readonly orderedPluginIds = signal<string[]>([]);
+
   readonly connectedApps = computed(() => this.userProfile.connectedApps());
 
   constructor() {
@@ -55,6 +63,7 @@ export class MyProfileComponent implements OnInit {
           emoji: typeof p.emoji === 'string' ? p.emoji : '👤',
           theme: (p.theme === 'light' || p.theme === 'dark' ? p.theme : 'dark') as ThemeMode,
           visiblePluginIds: Array.isArray(p.visiblePluginIds) ? p.visiblePluginIds : [],
+          pluginOrderIds: Array.isArray(p.pluginOrderIds) ? p.pluginOrderIds : [],
         }
       : DEFAULT_PROFILE;
     this.name.set(profile.name);
@@ -64,6 +73,17 @@ export class MyProfileComponent implements OnInit {
       profile.visiblePluginIds.length > 0
         ? new Set(profile.visiblePluginIds)
         : new Set(PLUGINS.map((x) => x.id))
+    );
+    const knownIds = new Set(PLUGINS.map((x) => x.id));
+    const savedOrder = Array.isArray(p?.pluginOrderIds) ? p.pluginOrderIds : [];
+    const validOrder =
+      Array.isArray(savedOrder) &&
+      savedOrder.length > 0 &&
+      savedOrder.every((id) => knownIds.has(id));
+    this.orderedPluginIds.set(
+      validOrder
+        ? savedOrder.filter((id) => knownIds.has(id))
+        : [...this.defaultPluginOrder]
     );
   }
 
@@ -91,6 +111,18 @@ export class MyProfileComponent implements OnInit {
     this.userProfile.updateProfile({ theme: mode });
   }
 
+  movePlugin(index: number, direction: 1 | -1): void {
+    const list = [...this.orderedPluginIds()];
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= list.length) return;
+    [list[index], list[newIndex]] = [list[newIndex], list[index]];
+    this.orderedPluginIds.set(list);
+  }
+
+  getPluginById(id: string): { id: string; name: string; icon?: string } | undefined {
+    return PLUGINS.find((p) => p.id === id);
+  }
+
   save(): void {
     this.saveStatus.set('saving');
     const current = this.userProfile.profile();
@@ -100,6 +132,7 @@ export class MyProfileComponent implements OnInit {
       emoji: this.emoji().trim() || '👤',
       visiblePluginIds: [...this.selectedPluginIds()],
       theme: this.theme(),
+      pluginOrderIds: this.orderedPluginIds().length > 0 ? [...this.orderedPluginIds()] : undefined,
       ...(Array.isArray(current?.dashboardWidgetIds) && {
         dashboardWidgetIds: current.dashboardWidgetIds,
       }),
