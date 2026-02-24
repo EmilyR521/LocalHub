@@ -11,6 +11,7 @@ import {
   DEFAULT_LANGUAGE_KEY,
   vocabKey,
 } from './vocabulist-store.constants';
+import { normalizeVocabWord } from './vocab-backup.helper';
 
 /**
  * Loads and persists vocabulist data per user.
@@ -78,8 +79,11 @@ export class VocabulistPersistenceService {
         .get<VocabularyFile>(VOCABULIST_PLUGIN_ID, vocabKey(code), id)
         .subscribe({
           next: (data) => {
-            const words = data?.words;
-            this.wordsSignal.set(Array.isArray(words) ? words : []);
+            const raw = data?.words;
+            const words = Array.isArray(raw)
+              ? raw.map((w) => normalizeVocabWord(w)).filter((w): w is VocabWord => w != null)
+              : [];
+            this.wordsSignal.set(words);
           },
           error: () => this.wordsSignal.set([]),
         });
@@ -104,7 +108,7 @@ export class VocabulistPersistenceService {
       .subscribe({ error: () => {} });
   }
 
-  /** Fetch vocabulary file for a language without changing current language. Missing file is treated as empty. */
+  /** Fetch vocabulary file for a language without changing current language. Missing file is treated as empty. Words are normalized to current structure. */
   getVocabularyFile(languageCode: string): Observable<VocabularyFile> {
     const id = this.userId();
     if (!id || !languageCode) {
@@ -113,10 +117,13 @@ export class VocabulistPersistenceService {
     return this.store
       .get<VocabularyFile>(VOCABULIST_PLUGIN_ID, vocabKey(languageCode), id)
       .pipe(
-        map((data) => ({
-          languageCode,
-          words: Array.isArray(data?.words) ? data.words : [],
-        })),
+        map((data) => {
+          const raw = data?.words;
+          const words = Array.isArray(raw)
+            ? raw.map((w) => normalizeVocabWord(w)).filter((w): w is VocabWord => w != null)
+            : [];
+          return { languageCode, words };
+        }),
         catchError(() => of({ languageCode, words: [] }))
       );
   }

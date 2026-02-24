@@ -5,6 +5,7 @@ import type { VocabWord } from '../models/word.model';
 import { VocabulistPersistenceService } from './vocabulist-persistence.service';
 import { VocabulistDictionaryService } from './vocabulist-dictionary.service';
 import { mapDuolingoToVocabWords, type DuolingoExport } from './duolingo-import.helper';
+import { buildVocabularyFileForExport, parseBackupFile } from './vocab-backup.helper';
 import {
   addDays,
   todayKey,
@@ -58,13 +59,14 @@ export class VocabulistService {
   }
 
   /**
-   * Export a language's vocabulary as JSON and trigger download.
+   * Export a language's vocabulary as JSON (current data structure) and trigger download.
    */
   exportLanguage(languageCode: string): void {
     const lang = languageCode.trim().toLowerCase();
     if (!lang) return;
     this.persistence.getVocabularyFile(lang).subscribe((file) => {
-      const blob = new Blob([JSON.stringify(file, null, 2)], {
+      const normalized = buildVocabularyFileForExport(file.languageCode || lang, file.words ?? []);
+      const blob = new Blob([JSON.stringify(normalized, null, 2)], {
         type: 'application/json',
       });
       const url = URL.createObjectURL(blob);
@@ -77,46 +79,16 @@ export class VocabulistService {
   }
 
   /**
-   * Replace a language's vocabulary with backup data (from export). Validates shape.
+   * Replace a language's vocabulary with backup data (from export). Validates and normalizes to current structure.
    */
   replaceFromBackup(file: unknown): { ok: boolean; error?: string } {
-    if (!file || typeof file !== 'object' || !('words' in file)) {
-      return { ok: false, error: 'Invalid backup: missing words array.' };
-    }
-    const f = file as Record<string, unknown>;
-    const words = f['words'];
-    if (!Array.isArray(words)) {
-      return { ok: false, error: 'Invalid backup: words must be an array.' };
-    }
-    const lang = typeof f['languageCode'] === 'string' ? f['languageCode'].trim().toLowerCase() : '';
-    if (!lang) {
-      return { ok: false, error: 'Invalid backup: missing languageCode.' };
-    }
-    const normalized: VocabWord[] = [];
-    for (const w of words) {
-      if (!w || typeof w !== 'object' || !('id' in w) || !('word' in w) || !('translation' in w)) continue;
-      const r = w as Record<string, unknown>;
-      const topicTags = Array.isArray(r['topicTags'])
-        ? (r['topicTags'] as unknown[]).filter((t: unknown): t is string => typeof t === 'string')
-        : [];
-      const grammarTags = Array.isArray(r['grammarTags'])
-        ? (r['grammarTags'] as unknown[]).filter((t: unknown): t is string => typeof t === 'string')
-        : undefined;
-      normalized.push({
-        id: String(r['id']),
-        word: String(r['word']),
-        translation: String(r['translation']),
-        topicTags,
-        grammarTags: grammarTags?.length ? grammarTags : undefined,
-        lastPracticed: typeof r['lastPracticed'] === 'string' ? r['lastPracticed'] : undefined,
-        nextDue: typeof r['nextDue'] === 'string' ? r['nextDue'] : undefined,
-        intervalDays: typeof r['intervalDays'] === 'number' ? r['intervalDays'] : undefined,
-      });
-    }
-    this.persistence.saveWords(lang, normalized);
+    const result = parseBackupFile(file);
+    if (!result.ok) return result;
+    const { file: normalizedFile } = result;
+    this.persistence.saveWords(normalizedFile.languageCode, normalizedFile.words);
     const allLangs = this.persistence.languages();
-    if (!allLangs.includes(lang)) {
-      this.persistence.saveLanguages([...allLangs, lang]);
+    if (!allLangs.includes(normalizedFile.languageCode)) {
+      this.persistence.saveLanguages([...allLangs, normalizedFile.languageCode]);
     }
     return { ok: true };
   }
