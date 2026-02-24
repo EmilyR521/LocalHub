@@ -1,6 +1,8 @@
 import { NgStyle } from '@angular/common';
 import { Component, inject, signal, computed, effect } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { HabitsService } from '../../../habits/services/habits.service';
+import { JournalService } from '../../../journal/services/journal.service';
 import { BookStatus } from '../../../reader/models/book-status.model';
 import { ReaderService } from '../../../reader/services/reader.service';
 import { CalendarDisplayService } from '../../services/calendar-display.service';
@@ -61,13 +63,14 @@ interface DayCell {
 @Component({
   selector: 'app-calendar-month-view',
   standalone: true,
-  imports: [NgStyle],
+  imports: [NgStyle, RouterLink],
   templateUrl: './calendar-month-view.component.html',
 })
 export class CalendarMonthViewComponent {
   private calendarGoogle = inject(CalendarGoogleService);
   private displayOptions = inject(CalendarDisplayService);
   private habitsService = inject(HabitsService);
+  private journalService = inject(JournalService);
   private readerService = inject(ReaderService);
 
   readonly viewYear = signal(new Date().getFullYear());
@@ -203,6 +206,14 @@ export class CalendarMonthViewComponent {
     effect(() => {
       if (this.displayReading()) this.readerService.load();
     });
+    effect(() => {
+      this.journalService.load();
+    });
+  }
+
+  /** Whether there is a journal entry for this date (day number becomes a link when true). */
+  hasJournalEntry(dateKey: string): boolean {
+    return this.journalService.entryDates().includes(dateKey);
   }
 
   private fetchEvents(year: number, month: number): void {

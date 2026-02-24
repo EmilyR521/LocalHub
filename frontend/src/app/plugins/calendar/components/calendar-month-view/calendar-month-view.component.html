@@ -21,7 +21,11 @@
         @for (cell of row; track cell.date.getTime()) {
           <div class="calendar-cell calendar-day" [class.other-month]="!cell.isCurrentMonth" [class.calendar-day-today]="isToday(cell)">
             <div class="calendar-day-header">
-              <span class="day-num">{{ cell.dayOfMonth }}</span>
+              @if (hasJournalEntry(dateKey(cell.date))) {
+                <a [routerLink]="['/plugins/journal']" [queryParams]="{ date: dateKey(cell.date) }" class="day-num day-num-link" [title]="'Open journal entry for ' + dateKey(cell.date)">{{ cell.dayOfMonth }}</a>
+              } @else {
+                <span class="day-num">{{ cell.dayOfMonth }}</span>
+              }
               @if (displayHabits() && cell.habitItems.length > 0) {
                 <span class="calendar-day-habit-dots" aria-label="Habits completed">
                   @for (habit of cell.habitItems; track habit.name) {

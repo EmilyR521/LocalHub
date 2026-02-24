@@ -43,6 +43,11 @@ export const routes: Routes = [
           import('./plugins/vocabulist/vocabulist.routes').then((m) => m.vocabulistRoutes),
       },
       {
+        path: 'plugins/journal',
+        loadChildren: () =>
+          import('./plugins/journal/journal.routes').then((m) => m.journalRoutes),
+      },
+      {
         path: 'plugins/user-management',
         loadChildren: () =>
           import('./plugins/user-management/user-management.routes').then((m) => m.userManagementRoutes),

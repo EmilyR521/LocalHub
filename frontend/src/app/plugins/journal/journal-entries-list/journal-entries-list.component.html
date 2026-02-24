@@ -1,0 +1,17 @@
+<section class="card journal-entries-list">
+  <h2 class="journal-entries-list-title">Previous entries</h2>
+  @if (entryDates().length === 0) {
+    <p class="hint">No journal entries yet. <a routerLink="/plugins/journal">Write your first entry</a>.</p>
+  } @else {
+    <ul class="journal-entries-list-ul">
+      @for (key of entryDates(); track key) {
+        <li class="journal-entries-list-li">
+          <a [routerLink]="['/plugins/journal']" [queryParams]="{ date: key }" class="journal-entries-list-link">
+            <span class="journal-entries-list-date">{{ formatDateShort(key) }}</span>
+            <span class="journal-entries-list-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</section>
