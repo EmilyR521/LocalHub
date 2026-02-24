@@ -1,12 +1,32 @@
 <div class="dashboard-widget dashboard-widget-currently-reading">
   <h2 class="dashboard-widget-title"><span class="dashboard-widget-title-emoji" aria-hidden="true">📖</span> Currently reading</h2>
   @if (currentlyReading().length > 0) {
-    <ul class="dashboard-widget-list">
+    <ul class="dashboard-widget-list dashboard-widget-currently-reading-list">
       @for (book of currentlyReading(); track book.id) {
-        <li>
-          <a [routerLink]="['/plugins/reader']" class="dashboard-widget-link">
-            <span class="widget-book-title">{{ book.title }}</span>
-            <span class="widget-book-author">by {{ book.author }}</span>
+        <li class="dashboard-widget-currently-reading-item">
+          <a [routerLink]="['/plugins/reader']" class="dashboard-widget-link dashboard-widget-currently-reading-link">
+            <div class="widget-currently-reading-cover-wrap">
+              <div class="widget-currently-reading-cover" [class.has-image]="showCover(book)">
+                @if (showCover(book)) {
+                  <img
+                    [src]="book.imageUrl"
+                    [alt]="book.title + ' cover'"
+                    (error)="setCoverError(book.id)" />
+                }
+                @if (!showCover(book)) {
+                  <div class="widget-currently-reading-cover-placeholder">
+                    <span class="placeholder-icon" aria-hidden="true">📚</span>
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="widget-currently-reading-info">
+              <span class="widget-book-title">{{ book.title }}</span>
+              <span class="widget-book-author">by {{ book.author }}</span>
+              @if (book.readingStartDate) {
+                <span class="widget-currently-reading-since">Since {{ book.readingStartDate | date:'mediumDate' }}</span>
+              }
+            </div>
           </a>
         </li>
       }

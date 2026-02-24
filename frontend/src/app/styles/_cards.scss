@@ -125,6 +125,85 @@
   margin-top: 0.125rem;
 }
 
+// Currently reading widget: cover + info + Since date
+.dashboard-widget-currently-reading-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dashboard-widget-currently-reading-item {
+  margin-bottom: 0 !important;
+}
+
+.dashboard-widget-currently-reading-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+}
+
+.widget-currently-reading-cover-wrap {
+  flex-shrink: 0;
+}
+
+.widget-currently-reading-cover {
+  width: 3.5rem;
+  height: 5.25rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg);
+  border: 1px solid var(--border);
+
+  &.has-image {
+    background: transparent;
+    border-color: transparent;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.widget-currently-reading-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+
+  .placeholder-icon {
+    font-size: 1.25rem;
+    opacity: 0.6;
+  }
+}
+
+.widget-currently-reading-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.widget-currently-reading-info .widget-book-title {
+  font-weight: 500;
+}
+
+.widget-currently-reading-info .widget-book-author {
+  margin-top: 0;
+}
+
+.widget-currently-reading-since {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
 // Run widgets: shared line styles (date = primary, when/meta = muted)
 .dashboard-widget-next-run .widget-next-run-date,
 .dashboard-widget-last-run .widget-last-run-date {
