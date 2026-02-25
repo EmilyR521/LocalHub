@@ -1,8 +1,8 @@
 import type { Type } from '@angular/core';
-import { DashboardCalendarWidgetComponent } from './widgets/dashboard-calendar-widget.component';
-import { DashboardCurrentlyReadingWidgetComponent } from './widgets/dashboard-currently-reading-widget.component';
-import { DashboardLastRunWidgetComponent } from './widgets/dashboard-last-run-widget.component';
-import { DashboardNextRunWidgetComponent } from './widgets/dashboard-next-run-widget.component';
+import { DashboardCalendarWidgetComponent } from './widgets/calendar-widget/dashboard-calendar-widget.component';
+import { DashboardCurrentlyReadingWidgetComponent } from './widgets/currently-reading-widget/dashboard-currently-reading-widget.component';
+import { DashboardLastRunWidgetComponent } from './widgets/last-run-widget/dashboard-last-run-widget.component';
+import { DashboardNextRunWidgetComponent } from './widgets/next-run-widget/dashboard-next-run-widget.component';
 
 export interface DashboardWidgetDef {
   id: string;

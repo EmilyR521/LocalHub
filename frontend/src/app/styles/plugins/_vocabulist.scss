@@ -1,0 +1,377 @@
+// Vocabulist plugin – home list, practice card, word detail, settings drawer
+.settings-section {
+  margin-bottom: 1.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.settings-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+}
+
+.vocabulist-language-heading {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: var(--text);
+}
+
+.vocabulist-home-actions,
+.vocabulist-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.vocabulist-filters-collapsible {
+  margin-bottom: 1rem;
+}
+
+.vocabulist-filters-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vocabulist-filters-badge {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.vocabulist-filters-chevron {
+  display: inline-block;
+  font-size: 0.6rem;
+  transition: transform 0.2s ease;
+
+  &.vocabulist-filters-chevron--open {
+    transform: rotate(-180deg);
+  }
+}
+
+.vocabulist-filter-panel {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+
+  &[hidden] {
+    display: none !important;
+  }
+}
+
+.vocabulist-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1.5rem;
+}
+
+.vocabulist-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vocabulist-search-field {
+  flex-direction: column;
+  align-items: stretch;
+
+  .vocabulist-filter-label {
+    margin-bottom: 0.25rem;
+  }
+  .vocabulist-search {
+    width: 100%;
+    max-width: 20rem;
+  }
+}
+
+.vocabulist-lang-tabs {
+  margin-bottom: 1rem;
+}
+
+// Settings: language order and default
+.vocabulist-settings-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.vocabulist-lang-order {
+  margin-bottom: 1rem;
+}
+
+.vocabulist-lang-order-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.vocabulist-lang-order-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.vocabulist-lang-order-name {
+  font-weight: 500;
+}
+
+.vocabulist-lang-order-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.vocabulist-lang-order-actions .icon-btn {
+  min-width: 2rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  line-height: 1.2;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.vocabulist-filter-label {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.25rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.vocabulist-filter-group .vocabulist-filter-label {
+  width: auto;
+  margin-bottom: 0;
+  margin-right: 0.25rem;
+}
+
+.vocabulist-search-field .vocabulist-filter-label {
+  width: 100%;
+  margin-bottom: 0.25rem;
+}
+
+.vocabulist-tag-multiselect {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  align-items: center;
+}
+
+.vocabulist-tag-chip {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8125rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  &.vocabulist-tag-chip--selected {
+    border-color: var(--accent);
+    background: rgba(88, 166, 255, 0.12);
+    color: var(--accent);
+  }
+}
+
+.vocabulist-search {
+  flex: 1;
+  min-width: 12rem;
+  max-width: 20rem;
+}
+
+.vocabulist-word-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.vocabulist-word-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.vocabulist-word-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  flex: 1;
+  min-width: 0;
+  gap: 0.5rem 1rem;
+  padding: 0.6rem 0;
+  color: var(--text);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--accent);
+  }
+}
+
+.vocabulist-word-grammar-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.vocabulist-grammar-chip {
+  font-size: 0.75rem;
+}
+
+.vocabulist-word-name {
+  font-weight: 600;
+}
+
+.vocabulist-word-translation {
+  color: var(--text-muted);
+}
+
+.vocabulist-word-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.vocabulist-tag {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.4rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+
+.vocabulist-empty {
+  padding: 1rem 0;
+  color: var(--text-muted);
+}
+
+// Practice
+.vocabulist-practice-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.vocabulist-practice-progress {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.vocabulist-practice-card {
+  padding: 1.5rem 0;
+}
+
+.vocabulist-practice-prompt {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.vocabulist-practice-word {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.vocabulist-practice-back {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.vocabulist-practice-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.vocabulist-practice-done {
+  padding: 1.5rem 0;
+}
+
+// Word detail
+.vocabulist-detail-form .field {
+  margin-bottom: 1rem;
+}
+
+.vocabulist-tags-edit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vocabulist-tag-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.vocabulist-tag-remove {
+  padding: 0 0.2rem;
+  font-size: 1rem;
+  line-height: 1;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 2px;
+
+  &:hover {
+    color: var(--danger, #dc3545);
+  }
+}
+
+.vocabulist-tag-add {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.vocabulist-tag-input {
+  width: 8rem;
+}
+
+.vocabulist-detail-actions-bottom {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+// Import progress (Duolingo import + dictionary enrichment) – .spinner in plugins.scss
+.import-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

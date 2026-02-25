@@ -1,48 +1,38 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ReaderService } from './services/reader.service';
 import { BookFormComponent } from './components/book-form/book-form.component';
 import { ReaderSettingsComponent } from './components/reader-settings/reader-settings.component';
-import { ReaderCollectionsComponent } from './components/reader-collections/reader-collections.component';
-import { ReaderTimelineComponent } from './components/reader-timeline/reader-timeline.component';
+import { ReaderCollectionsComponent } from './views/reader-collections/reader-collections.component';
+import { ReaderBooksTableComponent } from './views/reader-books-table/reader-books-table.component';
+import { ReaderTimelineComponent } from './views/reader-timeline/reader-timeline.component';
 import { SettingsDrawerHostComponent } from '../../shared/components/settings-drawer-host/settings-drawer-host.component';
+import { NavigationBarComponent, type NavigationBarItem } from '../../shared/components/navigation-bar/navigation-bar.component';
 import type { Book } from './models/book.model';
-import { BookStatus } from './models/book-status.model';
-import { BookRating } from './models/book-rating.model';
-import {
-  filterBooksByStatus,
-  sortBooks,
-  type BooksSortField,
-  type SortDirection,
-} from './helpers/reader-books-list.helper';
 
 @Component({
   selector: 'app-reader',
   standalone: true,
-  imports: [BookFormComponent, ReaderSettingsComponent, ReaderCollectionsComponent, ReaderTimelineComponent, SettingsDrawerHostComponent],
+  imports: [
+    BookFormComponent,
+    ReaderSettingsComponent,
+    ReaderCollectionsComponent,
+    ReaderBooksTableComponent,
+    ReaderTimelineComponent,
+    SettingsDrawerHostComponent,
+    NavigationBarComponent,
+  ],
   templateUrl: './reader.component.html',
 })
 export class ReaderComponent implements OnInit {
+  readonly readerNavItems: NavigationBarItem[] = [
+    { label: 'Timeline', value: 'timeline' },
+    { label: 'Books', value: 'books' },
+    { label: 'Collections', value: 'collections' },
+  ];
+
   panelOpen = signal(false);
   editingBook = signal<Book | null>(null);
   activeTab = signal<'books' | 'collections' | 'timeline'>('timeline');
-
-  statusFilter = signal<BookStatus | ''>('');
-  sortField = signal<BooksSortField>('author');
-  sortDir = signal<SortDirection>('asc');
-
-  readonly BookStatus = BookStatus;
-  readonly BookRating = BookRating;
-  readonly statusOptions: (BookStatus | '')[] = ['', ...Object.values(BookStatus)];
-
-  readonly books = this.reader.books;
-
-  readonly filteredAndSortedBooks = computed(() => {
-    const list = filterBooksByStatus(
-      this.reader.books(),
-      this.statusFilter()
-    );
-    return sortBooks(list, this.sortField(), this.sortDir());
-  });
 
   constructor(private reader: ReaderService) {}
 
@@ -81,35 +71,5 @@ export class ReaderComponent implements OnInit {
       this.reader.removeBook(book.id);
       this.closePanel();
     }
-  }
-
-  setStatusFilter(value: BookStatus | ''): void {
-    this.statusFilter.set(value);
-  }
-
-  setSort(field: BooksSortField): void {
-    if (this.sortField() === field) {
-      this.sortDir.update((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      this.sortField.set(field);
-      this.sortDir.set('asc');
-    }
-  }
-
-  formatDate(iso: string | undefined): string {
-    if (!iso) return '—';
-    try {
-      return new Date(iso).toLocaleDateString();
-    } catch {
-      return '—';
-    }
-  }
-
-  ratingIcon(rating: BookRating | undefined): string {
-    if (!rating || rating === BookRating.None) return '';
-    if (rating === BookRating.Positive) return '👍';
-    if (rating === BookRating.Negative) return '👎';
-    if (rating === BookRating.Favourite) return '❤️';
-    return '';
   }
 }

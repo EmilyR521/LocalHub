@@ -1,0 +1,30 @@
+<section class="card journal-home">
+  <div class="journal-home-toolbar">
+    <div class="journal-home-date-row">
+      <label for="journal-date" class="journal-home-label">Date</label>
+      <input
+        id="journal-date"
+        type="date"
+        class="form-input journal-home-date-input"
+        [value]="dateInputValue() || currentDateKey() || todayKey()"
+        (input)="onDateKeyChange(($any($event.target).value) || null)"
+      />
+      <button type="button" class="btn secondary" (click)="goToToday()">Today</button>
+    </div>
+    <p class="journal-home-date-label" aria-hidden="true">{{ selectedDateLabel() }}</p>
+  </div>
+
+  <div class="journal-home-editor">
+    <label for="journal-content" class="journal-home-label">Entry</label>
+    <textarea
+      id="journal-content"
+      class="form-textarea journal-home-textarea"
+      [value]="content()"
+      (input)="onContentInput($any($event.target).value)"
+      (blur)="save()"
+      placeholder="Write your thoughts for this day…"
+      rows="12"
+    ></textarea>
+    <p class="hint">Changes are saved automatically when you leave the field.</p>
+  </div>
+</section>

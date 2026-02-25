@@ -1,5 +1,4 @@
 /** British standard: 0 = Monday, 1 = Tuesday, ... 6 = Sunday */
-export type PlanMode = 'repeated' | 'ramp-up';
 
 export interface RunnerPlanBase {
   /** Which weekdays the user can run (0=Mon .. 6=Sun) */
@@ -15,20 +14,7 @@ export interface RunnerPlanRepeated extends RunnerPlanBase {
   weeksToShow?: number;
 }
 
-/** Ramp-up: build from start distance to goal distance on goal date. */
-export interface RunnerPlanRampUp extends RunnerPlanBase {
-  mode: 'ramp-up';
-  /** Weekdays that get the ramping long-run distance (subset of availableDays; 0=Mon .. 6=Sun) */
-  longRunDays?: number[];
-  /** Goal date (YYYY-MM-DD) – target for the single long run */
-  goalDate: string;
-  /** Distance in km for the single run on goal date */
-  goalDistanceKm: number;
-  /** Starting distance in km for week 1 (default 2) */
-  startDistanceKm?: number;
-}
-
-export type RunnerPlan = RunnerPlanRepeated | RunnerPlanRampUp;
+export type RunnerPlan = RunnerPlanRepeated;
 
 export interface ScheduledRun {
   date: string;
@@ -64,6 +50,16 @@ export function getWeekMonday(dateStr: string): string {
   return `${y}-${m}-${day}`;
 }
 
+/** Date string (YYYY-MM-DD) for the given week Monday and British weekday (0=Mon .. 6=Sun). */
+export function dateFromWeekAndDay(weekMonday: string, dayOfWeek: number): string {
+  const d = parseDate(weekMonday);
+  d.setDate(d.getDate() + dayOfWeek);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 /** Short label for week (e.g. "17 Feb") */
 export function formatWeekLabel(dateStr: string): string {
   const d = parseDate(dateStr);
@@ -76,6 +72,8 @@ export function isRepeated(plan: RunnerPlan): plan is RunnerPlanRepeated {
   return plan.mode === 'repeated';
 }
 
-export function isRampUp(plan: RunnerPlan): plan is RunnerPlanRampUp {
-  return plan.mode === 'ramp-up';
+/** JSON format for uploading a smart plan (template download or manual edit). */
+export interface RunnerPlanUpload {
+  description?: string;
+  runs: ScheduledRun[];
 }

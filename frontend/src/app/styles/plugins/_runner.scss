@@ -1,0 +1,96 @@
+// Runner plugin – view navigation uses shared .plugin-view-nav (plugins.scss)
+.runner-outlet {
+  margin-top: 0;
+}
+
+// Your plan – Add to Google Calendar feedback (spinner is .plugin-spinner in plugins.scss)
+.calendar-feedback-msg {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+}
+
+.calendar-feedback-success {
+  background: var(--success-bg, rgba(34, 139, 34, 0.12));
+  color: var(--success-text, #228b22);
+}
+
+.calendar-feedback-error {
+  background: var(--error-bg, rgba(180, 0, 0, 0.1));
+  color: var(--error-text, #b22222);
+}
+
+// Runner settings – Strava connected profile
+.strava-connected {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.strava-profile-img {
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.strava-profile-info {
+  margin: 0;
+}
+
+.strava-logged-in-as {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.strava-name {
+  margin: 0.25rem 0 0;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.strava-username {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+// Running Trends – cumulative distance chart
+.runner-trends-chart-wrap {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.runner-trends-chart {
+  display: block;
+  width: 100%;
+  max-width: 28rem;
+  height: auto;
+  aspect-ratio: 320 / 200;
+}
+
+.runner-trends-axis-label {
+  font-size: 0.75rem;
+  fill: var(--text-muted);
+}
+
+.runner-trends-grid-line {
+  stroke: var(--border);
+  stroke-width: 0.5;
+}
+
+.runner-trends-tick-label {
+  font-size: 0.6875rem;
+  fill: var(--text-muted);
+}
+
+.runner-trends-line {
+  vector-effect: non-scaling-stroke;
+}
+
+.runner-trends-summary {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}

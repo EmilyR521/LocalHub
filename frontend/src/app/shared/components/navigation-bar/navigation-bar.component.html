@@ -1,0 +1,23 @@
+<nav
+  class="plugin-view-nav"
+  [attr.aria-label]="ariaLabel()">
+  @for (item of items(); track item.label) {
+    @if (isLink(item)) {
+      <a
+        [routerLink]="item.route!"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: !!item.exact }"
+        class="btn secondary">
+        {{ item.label }}
+      </a>
+    } @else {
+      <button
+        type="button"
+        class="btn secondary"
+        [class.active]="selected() === item.value"
+        (click)="onTabClick(item.value!)">
+        {{ item.label }}
+      </button>
+    }
+  }
+</nav>

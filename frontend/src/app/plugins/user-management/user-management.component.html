@@ -3,10 +3,9 @@
   <p class="subtitle">Set your display name, emoji, and which plugin apps appear in the sidebar.</p>
 </header>
 
-<div class="reader-tabs" aria-label="User management views">
-  <a routerLink="profile" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="btn secondary">My profile</a>
-  <a routerLink="users" routerLinkActive="active" class="btn secondary">All users</a>
-</div>
+<app-navigation-bar
+  [items]="userManagementNavItems"
+  ariaLabel="User management views" />
 
 <main>
   <router-outlet />

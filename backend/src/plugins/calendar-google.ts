@@ -307,9 +307,14 @@ router.post('/google/events/delete', async (req: Request, res: Response) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
-      if (delRes.ok || delRes.status === 404) deleted += 1;
-    } catch {
-      // skip failed deletes; still count as "handled"
+      if (delRes.ok || delRes.status === 404) {
+        deleted += 1;
+      } else {
+        const errText = await delRes.text();
+        console.error('Google Calendar delete event failed', delRes.status, eventId, errText.slice(0, 100));
+      }
+    } catch (err) {
+      console.error('Google Calendar delete event error', eventId, err);
     }
   }
   res.json({ deleted });

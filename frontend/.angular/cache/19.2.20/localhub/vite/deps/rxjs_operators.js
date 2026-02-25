@@ -1,7 +1,7 @@
 import {
   partition,
   race
-} from "./chunk-C6ZQOQFD.js";
+} from "./chunk-6Q4RANH6.js";
 import {
   audit,
   auditTime,
@@ -15,7 +15,7 @@ import {
   combineLatest2 as combineLatest,
   combineLatestAll,
   combineLatestWith,
-  concat,
+  concat2 as concat,
   concatAll,
   concatMap,
   concatMapTo,
@@ -114,7 +114,7 @@ import {
   zip2 as zip,
   zipAll,
   zipWith
-} from "./chunk-2C44WUKA.js";
+} from "./chunk-CXCX2JKZ.js";
 export {
   audit,
   auditTime,

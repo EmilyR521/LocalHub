@@ -1,17 +1,18 @@
-import { Injectable, signal, inject, effect } from '@angular/core';
+import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { switchMap, tap, map } from 'rxjs/operators';
 import { PluginStoreService } from '../../../core/services/plugin-store.service';
 import { UserProfileService } from '../../../core/services/user-profile.service';
-import type { RunnerPlan, RunnerPlanRepeated, RunnerPlanRampUp, ScheduledRun } from '../models/runner-plan.model';
-import { isRepeated, isRampUp } from '../models/runner-plan.model';
+import type { RunnerPlan, RunnerPlanRepeated, RunnerPlanUpload, ScheduledRun } from '../models/runner-plan.model';
+import { isRepeated } from '../models/runner-plan.model';
 
 const CALENDAR_EVENTS_API = '/api/plugins/calendar/google/events';
 const CALENDAR_EVENTS_DELETE_API = '/api/plugins/calendar/google/events/delete';
 
 const PLUGIN_ID = 'runner';
 const STORE_KEY = 'plan';
+const UPLOADED_RUNS_KEY = 'uploadedRuns';
 const CALENDAR_COLOR_KEY = 'calendarEventColorId';
 const CALENDAR_EVENT_IDS_KEY = 'calendarEventIds';
 
@@ -64,7 +65,6 @@ function getNextMonday(): Date {
 
 export function buildSchedule(plan: RunnerPlan): ScheduledRun[] {
   if (isRepeated(plan)) return buildScheduleRepeated(plan);
-  if (isRampUp(plan)) return buildScheduleRampUp(plan);
   return [];
 }
 
@@ -94,62 +94,68 @@ function buildScheduleRepeated(plan: RunnerPlanRepeated): ScheduledRun[] {
   return runs;
 }
 
-function buildScheduleRampUp(plan: RunnerPlanRampUp): ScheduledRun[] {
-  const { availableDays, goalDate, goalDistanceKm, startDistanceKm = 2 } = plan;
-  const availableSet = new Set(availableDays);
-  if (availableSet.size === 0 || goalDistanceKm <= 0) return [];
+/** Template JSON for smart plan: download and edit, or use as-is and import. */
+export const RUNNER_PLAN_TEMPLATE: RunnerPlanUpload = {
+  description:
+    'Runner plan import format. Fill the "runs" array. Each run needs: date (YYYY-MM-DD), distanceKm (number), title (e.g. "Run 10 km"). You can provide a custom training plan; dates must be valid and distances in km.',
+  runs: [
+          { date: '2025-01-01', distanceKm: 5, title: '(EXAMPLE) Easy run' },
+        ],
+};
 
-  const longRunSet = new Set(
-    Array.isArray(plan.longRunDays) && plan.longRunDays.length > 0
-      ? plan.longRunDays.filter((d) => availableSet.has(d))
-      : [Math.min(...availableDays)]
+function isValidScheduledRun(r: unknown): r is ScheduledRun {
+  return (
+    r !== null &&
+    typeof r === 'object' &&
+    typeof (r as ScheduledRun).date === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test((r as ScheduledRun).date) &&
+    typeof (r as ScheduledRun).distanceKm === 'number' &&
+    Number.isFinite((r as ScheduledRun).distanceKm)
   );
+}
 
-  const goal = parseDate(goalDate);
-  const startMonday = getNextMonday();
-  if (startMonday > goal) return [];
-
-  const weekCount = Math.max(1, Math.ceil((goal.getTime() - startMonday.getTime()) / (7 * 24 * 60 * 60 * 1000)));
-  const runs: ScheduledRun[] = [];
-
-  for (let w = 0; w < weekCount; w++) {
-    const t = weekCount <= 1 ? 1 : (w + 1) / weekCount;
-    const weekLongRunKm = startDistanceKm + (goalDistanceKm - startDistanceKm) * t;
-    const isGoalWeek = w === weekCount - 1;
-    const longRunDistance = isGoalWeek ? goalDistanceKm : roundToHalf(weekLongRunKm);
-    const otherRaw = roundToHalf((isGoalWeek ? goalDistanceKm : weekLongRunKm) * 0.5);
-    const otherMaxKm = Math.min(otherRaw, 10);
-    const easyRunKm = Math.min(otherRaw, 5);
-
-    const firstNonLongRunDay = [0, 1, 2, 3, 4, 5, 6].find((d) => availableSet.has(d) && !longRunSet.has(d));
-
-    const weekStart = new Date(startMonday);
-    weekStart.setDate(startMonday.getDate() + w * 7);
-
-    for (let d = 0; d < 7; d++) {
-      if (!availableSet.has(d)) continue;
-      const runDate = new Date(weekStart);
-      runDate.setDate(weekStart.getDate() + d);
-      if (runDate > goal) continue;
-
-      let distanceKm: number;
-      if (longRunSet.has(d)) {
-        distanceKm = longRunDistance;
-      } else if (firstNonLongRunDay !== undefined && d === firstNonLongRunDay) {
-        distanceKm = easyRunKm;
-      } else {
-        distanceKm = otherMaxKm;
+/** Parse and validate uploaded JSON. Returns runs array or null if invalid. */
+export function parseUploadedPlan(json: unknown): ScheduledRun[] | null {
+  if (!json || typeof json !== 'object') return null;
+  const obj = json as Record<string, unknown>;
+  let runs = obj['runs'];
+  if (Array.isArray(runs)) {
+    const result: ScheduledRun[] = [];
+    for (const r of runs) {
+      if (!r || typeof r !== 'object') continue;
+      const rec = r as Record<string, unknown>;
+      const date = typeof rec['date'] === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(rec['date']) ? rec['date'] : null;
+      const distanceKm = typeof rec['distanceKm'] === 'number' && Number.isFinite(rec['distanceKm']) && rec['distanceKm'] > 0 ? rec['distanceKm'] : null;
+      const title = typeof rec['title'] === 'string' ? rec['title'].trim() : null;
+      if (date && distanceKm !== null) {
+        result.push({
+          date,
+          distanceKm: Math.round(distanceKm * 2) / 2,
+          title: title || `Run ${Math.round(distanceKm * 2) / 2} km`,
+        });
       }
-      runs.push({
-        date: formatDate(runDate),
-        distanceKm,
-        title: `Run ${distanceKm} km`,
-      });
     }
+    return result.length > 0 ? result.sort((a, b) => a.date.localeCompare(b.date)) : null;
   }
-
-  runs.sort((a, b) => a.date.localeCompare(b.date));
-  return runs;
+  if (Array.isArray(json)) {
+    const result: ScheduledRun[] = [];
+    for (const r of json) {
+      if (!r || typeof r !== 'object') continue;
+      const rec = r as Record<string, unknown>;
+      const date = typeof rec['date'] === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(rec['date']) ? rec['date'] : null;
+      const distanceKm = typeof rec['distanceKm'] === 'number' && Number.isFinite(rec['distanceKm']) && rec['distanceKm'] > 0 ? rec['distanceKm'] : null;
+      const title = typeof rec['title'] === 'string' ? rec['title'].trim() : null;
+      if (date && distanceKm !== null) {
+        result.push({
+          date,
+          distanceKm: Math.round(distanceKm * 2) / 2,
+          title: title || `Run ${Math.round(distanceKm * 2) / 2} km`,
+        });
+      }
+    }
+    return result.length > 0 ? result.sort((a, b) => a.date.localeCompare(b.date)) : null;
+  }
+  return null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -159,7 +165,11 @@ export class RunnerPlanService {
   private http = inject(HttpClient);
 
   readonly plan = signal<RunnerPlan | null>(null);
-  /** True after load from store (saved plan) or after user clicks Generate plan. */
+  /** Uploaded runs (from JSON import). When set, schedule() returns these instead of generated from plan. */
+  readonly uploadedRuns = signal<ScheduledRun[] | null>(null);
+  /** Incremented when uploaded runs are set so the planner can sync editableRuns. */
+  readonly scheduleVersion = signal(0);
+  /** True after load from store, Generate plan, or Upload plan. */
   readonly userHasGenerated = signal(false);
   /** Google Calendar event colorId (1–11) for runs added to calendar. */
   readonly eventColorId = signal<string>('9');
@@ -168,21 +178,22 @@ export class RunnerPlanService {
   private loaded = false;
   private loadRequested = signal(false);
 
-  readonly schedule = signal<ScheduledRun[]>([]);
+  /** Current schedule: uploaded runs if any, otherwise generated from plan. */
+  readonly schedule = computed(() => {
+    const uploaded = this.uploadedRuns();
+    if (uploaded && uploaded.length > 0) return uploaded;
+    const p = this.plan();
+    return p ? buildSchedule(p) : [];
+  });
   private previousUserId: string | undefined;
 
   constructor() {
-    effect(() => {
-      const p = this.plan();
-      if (p) this.schedule.set(buildSchedule(p));
-      else this.schedule.set([]);
-    });
     effect(() => {
       const id = this.userProfile.profile().id;
       if (id !== this.previousUserId) {
         this.previousUserId = id;
         this.plan.set(null);
-        this.schedule.set([]);
+        this.uploadedRuns.set(null);
         this.calendarEventIds.set([]);
         this.loaded = false;
       }
@@ -203,21 +214,45 @@ export class RunnerPlanService {
   private doLoad(userId: string): void {
     this.store.get<RunnerPlan>(PLUGIN_ID, STORE_KEY, userId).subscribe({
       next: (p) => {
-        this.loaded = true;
         this.plan.set(normalizePlan(p));
-        this.userHasGenerated.set(true);
+        this.store.get<ScheduledRun[]>(PLUGIN_ID, UPLOADED_RUNS_KEY, userId).subscribe({
+          next: (runs) => {
+            if (Array.isArray(runs) && runs.length > 0 && runs.every(isValidScheduledRun)) {
+              this.uploadedRuns.set(runs);
+            }
+          },
+        });
         this.store.get<string>(PLUGIN_ID, CALENDAR_COLOR_KEY, userId).subscribe({
           next: (c) => this.eventColorId.set(/^([1-9]|1[01])$/.test(String(c)) ? String(c) : '9'),
         });
         this.store.get<string[]>(PLUGIN_ID, CALENDAR_EVENT_IDS_KEY, userId).subscribe({
           next: (ids) => this.calendarEventIds.set(Array.isArray(ids) ? ids : []),
         });
+        this.loaded = true;
+        this.userHasGenerated.set(true);
       },
       error: () => {
-        this.loaded = true;
         this.plan.set(defaultPlan());
+        this.loaded = true;
       },
     });
+  }
+
+  /** Set schedule from uploaded JSON. Replaces any generated schedule until next Generate. */
+  setUploadedRuns(runs: ScheduledRun[]): void {
+    const userId = this.userProfile.profile().id;
+    this.uploadedRuns.set(runs);
+    this.scheduleVersion.update((v) => v + 1);
+    this.userHasGenerated.set(true);
+    if (userId) this.store.put(PLUGIN_ID, UPLOADED_RUNS_KEY, runs, userId).subscribe();
+  }
+
+  /** Clear uploaded runs so schedule comes from plan again. */
+  clearUploadedRuns(): void {
+    const userId = this.userProfile.profile().id;
+    this.uploadedRuns.set(null);
+    this.scheduleVersion.update((v) => v + 1);
+    if (userId) this.store.put(PLUGIN_ID, UPLOADED_RUNS_KEY, [], userId).subscribe();
   }
 
   setEventColorId(colorId: string): void {
@@ -291,57 +326,30 @@ export interface AddToCalendarResult {
 }
 
 function defaultPlan(): RunnerPlan {
-  const d = new Date();
-  d.setMonth(d.getMonth() + 1);
   return {
-    mode: 'ramp-up',
+    mode: 'repeated',
     availableDays: [0, 2, 4],
-    longRunDays: [0],
-    goalDate: formatDate(d),
-    goalDistanceKm: 10,
-    startDistanceKm: 2,
+    distancesByDay: { 0: 5, 2: 5, 4: 10 },
+    weeksToShow: 12,
   };
 }
 
 function normalizePlan(p: unknown): RunnerPlan {
   if (!p || typeof p !== 'object') return defaultPlan();
-
   const any = p as Record<string, unknown>;
+  if (any['mode'] !== 'repeated') return defaultPlan();
+
   const availableDays = Array.isArray(any['availableDays'])
     ? (any['availableDays'] as number[]).filter((d) => Number.isInteger(d) && d >= 0 && d <= 6)
     : [0, 2, 4];
 
-  if (any['mode'] === 'repeated') {
-    const distancesByDay = typeof any['distancesByDay'] === 'object' && any['distancesByDay'] !== null
+  const distancesByDay =
+    typeof any['distancesByDay'] === 'object' && any['distancesByDay'] !== null
       ? (any['distancesByDay'] as Record<number, number>)
       : {};
-    const weeksToShow = Number.isFinite(any['weeksToShow']) && (any['weeksToShow'] as number) > 0
+  const weeksToShow =
+    Number.isFinite(any['weeksToShow']) && (any['weeksToShow'] as number) > 0
       ? Math.round(any['weeksToShow'] as number)
       : 12;
-    return { mode: 'repeated', availableDays, distancesByDay, weeksToShow };
-  }
-
-  if (any['mode'] === 'ramp-up' || any['goalDate']) {
-    const goalDate = typeof any['goalDate'] === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(any['goalDate'])
-      ? any['goalDate']
-      : formatDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
-    const goalDistanceKm = Number.isFinite(any['goalDistanceKm']) && (any['goalDistanceKm'] as number) > 0
-      ? (any['goalDistanceKm'] as number)
-      : 10;
-    const startDistanceKm = Number.isFinite(any['startDistanceKm']) && (any['startDistanceKm'] as number) >= 0
-      ? (any['startDistanceKm'] as number)
-      : 2;
-    const rawLongRun = Array.isArray(any['longRunDays']) ? (any['longRunDays'] as number[]) : [];
-    const longRunDays = rawLongRun.filter((d) => Number.isInteger(d) && d >= 0 && d <= 6 && availableDays.includes(d));
-    return {
-      mode: 'ramp-up',
-      availableDays,
-      longRunDays: longRunDays.length > 0 ? longRunDays : [Math.min(...availableDays)],
-      goalDate,
-      goalDistanceKm,
-      startDistanceKm,
-    };
-  }
-
-  return defaultPlan();
+  return { mode: 'repeated', availableDays, distancesByDay, weeksToShow };
 }

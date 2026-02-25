@@ -1,0 +1,95 @@
+// Shared plugin styling – page header, tabs, spinners, bordered lists (extracted from plugin-specific files)
+
+// Standard page header for hub and plugin views
+.page-header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+}
+
+// Plugin view navigation
+
+.plugin-view-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  flex-shrink: 0;
+}
+
+
+.plugin-view-nav a.btn {
+  text-decoration: none;
+}
+
+
+
+// Shared loading spinner (Runner calendar, Vocabulist import, etc.)
+.plugin-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: plugin-spinner-rotate 0.7s linear infinite;
+}
+
+.plugin-spinner--with-margin {
+  margin-right: 0.35em;
+  vertical-align: -0.15em;
+}
+
+@keyframes plugin-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Alias for Vocabulist (import progress)
+.spinner {
+  @extend .plugin-spinner;
+}
+
+// Bordered list with rows (plugin order, language order, etc.)
+.plugin-list-bordered {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.plugin-list-bordered-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+// Plugin order list (user-management) – uses same pattern
+.plugin-order-list {
+  @extend .plugin-list-bordered;
+}
+
+.plugin-order-row {
+  @extend .plugin-list-bordered-row;
+}

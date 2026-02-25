@@ -6,16 +6,26 @@ export const runnerRoutes: Routes = [
     loadComponent: () =>
       import('./runner.component').then((m) => m.RunnerComponent),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'recent' },
+      { path: '', pathMatch: 'full', redirectTo: 'plan' },
       {
-        path: 'planner',
+        path: 'plan',
         loadComponent: () =>
-          import('./run-planner/run-planner.component').then((m) => m.RunPlannerComponent),
+          import('./views/your-plan/your-plan.component').then((m) => m.YourPlanComponent),
+      },
+      {
+        path: 'plan-generator',
+        loadComponent: () =>
+          import('./views/plan-generator/plan-generator.component').then((m) => m.PlanGeneratorComponent),
       },
       {
         path: 'recent',
         loadComponent: () =>
-          import('./recent-runs/recent-runs.component').then((m) => m.RecentRunsComponent),
+          import('./views/recent-runs/recent-runs.component').then((m) => m.RecentRunsComponent),
+      },
+      {
+        path: 'trends',
+        loadComponent: () =>
+          import('./views/running-trends/running-trends.component').then((m) => m.RunningTrendsComponent),
       },
     ],
   },

@@ -145,42 +145,88 @@
     color: var(--text);
   }
 
+  .schedule-total-col {
+    min-width: 4.5rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .schedule-total-cell {
+    font-weight: 500;
+    color: var(--text);
+    vertical-align: middle;
+  }
+
   .schedule-cell {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 0.25rem;
     min-height: 3.5rem;
   }
 
-  .schedule-date {
-    font-size: 0.75rem;
-    color: var(--text-muted);
+  .schedule-remove-btn {
+    position: absolute;
+    top: 0.15rem;
+    right: 0.15rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    padding: 0;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--surface);
+    background: var(--danger, #c0392b);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .schedule-distance-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
   }
 
   .schedule-distance {
     width: 3.5rem;
-    padding: 0.2rem 0.35rem;
-    font-size: 0.875rem;
     text-align: center;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--bg);
-    color: var(--text);
+    font-size: 0.875rem;
   }
 
   .schedule-unit {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-  }
-
-  .schedule-empty {
-    color: var(--text-muted);
     font-size: 0.875rem;
+    color: var(--text-muted);
   }
 
-  .btn-icon {
-    padding: 0.2rem 0.5rem;
-    font-size: 0.75rem;
+  .schedule-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: 0;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+
+    &:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
   }
 }

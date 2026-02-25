@@ -1,0 +1,63 @@
+<section class="card">
+  <h2 class="card-title">Your schedule</h2>
+  @if (runnerPlan.userHasGenerated() && editableRuns().length > 0) {
+    <p class="hint">Edit distances, add runs with + in empty cells, or remove with −.</p>
+    <div class="schedule-calendar-wrap">
+      <table class="schedule-calendar">
+        <thead>
+          <tr>
+            <th class="week-col">Week</th>
+            @for (day of dayNames; track day.value) {
+              <th>{{ day.label }}</th>
+            }
+            <th class="schedule-total-col">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of calendarRows(); track row.weekMonday) {
+            <tr>
+              <td class="week-col">{{ row.weekLabel }}</td>
+              @for (day of dayNames; track day.value) {
+                <td>
+                  @if (row.days[day.value]; as run) {
+                    <div class="schedule-cell">
+                      <button
+                        type="button"
+                        class="schedule-remove-btn"
+                        (click)="removeRun(run.date)"
+                        title="Remove this run"
+                        aria-label="Remove this run">−</button>
+                      <div class="schedule-distance-wrap">
+                        <input
+                          type="number"
+                          class="form-input form-input--compact schedule-distance"
+                          min="0"
+                          step="0.5"
+                          [ngModel]="run.distanceKm"
+                          (ngModelChange)="updateRunDistance(run.date, $event)"
+                          title="Distance (km)" />
+                        <span class="schedule-unit">km</span>
+                      </div>
+                    </div>
+                  } @else {
+                    <button
+                      type="button"
+                      class="schedule-add-btn"
+                      (click)="addRun(row.weekMonday, day.value)"
+                      title="Add run"
+                      aria-label="Add run">+</button>
+                  }
+                </td>
+              }
+              <td class="schedule-total-cell">{{ getWeekTotal(row) | number:'1.1-1' }} km</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else if (runnerPlan.userHasGenerated()) {
+    <p class="hint">Add runs in <strong>Plan</strong> (Repeated + Generate, or Smart plan + upload JSON), or import from Runner settings.</p>
+  } @else {
+    <p class="hint">Create a plan in <strong>Plan</strong> (download template and upload JSON for a smart plan, or generate a repeated plan), or use <strong>Upload plan</strong> in Runner settings.</p>
+  }
+</section>

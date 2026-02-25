@@ -1,59 +1,14 @@
 <app-settings-drawer-host title="Reader" subtitle="Track your reading list: books, status, and ratings.">
   <ng-container main>
-    <div class="reader-tabs">
-      <button type="button" class="btn secondary" [class.active]="activeTab() === 'timeline'" (click)="activeTab.set('timeline')">Timeline</button>
-      <button type="button" class="btn secondary" [class.active]="activeTab() === 'books'" (click)="activeTab.set('books')">Books</button>
-      <button type="button" class="btn secondary" [class.active]="activeTab() === 'collections'" (click)="activeTab.set('collections')">Collections</button>
-      </div>
+    <app-navigation-bar
+      [items]="readerNavItems"
+      [selected]="activeTab()"
+      (selectedChange)="activeTab.set($any($event))" />
 
     @if (activeTab() === 'books') {
-    <section class="card card-table-scroll">
-      <div class="actions" style="margin-bottom: 1rem;">
-        <button type="button" class="btn primary" (click)="openAdd()">Add book</button>
-        <div class="plugin-actions" style="margin-bottom: 0;">
-          <label>
-            <span class="hint" style="margin: 0 0.5rem 0 0;">Status:</span>
-            <select class="form-select" [value]="statusFilter()" (change)="setStatusFilter($any($event.target).value)">
-              @for (s of statusOptions; track s) {
-                <option [value]="s">{{ s || 'All' }}</option>
-              }
-            </select>
-          </label>
-        </div>
-      </div>
-
-      <div class="data-table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th class="sortable" (click)="setSort('title')">Title</th>
-              <th class="sortable" (click)="setSort('author')">Author</th>
-              <th class="sortable" (click)="setSort('status')">Status</th>
-              <th class="sortable" (click)="setSort('readingEndDate')">Finished</th>
-              <th>Rating</th>
-              <th>Tags</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (book of filteredAndSortedBooks(); track book.id) {
-              <tr class="clickable" (click)="openEdit(book)">
-                <td>{{ book.title }}</td>
-                <td>{{ book.author }}</td>
-                <td><span class="status-badge">{{ book.status }}</span></td>
-                <td class="empty-cell">{{ formatDate(book.readingEndDate) }}</td>
-                <td><span class="rating-icon">{{ ratingIcon(book.rating) || '—' }}</span></td>
-                <td class="empty-cell">{{ (book.tags ?? []).length ? (book.tags ?? []).join(', ') : '—' }}</td>
-              </tr>
-            }
-            @if (filteredAndSortedBooks().length === 0) {
-              <tr>
-                <td colspan="6" class="empty-cell">{{ statusFilter() ? 'No books match the filter' : 'No books yet. Add one above.' }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </section>
+      <app-reader-books-table
+        (viewBook)="openEdit($event)"
+        (addBook)="openAdd()" />
     } @else if (activeTab() === 'collections') {
     <section class="card card-table-scroll">
       <app-reader-collections (viewBook)="openEdit($event)" />

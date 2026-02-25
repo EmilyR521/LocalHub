@@ -1,0 +1,24 @@
+<section class="habit-today-section">
+  <h2 class="habit-today-title">Today's habits</h2>
+    <ul class="habit-today-list" aria-label="Today's habits">
+      @for (habit of habits(); track habit.id) {
+        <li class="habit-today-item">
+          <button
+            type="button"
+            class="habit-today-circle"
+            [class.habit-today-circle--checked]="isCompleted(habit.id)"
+            [style.--habit-color]="habit.color ?? '#58a6ff'"
+            (click)="toggle(habit)"
+            [attr.aria-pressed]="isCompleted(habit.id)"
+            [attr.aria-label]="habit.name + (isCompleted(habit.id) ? ': done' : ': not done')"
+            [attr.title]="habit.name + ' – ' + (isCompleted(habit.id) ? 'Done (click to undo)' : 'Not done (click to mark done)')">
+            @if (isCompleted(habit.id)) {
+              <span class="habit-today-tick" aria-hidden="true">✓</span>
+            }
+          </button>
+          <span class="habit-today-icon" aria-hidden="true">{{ habit.icon || '✓' }}</span>
+          <span class="habit-today-name">{{ habit.name }}</span>
+        </li>
+      }
+    </ul>
+</section>

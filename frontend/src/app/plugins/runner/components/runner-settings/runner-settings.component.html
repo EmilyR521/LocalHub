@@ -1,4 +1,22 @@
 <div class="card" style="margin: 0;">
+  <h2 class="card-title">Plan import / export</h2>
+  <p class="hint">Use a template with a GenAI assistant to create a custom plan, then upload the JSON here.</p>
+  <div class="runner-plan-import-actions">
+    <button type="button" class="btn secondary" (click)="downloadTemplate()">Download template</button>
+    <button type="button" class="btn secondary" (click)="uploadTrigger.click()">Upload plan</button>
+    <input
+      #uploadTrigger
+      type="file"
+      accept=".json,application/json"
+      class="runner-upload-input"
+      (change)="onFileSelected($event)" />
+  </div>
+  @if (uploadMessage(); as msg) {
+    <p class="hint" [class.error-msg]="uploadError()" style="margin-top: 0.5rem;">{{ msg }}</p>
+  }
+</div>
+
+<div class="card" style="margin: 0;">
   <h2 class="card-title">Strava</h2>
   <p class="hint">Connect your Strava account to see your recent activities in the Recent runs view.</p>
   @if (strava.connection(); as conn) {

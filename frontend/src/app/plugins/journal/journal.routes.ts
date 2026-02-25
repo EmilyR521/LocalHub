@@ -10,12 +10,12 @@ export const journalRoutes: Routes = [
         path: '',
         pathMatch: 'full',
         loadComponent: () =>
-          import('./journal-home/journal-home.component').then((m) => m.JournalHomeComponent),
+          import('./views/journal-home/journal-home.component').then((m) => m.JournalHomeComponent),
       },
       {
         path: 'entries',
         loadComponent: () =>
-          import('./journal-entries-list/journal-entries-list.component').then((m) => m.JournalEntriesListComponent),
+          import('./views/journal-entries-list/journal-entries-list.component').then((m) => m.JournalEntriesListComponent),
       },
     ],
   },

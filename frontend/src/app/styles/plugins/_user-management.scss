@@ -1,0 +1,42 @@
+// My profile – cards in a row on wide screens, stack on narrow
+.my-profile-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+
+  @media (min-width: 36rem) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 56rem) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card {
+    margin-bottom: 0;
+    min-width: 0;
+  }
+}
+
+// Plugin order (reorder sidebar apps) – list/row in plugins.scss
+.plugin-order-name {
+  font-weight: 500;
+}
+
+.plugin-order-actions {
+  display: flex;
+  gap: 0.25rem;
+
+  .icon-btn {
+    min-width: 2rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 1rem;
+    line-height: 1.2;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}
