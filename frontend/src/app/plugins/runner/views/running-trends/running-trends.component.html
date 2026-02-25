@@ -1,6 +1,6 @@
 <section class="card">
   <h2 class="card-title">Running Trends</h2>
-  <p class="hint">Weekly cumulative distance over time from your Strava runs.</p>
+  <p class="hint">Weekly running distance from your Strava runs.</p>
 
   @if (!connected()) {
     <p class="hint" style="margin-top: 1rem;">
@@ -22,19 +22,13 @@
         <svg
           class="runner-trends-chart"
           [attr.viewBox]="'0 0 ' + config.width + ' ' + config.height"
-          aria-label="Weekly cumulative distance in km">
-          <defs>
-            <linearGradient id="runner-trends-gradient" x1="0" x2="0" y1="1" y2="0">
-              <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.2" />
-              <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
-            </linearGradient>
-          </defs>
+          aria-label="Weekly running distance in km">
           <text
             x="12"
             [attr.y]="config.axisLabelY"
             class="runner-trends-axis-label"
             text-anchor="middle"
-            [attr.transform]="'rotate(-90, 12, ' + config.axisLabelY + ')'">Cumulative km</text>
+            [attr.transform]="'rotate(-90, 12, ' + config.axisLabelY + ')'">Distance (km)</text>
           @for (tick of config.yTicks; track tick.value) {
             <line
               [attr.x1]="config.padding.left"
@@ -48,15 +42,15 @@
               class="runner-trends-tick-label"
               text-anchor="end">{{ tick.value }}</text>
           }
-          <path [attr.d]="config.areaPath" fill="url(#runner-trends-gradient)" />
-          <polyline
-            [attr.points]="config.linePoints"
-            class="runner-trends-line"
-            fill="none"
-            stroke="var(--accent)"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round" />
+          @for (bar of config.bars; track bar.weekLabel + bar.x) {
+            <rect
+              [attr.x]="bar.x"
+              [attr.y]="bar.y"
+              [attr.width]="bar.width"
+              [attr.height]="bar.height"
+              class="runner-trends-bar"
+              [attr.aria-label]="bar.weekLabel + ': ' + bar.totalKm.toFixed(1) + ' km'" />
+          }
           @for (label of config.xLabels; track label.weekLabel) {
             <text
               [attr.x]="label.x"
@@ -67,7 +61,7 @@
         </svg>
       </div>
       <p class="hint runner-trends-summary">
-        Total {{ config.data.length }} week(s). Cumulative distance: <strong>{{ config.data[config.data.length - 1].cumulativeKm.toFixed(1) }} km</strong>.
+        {{ config.data.length }} week(s) shown. Total distance: <strong>{{ config.totalKm.toFixed(1) }} km</strong>.
       </p>
     } @else if (loading() && activities().length === 0) {
       <p class="hint" style="margin-top: 1rem;">Loading activities…</p>

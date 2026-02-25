@@ -20,7 +20,6 @@ export interface WeekPoint {
   weekStart: string;
   weekLabel: string;
   totalKm: number;
-  cumulativeKm: number;
 }
 
 @Component({
@@ -35,7 +34,7 @@ export class RunningTrendsComponent implements OnInit {
   readonly loading = this.strava.loading.asReadonly();
   readonly activities = this.strava.activities.asReadonly();
 
-  /** Weekly totals then cumulative, oldest week first. */
+  /** Weekly distance totals, oldest week first. */
   readonly weeklyData = computed<WeekPoint[]>(() => {
     const list = this.activities().filter(isRun);
     const byWeek = new Map<string, number>();
@@ -43,45 +42,50 @@ export class RunningTrendsComponent implements OnInit {
       const iso = a.start_date_local ?? a.start_date;
       if (!iso || a.distance == null) continue;
       const week = getWeekMonday(iso);
-      const km = (a.distance / 1000);
+      const km = a.distance / 1000;
       byWeek.set(week, (byWeek.get(week) ?? 0) + km);
     }
     const weeks = [...byWeek.entries()].sort((a, b) => a[0].localeCompare(b[0]));
     if (weeks.length === 0) return [];
-    let cumulative = 0;
     return weeks.map(([weekStart, totalKm]) => {
-      cumulative += totalKm;
       const d = new Date(weekStart + 'T12:00:00');
       const weekLabel = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-      return { weekStart, weekLabel, totalKm, cumulativeKm: cumulative };
+      return { weekStart, weekLabel, totalKm };
     });
   });
 
-  /** Chart dimensions, scaling, and precomputed path for SVG. */
+  /** Chart dimensions and bar geometry for SVG (weekly distance bars). */
   readonly chartConfig = computed(() => {
     const data = this.weeklyData();
     if (data.length === 0) return null;
-    const maxCumulative = Math.max(...data.map((d) => d.cumulativeKm), 1);
+    const maxKm = Math.max(...data.map((d) => d.totalKm), 1);
     const padding = { top: 20, right: 20, bottom: 36, left: 44 };
     const width = 320;
     const height = 200;
     const innerWidth = width - padding.left - padding.right;
     const innerHeight = height - padding.top - padding.bottom;
-    const xScale = (i: number) => padding.left + (data.length === 1 ? 0 : (i / Math.max(data.length - 1, 1)) * innerWidth);
-    const yScale = (value: number) => padding.top + innerHeight - (value / maxCumulative) * innerHeight;
+    const barGap = 2;
+    const totalGap = (data.length - 1) * barGap;
+    const barWidth = (innerWidth - totalGap) / data.length;
     const bottomY = padding.top + innerHeight;
-    const linePoints = data.map((d, i) => `${xScale(i)},${yScale(d.cumulativeKm)}`).join(' ');
-    const areaPath =
-      'M ' +
-      data.map((d, i) => `${xScale(i)} ${yScale(d.cumulativeKm)}`).join(' L ') +
-      ` L ${width - padding.right} ${bottomY} L ${padding.left} ${bottomY} Z`;
+    const bars = data.map((d, i) => {
+      const x = padding.left + i * (barWidth + barGap);
+      const barHeight = maxKm > 0 ? (d.totalKm / maxKm) * innerHeight : 0;
+      const y = bottomY - barHeight;
+      return { x, y, width: barWidth, height: barHeight, totalKm: d.totalKm, weekLabel: d.weekLabel };
+    });
     const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => ({
       y: padding.top + innerHeight - t * innerHeight,
-      value: (t * maxCumulative).toFixed(t >= 0.5 ? 0 : 1),
+      value: (t * maxKm).toFixed(t >= 0.5 ? 0 : 1),
     }));
     const xLabels = data
-      .map((d, i) => ({ weekLabel: d.weekLabel, x: xScale(i), show: i === 0 || i === data.length - 1 || data.length <= 6 || i % Math.ceil(data.length / 5) === 0 }))
+      .map((d, i) => ({
+        weekLabel: d.weekLabel,
+        x: padding.left + i * (barWidth + barGap) + barWidth / 2,
+        show: i === 0 || i === data.length - 1 || data.length <= 6 || i % Math.ceil(data.length / 5) === 0,
+      }))
       .filter((l) => l.show);
+    const totalKm = data.reduce((sum, d) => sum + d.totalKm, 0);
     return {
       data,
       width,
@@ -89,12 +93,12 @@ export class RunningTrendsComponent implements OnInit {
       padding,
       innerWidth,
       innerHeight,
-      maxCumulative,
-      linePoints,
-      areaPath,
+      maxKm,
+      bars,
       yTicks,
       xLabels,
       axisLabelY: padding.top + innerHeight / 2,
+      totalKm,
     };
   });
 

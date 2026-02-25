@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UserProfileService } from '../../../core/services/user-profile.service';
 import { DASHBOARD_WIDGETS } from '../dashboard-widgets.registry';
@@ -14,6 +14,12 @@ export class DashboardSettingsComponent {
 
   readonly widgets = DASHBOARD_WIDGETS;
   readonly selectedIds = computed(() => new Set(this.userProfile.dashboardWidgetIds()));
+  readonly countdownItems = this.userProfile.countdownItems;
+
+  /** Form state for adding a new countdown */
+  readonly newCountdownTitle = signal('');
+  readonly newCountdownEmoji = signal('📅');
+  readonly newCountdownDate = signal('');
 
   isSelected(id: string): boolean {
     return this.selectedIds().has(id);
@@ -25,5 +31,23 @@ export class DashboardSettingsComponent {
     if (next.has(widgetId)) next.delete(widgetId);
     else next.add(widgetId);
     this.userProfile.updateProfile({ dashboardWidgetIds: Array.from(next) });
+  }
+
+  addCountdown(): void {
+    const title = this.newCountdownTitle().trim();
+    const eventDate = this.newCountdownDate().trim();
+    if (!title || !eventDate) return;
+    this.userProfile.addCountdown({
+      title,
+      emoji: this.newCountdownEmoji().trim() || '📅',
+      eventDate,
+    });
+    this.newCountdownTitle.set('');
+    this.newCountdownEmoji.set('📅');
+    this.newCountdownDate.set('');
+  }
+
+  removeCountdown(id: string): void {
+    this.userProfile.removeCountdown(id);
   }
 }

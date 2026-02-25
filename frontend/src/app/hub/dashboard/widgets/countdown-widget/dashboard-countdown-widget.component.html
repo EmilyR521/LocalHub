@@ -1,0 +1,15 @@
+<div class="dashboard-widget dashboard-widget-countdown">
+  <h2 class="dashboard-widget-title"><span class="dashboard-widget-title-emoji" aria-hidden="true">⏱</span> Countdown</h2>
+  @if (countdowns().length > 0) {
+    <ul class="dashboard-widget-list dashboard-widget-countdown-list">
+      @for (item of countdowns(); track item.id) {
+        <li class="dashboard-widget-countdown-item">
+          <span class="dashboard-widget-countdown-emoji" aria-hidden="true">{{ item.emoji || '📅' }}</span>
+          <span class="dashboard-widget-countdown-text">{{ countdownLabel(item) }}</span>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="hint">No countdowns yet. Open dashboard settings (⚙️) to add countdown events.</p>
+  }
+</div>

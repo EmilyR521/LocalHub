@@ -4,6 +4,14 @@ import { PluginStoreService } from './plugin-store.service';
 
 export type ThemeMode = 'light' | 'dark';
 
+export interface CountdownItem {
+  id: string;
+  title: string;
+  emoji: string;
+  /** Event date in YYYY-MM-DD. */
+  eventDate: string;
+}
+
 export interface UserProfile {
   id?: string;
   name: string;
@@ -11,6 +19,8 @@ export interface UserProfile {
   visiblePluginIds: string[];
   /** Dashboard widget IDs to show, in order. Defaults to ['currently-reading'] when empty. */
   dashboardWidgetIds?: string[];
+  /** Countdown widgets: title, emoji, event date. */
+  countdownItems?: CountdownItem[];
   /** UI theme. Defaults to 'dark' when unset. */
   theme?: ThemeMode;
   /** Plugin IDs that have external API authorisation (e.g. 'calendar', 'strava'). */
@@ -31,6 +41,20 @@ function generateUserId(): string {
   return typeof crypto !== 'undefined' && crypto.randomUUID
     ? crypto.randomUUID()
     : `user-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
+function normalizeCountdownItems(
+  items: CountdownItem[] | null | undefined
+): CountdownItem[] {
+  if (!Array.isArray(items)) return [];
+  return items.filter(
+    (c) =>
+      c &&
+      typeof c.id === 'string' &&
+      typeof c.title === 'string' &&
+      typeof c.emoji === 'string' &&
+      typeof c.eventDate === 'string'
+  );
 }
 
 const PLUGIN_ID = 'user-management';
@@ -69,6 +93,11 @@ export class UserProfileService {
   readonly pluginOrderIds = computed(() => {
     const ids = this.profileSignal().pluginOrderIds;
     return Array.isArray(ids) && ids.length > 0 ? ids : [];
+  });
+
+  readonly countdownItems = computed(() => {
+    const items = this.profileSignal().countdownItems;
+    return Array.isArray(items) ? items : [];
   });
 
   constructor(private store: PluginStoreService) {}
@@ -145,6 +174,27 @@ export class UserProfileService {
     });
   }
 
+  addCountdown(item: Omit<CountdownItem, 'id'>): void {
+    const id =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `countdown-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const items = [...this.countdownItems(), { ...item, id }];
+    this.updateProfile({ countdownItems: items });
+  }
+
+  removeCountdown(id: string): void {
+    const items = this.countdownItems().filter((c) => c.id !== id);
+    this.updateProfile({ countdownItems: items });
+  }
+
+  updateCountdown(id: string, patch: Partial<Omit<CountdownItem, 'id'>>): void {
+    const items = this.countdownItems().map((c) =>
+      c.id === id ? { ...c, ...patch } : c
+    );
+    this.updateProfile({ countdownItems: items });
+  }
+
   private normalize(p: UserProfile | null | undefined): UserProfile {
     if (!p || typeof p !== 'object') return DEFAULT_PROFILE;
     const theme = p.theme === 'light' || p.theme === 'dark' ? p.theme : undefined;
@@ -158,6 +208,7 @@ export class UserProfileService {
       dashboardWidgetIds: Array.isArray(p.dashboardWidgetIds)
         ? p.dashboardWidgetIds.filter((id) => typeof id === 'string')
         : DEFAULT_PROFILE.dashboardWidgetIds,
+      countdownItems: normalizeCountdownItems(p.countdownItems),
       theme,
       connectedApps: Array.isArray(p.connectedApps)
         ? p.connectedApps.filter((id) => typeof id === 'string')

@@ -1,5 +1,6 @@
 import type { Type } from '@angular/core';
 import { DashboardCalendarWidgetComponent } from './widgets/calendar-widget/dashboard-calendar-widget.component';
+import { DashboardCountdownWidgetComponent } from './widgets/countdown-widget/dashboard-countdown-widget.component';
 import { DashboardCurrentlyReadingWidgetComponent } from './widgets/currently-reading-widget/dashboard-currently-reading-widget.component';
 import { DashboardLastRunWidgetComponent } from './widgets/last-run-widget/dashboard-last-run-widget.component';
 import { DashboardNextRunWidgetComponent } from './widgets/next-run-widget/dashboard-next-run-widget.component';
@@ -39,6 +40,12 @@ export const DASHBOARD_WIDGETS: DashboardWidgetDef[] = [
     component: DashboardCalendarWidgetComponent,
     pluginId: 'calendar',
     columns: 3,
+  },
+  {
+    id: 'countdown',
+    name: 'Countdown',
+    component: DashboardCountdownWidgetComponent,
+    pluginId: 'dashboard',
   },
 ];
 

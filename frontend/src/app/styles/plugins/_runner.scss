@@ -57,7 +57,7 @@
   color: var(--text-muted);
 }
 
-// Running Trends – cumulative distance chart
+// Running Trends – weekly distance bar chart
 .runner-trends-chart-wrap {
   max-width: 100%;
   overflow: hidden;
@@ -86,8 +86,9 @@
   fill: var(--text-muted);
 }
 
-.runner-trends-line {
-  vector-effect: non-scaling-stroke;
+.runner-trends-bar {
+  fill: var(--accent);
+  opacity: 0.85;
 }
 
 .runner-trends-summary {

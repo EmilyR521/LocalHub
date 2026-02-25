@@ -12,4 +12,38 @@
       </label>
     }
   </div>
+
+  @if (isSelected('countdown')) {
+    <div class="dashboard-settings-countdown-section">
+      <h3 class="card-title dashboard-settings-countdown-title">Countdown events</h3>
+      <p class="hint">Add events to show “x days until eventname” on the dashboard.</p>
+      <ul class="dashboard-settings-countdown-list">
+        @for (item of countdownItems(); track item.id) {
+          <li class="dashboard-settings-countdown-row">
+            <span class="dashboard-settings-countdown-emoji" aria-hidden="true">{{ item.emoji || '📅' }}</span>
+            <span class="dashboard-settings-countdown-label">{{ item.title }} — {{ item.eventDate }}</span>
+            <button type="button" class="btn secondary dashboard-settings-countdown-remove" (click)="removeCountdown(item.id)" aria-label="Remove countdown">Remove</button>
+          </li>
+        }
+      </ul>
+      <div class="dashboard-settings-countdown-add">
+        <div class="field">
+          <label class="form-label" for="countdown-emoji">Emoji</label>
+          <input id="countdown-emoji" type="text" class="form-input form-input--compact" style="width: 3.5rem; text-align: center;" placeholder="📅" [ngModel]="newCountdownEmoji()" (ngModelChange)="newCountdownEmoji.set($event)" />
+        </div>
+        <div class="field">
+          <label class="form-label" for="countdown-title">Event name</label>
+          <input id="countdown-title" type="text" class="form-input" placeholder="e.g. Holiday" [ngModel]="newCountdownTitle()" (ngModelChange)="newCountdownTitle.set($event)" />
+        </div>
+        <div class="field">
+          <label class="form-label" for="countdown-date">Event date</label>
+          <input id="countdown-date" type="date" class="form-input form-input--compact" [ngModel]="newCountdownDate()" (ngModelChange)="newCountdownDate.set($event)" />
+        </div>
+        <div class="field dashboard-settings-countdown-add-btn">
+          <label class="form-label">&nbsp;</label>
+          <button type="button" class="btn primary" (click)="addCountdown()">Add</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
