@@ -112,12 +112,12 @@ function getYearMonthBlocks(year: number): YearMonthBlock[] {
 const DEFAULT_HABIT_ICON = '✓';
 
 @Component({
-  selector: 'app-habit-home',
+  selector: 'app-all-habits',
   standalone: true,
   imports: [EmojiGridComponent],
-  templateUrl: './habit-home.component.html',
+  templateUrl: './all-habits.component.html',
 })
-export class HabitHomeComponent {
+export class AllHabitsComponent { 
   private habitsService = inject(HabitsService);
 
   /** 4×7 grid: row 0 = current week (up to today), rows 1–3 = previous weeks. null = future day (no dot). */

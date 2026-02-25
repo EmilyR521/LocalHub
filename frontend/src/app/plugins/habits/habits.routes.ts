@@ -10,8 +10,8 @@ export const habitsRoutes: Routes = [
         path: '',
         pathMatch: 'full',
         loadComponent: () =>
-          import('./habit-home/habit-home.component').then((m) => m.HabitHomeComponent),
-      },
+          import('./today-habits/today-habits.component').then((m) => m.TodayHabitsComponent),
+      },      
     ],
   },
 ];

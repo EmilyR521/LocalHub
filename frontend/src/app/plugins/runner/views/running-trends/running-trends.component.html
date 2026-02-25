@@ -1,0 +1,78 @@
+<section class="card">
+  <h2 class="card-title">Running Trends</h2>
+  <p class="hint">Weekly cumulative distance over time from your Strava runs.</p>
+
+  @if (!connected()) {
+    <p class="hint" style="margin-top: 1rem;">
+      Connect Strava in Runner settings (⚙️) to see your running trends.
+    </p>
+  } @else {
+    <div class="runner-trends-actions" style="margin-top: 1rem;">
+      <button
+        type="button"
+        class="btn secondary"
+        (click)="loadMore()"
+        [disabled]="loading()">
+        {{ loading() ? 'Loading…' : 'Refresh data' }}
+      </button>
+    </div>
+
+    @if (chartConfig(); as config) {
+      <div class="runner-trends-chart-wrap" style="margin-top: 1.25rem;">
+        <svg
+          class="runner-trends-chart"
+          [attr.viewBox]="'0 0 ' + config.width + ' ' + config.height"
+          aria-label="Weekly cumulative distance in km">
+          <defs>
+            <linearGradient id="runner-trends-gradient" x1="0" x2="0" y1="1" y2="0">
+              <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.2" />
+              <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <text
+            x="12"
+            [attr.y]="config.axisLabelY"
+            class="runner-trends-axis-label"
+            text-anchor="middle"
+            [attr.transform]="'rotate(-90, 12, ' + config.axisLabelY + ')'">Cumulative km</text>
+          @for (tick of config.yTicks; track tick.value) {
+            <line
+              [attr.x1]="config.padding.left"
+              [attr.x2]="config.width - config.padding.right"
+              [attr.y1]="tick.y"
+              [attr.y2]="tick.y"
+              class="runner-trends-grid-line" />
+            <text
+              [attr.x]="config.padding.left - 6"
+              [attr.y]="tick.y + 4"
+              class="runner-trends-tick-label"
+              text-anchor="end">{{ tick.value }}</text>
+          }
+          <path [attr.d]="config.areaPath" fill="url(#runner-trends-gradient)" />
+          <polyline
+            [attr.points]="config.linePoints"
+            class="runner-trends-line"
+            fill="none"
+            stroke="var(--accent)"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round" />
+          @for (label of config.xLabels; track label.weekLabel) {
+            <text
+              [attr.x]="label.x"
+              [attr.y]="config.height - 8"
+              class="runner-trends-tick-label"
+              text-anchor="middle">{{ label.weekLabel }}</text>
+          }
+        </svg>
+      </div>
+      <p class="hint runner-trends-summary">
+        Total {{ config.data.length }} week(s). Cumulative distance: <strong>{{ config.data[config.data.length - 1].cumulativeKm.toFixed(1) }} km</strong>.
+      </p>
+    } @else if (loading() && activities().length === 0) {
+      <p class="hint" style="margin-top: 1rem;">Loading activities…</p>
+    } @else {
+      <p class="hint" style="margin-top: 1rem;">No run activities yet. Record runs on Strava and refresh.</p>
+    }
+  }
+</section>
