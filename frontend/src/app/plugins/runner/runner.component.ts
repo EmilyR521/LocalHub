@@ -22,7 +22,7 @@ export class RunnerComponent implements OnInit {
   readonly runnerNavItems: NavigationBarItem[] = [
     { label: 'Your plan', route: 'plan' },
     { label: 'Recent runs', route: 'recent', exact: true },
-    { label: 'Running Trends', route: 'trends' },
+    { label: 'Stats', route: 'trends' },
     { label: 'Plan Generator', route: 'plan-generator' },
   ];
 

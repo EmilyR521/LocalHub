@@ -2,7 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { PluginStoreService } from './plugin-store.service';
 
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = 'light' | 'dark' | 'classic';
 
 export interface CountdownItem {
   id: string;
@@ -82,7 +82,7 @@ export class UserProfileService {
 
   readonly theme = computed(() => {
     const t = this.profileSignal().theme;
-    return t === 'light' || t === 'dark' ? t : 'dark';
+    return t === 'light' || t === 'dark' || t === 'classic' ? t : 'dark';
   });
 
   readonly connectedApps = computed(() => {
@@ -197,7 +197,7 @@ export class UserProfileService {
 
   private normalize(p: UserProfile | null | undefined): UserProfile {
     if (!p || typeof p !== 'object') return DEFAULT_PROFILE;
-    const theme = p.theme === 'light' || p.theme === 'dark' ? p.theme : undefined;
+    const theme = p.theme === 'light' || p.theme === 'dark' || p.theme === 'classic' ? p.theme : undefined;
     return {
       id: typeof p.id === 'string' && p.id.trim().length > 0 ? p.id.trim() : undefined,
       name: typeof p.name === 'string' ? p.name : DEFAULT_PROFILE.name,

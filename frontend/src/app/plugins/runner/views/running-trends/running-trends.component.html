@@ -1,72 +1,180 @@
-<section class="card">
-  <h2 class="card-title">Running Trends</h2>
-  <p class="hint">Weekly running distance from your Strava runs.</p>
-
-  @if (!connected()) {
-    <p class="hint" style="margin-top: 1rem;">
-      Connect Strava in Runner settings (⚙️) to see your running trends.
-    </p>
-  } @else {
-    <div class="runner-trends-actions" style="margin-top: 1rem;">
-      <button
-        type="button"
-        class="btn secondary"
-        (click)="loadMore()"
-        [disabled]="loading()">
-        {{ loading() ? 'Loading…' : 'Refresh data' }}
-      </button>
+<div class="reader-stats">
+  @if (chartConfig(); as config) {
+    <div class="reader-stats-row">
+      <section class="card reader-stats-card">
+        <div class="runner-trends-chart-container">
+          <div class="runner-trends-chart-wrap">
+            <svg
+              class="runner-trends-chart"
+              [attr.viewBox]="'0 0 ' + config.width + ' ' + config.height"
+              aria-label="Weekly cumulative distance in km">
+              <text
+                [attr.x]="config.width / 2"
+                y="16"
+                class="runner-trends-chart-title"
+                text-anchor="middle">{{ config.chartTitle }}</text>
+              <text
+                x="12"
+                [attr.y]="config.axisLabelY"
+                class="runner-trends-axis-label"
+                text-anchor="middle"
+                [attr.transform]="'rotate(-90, 12, ' + config.axisLabelY + ')'">Distance (km)</text>
+              @for (tick of config.yTicks; track tick.value) {
+                <line
+                  [attr.x1]="config.padding.left"
+                  [attr.x2]="config.width - config.padding.right"
+                  [attr.y1]="tick.y"
+                  [attr.y2]="tick.y"
+                  class="runner-trends-grid-line" />
+                <text
+                  [attr.x]="config.padding.left - 6"
+                  [attr.y]="tick.y + 4"
+                  class="runner-trends-tick-label"
+                  text-anchor="end">{{ tick.value }}</text>
+              }
+              @for (bar of config.bars; track bar.weekLabel + bar.x) {
+                <rect
+                  [attr.x]="bar.x"
+                  [attr.y]="bar.y"
+                  [attr.width]="bar.width"
+                  [attr.height]="bar.height"
+                  class="runner-trends-bar"
+                  [attr.aria-label]="bar.weekLabel + ': ' + bar.totalKm.toFixed(1) + ' km'" />
+                @if (bar.totalKm > 0) {
+                <text
+                  [attr.x]="bar.x + bar.width / 2"
+                  [attr.y]="bar.y - 4"
+                  class="runner-trends-bar-value"
+                  text-anchor="middle">{{ bar.totalKm.toFixed(1) }}</text>
+              }
+              }
+              @for (month of config.xMonthTicks; track month.label + month.x) {
+                <line
+                  [attr.x1]="month.x"
+                  [attr.x2]="month.x"
+                  [attr.y1]="config.padding.top + config.innerHeight"
+                  [attr.y2]="config.padding.top + config.innerHeight + 8"
+                  class="runner-trends-x-marker" />
+                <text
+                  [attr.x]="month.xLabel"
+                  [attr.y]="config.padding.top + config.innerHeight + 28"
+                  class="runner-trends-tick-label runner-trends-month-label"
+                  text-anchor="end"
+                  [attr.transform]="'rotate(-45, ' + month.xLabel + ', ' + (config.padding.top + config.innerHeight + 28) + ')'">{{ month.label }}</text>
+              }
+            </svg>
+          </div>
+        </div>
+        <div class="runner-trends-chart-period">
+          <span class="runner-trends-period-label">Period:</span>
+          @for (period of [3, 6, 12]; track period) {
+            <button
+              type="button"
+              class="btn runner-trends-period-btn"
+              [class.runner-trends-period-btn--active]="chartPeriodMonths() === period"
+              (click)="chartPeriodMonths.set(period)">
+              {{ period }} months
+            </button>
+          }
+        </div>
+      </section>
+      @if (paceChartConfig(); as paceConfig) {
+        <section class="card reader-stats-card">
+          <div class="runner-trends-chart-container">
+            <div class="runner-trends-chart-wrap">
+              <svg
+                class="runner-trends-chart"
+                [attr.viewBox]="'0 0 ' + paceConfig.width + ' ' + paceConfig.height"
+                aria-label="Average pace in min per km">
+                <text
+                  [attr.x]="paceConfig.width / 2"
+                  y="16"
+                  class="runner-trends-chart-title"
+                  text-anchor="middle">{{ paceConfig.chartTitle }}</text>
+                <text
+                  x="12"
+                  [attr.y]="paceConfig.axisLabelY"
+                  class="runner-trends-axis-label"
+                  text-anchor="middle"
+                  [attr.transform]="'rotate(-90, 12, ' + paceConfig.axisLabelY + ')'">Pace (min/km)</text>
+                @for (tick of paceConfig.yTicks; track tick.value) {
+                  <line
+                    [attr.x1]="paceConfig.padding.left"
+                    [attr.x2]="paceConfig.width - paceConfig.padding.right"
+                    [attr.y1]="tick.y"
+                    [attr.y2]="tick.y"
+                    class="runner-trends-grid-line" />
+                  <text
+                    [attr.x]="paceConfig.padding.left - 6"
+                    [attr.y]="tick.y + 4"
+                    class="runner-trends-tick-label"
+                    text-anchor="end">{{ tick.value }}</text>
+                }
+                @if (paceConfig.trendPathD) {
+                  <path
+                    [attr.d]="paceConfig.trendPathD"
+                    class="runner-trends-pace-line"
+                    fill="none"
+                    aria-hidden="true" />
+                }
+                @for (point of paceConfig.linePoints; track point.weekLabel + point.x) {
+                  <circle
+                    [attr.cx]="point.x"
+                    [attr.cy]="point.y"
+                    r="3"
+                    class="runner-trends-pace-point"
+                    [attr.aria-label]="point.weekLabel + ': ' + point.avgPaceMinPerKm.toFixed(1) + ' min/km'" />
+                  <text
+                    [attr.x]="point.x"
+                    [attr.y]="point.y - 6"
+                    class="runner-trends-bar-value"
+                    text-anchor="middle">{{ point.avgPaceMinPerKm.toFixed(1) }}</text>
+                }
+                @for (month of paceConfig.xMonthTicks; track month.label + month.x) {
+                  <line
+                    [attr.x1]="month.x"
+                    [attr.x2]="month.x"
+                    [attr.y1]="paceConfig.padding.top + paceConfig.innerHeight"
+                    [attr.y2]="paceConfig.padding.top + paceConfig.innerHeight + 8"
+                    class="runner-trends-x-marker" />
+                  <text
+                    [attr.x]="month.xLabel"
+                    [attr.y]="paceConfig.padding.top + paceConfig.innerHeight + 28"
+                    class="runner-trends-tick-label runner-trends-month-label"
+                    text-anchor="end"
+                    [attr.transform]="'rotate(-45, ' + month.xLabel + ', ' + (paceConfig.padding.top + paceConfig.innerHeight + 28) + ')'">{{ month.label }}</text>
+                }
+              </svg>
+            </div>
+          </div>
+          <div class="runner-trends-chart-period">
+            <span class="runner-trends-period-label">Period:</span>
+            @for (period of [3, 6, 12]; track period) {
+              <button
+                type="button"
+                class="btn runner-trends-period-btn"
+                [class.runner-trends-period-btn--active]="chartPeriodMonths() === period"
+                (click)="chartPeriodMonths.set(period)">
+                {{ period }} months
+              </button>
+            }
+          </div>
+        </section>
+      }
     </div>
-
-    @if (chartConfig(); as config) {
-      <div class="runner-trends-chart-wrap" style="margin-top: 1.25rem;">
-        <svg
-          class="runner-trends-chart"
-          [attr.viewBox]="'0 0 ' + config.width + ' ' + config.height"
-          aria-label="Weekly running distance in km">
-          <text
-            x="12"
-            [attr.y]="config.axisLabelY"
-            class="runner-trends-axis-label"
-            text-anchor="middle"
-            [attr.transform]="'rotate(-90, 12, ' + config.axisLabelY + ')'">Distance (km)</text>
-          @for (tick of config.yTicks; track tick.value) {
-            <line
-              [attr.x1]="config.padding.left"
-              [attr.x2]="config.width - config.padding.right"
-              [attr.y1]="tick.y"
-              [attr.y2]="tick.y"
-              class="runner-trends-grid-line" />
-            <text
-              [attr.x]="config.padding.left - 6"
-              [attr.y]="tick.y + 4"
-              class="runner-trends-tick-label"
-              text-anchor="end">{{ tick.value }}</text>
-          }
-          @for (bar of config.bars; track bar.weekLabel + bar.x) {
-            <rect
-              [attr.x]="bar.x"
-              [attr.y]="bar.y"
-              [attr.width]="bar.width"
-              [attr.height]="bar.height"
-              class="runner-trends-bar"
-              [attr.aria-label]="bar.weekLabel + ': ' + bar.totalKm.toFixed(1) + ' km'" />
-          }
-          @for (label of config.xLabels; track label.weekLabel) {
-            <text
-              [attr.x]="label.x"
-              [attr.y]="config.height - 8"
-              class="runner-trends-tick-label"
-              text-anchor="middle">{{ label.weekLabel }}</text>
-          }
-        </svg>
-      </div>
-      <p class="hint runner-trends-summary">
-        {{ config.data.length }} week(s) shown. Total distance: <strong>{{ config.totalKm.toFixed(1) }} km</strong>.
+  } @else if (!connected()) {
+    <section class="card">
+      <p class="hint" style="margin: 0;">
+        Connect Strava in Runner settings (⚙️) to see your stats.
       </p>
-    } @else if (loading() && activities().length === 0) {
-      <p class="hint" style="margin-top: 1rem;">Loading activities…</p>
-    } @else {
-      <p class="hint" style="margin-top: 1rem;">No run activities yet. Record runs on Strava and refresh.</p>
-    }
+    </section>
+  } @else if (loading() && activities().length === 0) {
+    <section class="card">
+      <p class="hint" style="margin: 0;">Loading activities…</p>
+    </section>
+  } @else {
+    <section class="card">
+      <p class="hint" style="margin: 0;">No run activities yet. Record runs on Strava and refresh.</p>
+    </section>
   }
-</section>
+</div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RunnerPlanService, CALENDAR_EVENT_COLORS, RUNNER_PLAN_TEMPLATE, parseUploadedPlan, buildSchedule } from '../../services/runner-plan.service';
 import { getDayName } from '../../models/runner-plan.model';
@@ -20,6 +20,7 @@ export class PlanGeneratorComponent implements OnInit {
 
   readonly uploadMessage = signal('');
   readonly uploadError = signal(false);
+  readonly uploading = signal(false);
 
   readonly calendarStatus = signal<'idle' | 'sending' | 'done' | 'error'>('idle');
   readonly calendarMessage = signal('');
@@ -27,18 +28,6 @@ export class PlanGeneratorComponent implements OnInit {
   readonly schedule = computed(() => this.runnerPlan.schedule());
   readonly dayNames = [0, 1, 2, 3, 4, 5, 6].map((d) => ({ value: d, label: getDayName(d) }));
   readonly calendarEventColors = CALENDAR_EVENT_COLORS;
-
-  constructor() {
-    effect(() => {
-      const p = this.runnerPlan.plan();
-      if (p && p.mode === 'repeated') {
-        this.mode.set('repeated');
-        this.availableDays.set([...p.availableDays]);
-        this.distancesByDay.set({ ...p.distancesByDay });
-        this.weeksToShow.set(p.weeksToShow ?? 12);
-      }
-    });
-  }
 
   ngOnInit(): void {
     this.runnerPlan.load();
@@ -85,6 +74,7 @@ export class PlanGeneratorComponent implements OnInit {
     const file = input.files?.[0];
     input.value = '';
     if (!file) return;
+    this.uploading.set(true);
     const reader = new FileReader();
     reader.onload = () => {
       try {
@@ -104,6 +94,7 @@ export class PlanGeneratorComponent implements OnInit {
         this.uploadMessage.set('Invalid JSON. Download the template and use that format.');
         this.uploadError.set(true);
       }
+      this.uploading.set(false);
     };
     reader.readAsText(file);
   }

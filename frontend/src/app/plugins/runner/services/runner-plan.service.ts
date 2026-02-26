@@ -11,7 +11,6 @@ const CALENDAR_EVENTS_API = '/api/plugins/calendar/google/events';
 const CALENDAR_EVENTS_DELETE_API = '/api/plugins/calendar/google/events/delete';
 
 const PLUGIN_ID = 'runner';
-const STORE_KEY = 'plan';
 const UPLOADED_RUNS_KEY = 'uploadedRuns';
 const CALENDAR_COLOR_KEY = 'calendarEventColorId';
 const CALENDAR_EVENT_IDS_KEY = 'calendarEventIds';
@@ -212,28 +211,28 @@ export class RunnerPlanService {
   }
 
   private doLoad(userId: string): void {
-    this.store.get<RunnerPlan>(PLUGIN_ID, STORE_KEY, userId).subscribe({
-      next: (p) => {
-        this.plan.set(normalizePlan(p));
-        this.store.get<ScheduledRun[]>(PLUGIN_ID, UPLOADED_RUNS_KEY, userId).subscribe({
-          next: (runs) => {
-            if (Array.isArray(runs) && runs.length > 0 && runs.every(isValidScheduledRun)) {
-              this.uploadedRuns.set(runs);
-            }
-          },
-        });
-        this.store.get<string>(PLUGIN_ID, CALENDAR_COLOR_KEY, userId).subscribe({
-          next: (c) => this.eventColorId.set(/^([1-9]|1[01])$/.test(String(c)) ? String(c) : '9'),
-        });
+    this.store.get<ScheduledRun[]>(PLUGIN_ID, UPLOADED_RUNS_KEY, userId).subscribe({
+      next: (runs) => {
+        if (Array.isArray(runs) && runs.length > 0 && runs.every(isValidScheduledRun)) {
+          this.uploadedRuns.set(runs);
+          this.userHasGenerated.set(true);
+        }
+      },
+      error: () => this.loadCalendarPrefs(userId),
+      complete: () => this.loadCalendarPrefs(userId),
+    });
+  }
+
+  private loadCalendarPrefs(userId: string): void {
+    this.store.get<string>(PLUGIN_ID, CALENDAR_COLOR_KEY, userId).subscribe({
+      next: (c) => this.eventColorId.set(/^([1-9]|1[01])$/.test(String(c)) ? String(c) : '9'),
+      complete: () => {
         this.store.get<string[]>(PLUGIN_ID, CALENDAR_EVENT_IDS_KEY, userId).subscribe({
           next: (ids) => this.calendarEventIds.set(Array.isArray(ids) ? ids : []),
+          complete: () => {
+            this.loaded = true;
+          },
         });
-        this.loaded = true;
-        this.userHasGenerated.set(true);
-      },
-      error: () => {
-        this.plan.set(defaultPlan());
-        this.loaded = true;
       },
     });
   }
@@ -262,13 +261,11 @@ export class RunnerPlanService {
     if (userId) this.store.put(PLUGIN_ID, CALENDAR_COLOR_KEY, id, userId).subscribe();
   }
 
+  /** Set plan in memory and mark as generated. Plan config is not persisted; only uploaded/scheduled runs are saved. */
   save(plan: RunnerPlan): void {
-    const userId = this.userProfile.profile().id;
-    if (!userId) return;
     const normalized = normalizePlan(plan);
     this.plan.set(normalized);
     this.userHasGenerated.set(true);
-    this.store.put(PLUGIN_ID, STORE_KEY, normalized, userId).subscribe();
   }
 
   addRunsToCalendar(runs: ScheduledRun[]): Observable<AddToCalendarResult> {

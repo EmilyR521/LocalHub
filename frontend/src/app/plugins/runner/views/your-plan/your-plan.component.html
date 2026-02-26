@@ -1,8 +1,11 @@
 <section class="card">
   <h2 class="card-title">Your schedule</h2>
-  @if (runnerPlan.userHasGenerated() && editableRuns().length > 0) {
-    <p class="hint">Edit distances, add runs with + in empty cells, or remove with −.</p>
-    <div class="schedule-calendar-wrap">
+  @if (runnerPlan.userHasGenerated() && (editableRuns().length > 0 || extendedWeekMondays().length > 0)) {
+    <div class="schedule-add-week-bar schedule-add-week-bar--top">
+      <button type="button" class="btn secondary schedule-add-week-btn" (click)="addWeekAtStart()"
+        title="Add a week at the beginning" aria-label="Add week above">+ Add week above</button>
+    </div>
+    <div class="schedule-calendar-wrap">      
       <table class="schedule-calendar">
         <thead>
           <tr>
@@ -18,46 +21,82 @@
             <tr>
               <td class="week-col">{{ row.weekLabel }}</td>
               @for (day of dayNames; track day.value) {
-                <td>
+                <td [class.schedule-cell--today]="isCellToday(row.weekMonday, day.value)"
+                    [class.schedule-cell--missed]="isCellMissed(row.days[day.value])">
                   @if (row.days[day.value]; as run) {
-                    <div class="schedule-cell">
-                      <button
-                        type="button"
-                        class="schedule-remove-btn"
-                        (click)="removeRun(run.date)"
-                        title="Remove this run"
-                        aria-label="Remove this run">−</button>
-                      <div class="schedule-distance-wrap">
-                        <input
-                          type="number"
-                          class="form-input form-input--compact schedule-distance"
-                          min="0"
-                          step="0.5"
-                          [ngModel]="run.distanceKm"
-                          (ngModelChange)="updateRunDistance(run.date, $event)"
-                          title="Distance (km)" />
-                        <span class="schedule-unit">km</span>
-                      </div>
+                    <div class="schedule-cell" [class.schedule-cell--completed]="isRunCompleted(run.date)"
+                         (contextmenu)="onContextMenu($event, run)">
+                      @if (editingRunDate() === run.date) {
+                        <div class="schedule-distance-wrap">
+                          <input
+                            type="number"
+                            class="form-input form-input--compact schedule-distance"
+                            min="0"
+                            step="0.5"
+                            [ngModel]="run.distanceKm"
+                            (ngModelChange)="updateRunDistance(run.date, $event)"
+                            (blur)="clearEditMode()"
+                            title="Distance (km)" />
+                          <span class="schedule-unit">km</span>
+                        </div>
+                        <button type="button" class="schedule-remove-btn" (click)="removeRun(run.date)" title="Remove this run"
+                          aria-label="Remove this run">
+                          <svg class="schedule-remove-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            <line x1="10" y1="11" x2="10" y2="17"/>
+                            <line x1="14" y1="11" x2="14" y2="17"/>
+                          </svg>
+                        </button>
+                      } @else {
+                        <span class="schedule-distance-readonly">{{ run.distanceKm }} km</span>
+                        @if (isRunCompleted(run.date)) {
+                          <span class="schedule-completed-mark" aria-hidden="true">✓</span>
+                        }
+                      }
                     </div>
                   } @else {
-                    <button
-                      type="button"
-                      class="schedule-add-btn"
-                      (click)="addRun(row.weekMonday, day.value)"
-                      title="Add run"
-                      aria-label="Add run">+</button>
+                    @if (getStravaRunForCell(row.weekMonday, day.value); as stravaRun) {
+                      <div class="schedule-cell schedule-cell--recorded">
+                        <span class="schedule-distance-readonly">{{ stravaRun.distanceKm | number:'1.1-1' }} km</span>
+                        <span class="schedule-completed-mark" aria-hidden="true">✓</span>
+                      </div>
+                    } @else {
+                      <button
+                        type="button"
+                        class="schedule-add-btn"
+                        (click)="addRun(row.weekMonday, day.value)"
+                        title="Add run"
+                        aria-label="Add run">+</button>
+                    }
                   }
                 </td>
               }
-              <td class="schedule-total-cell">{{ getWeekTotal(row) | number:'1.1-1' }} km</td>
+              <td class="schedule-total-cell">
+                @if (isWeekCompletedOrInProgress(row)) {
+                  {{ getWeekCompletedKm(row) | number:'1.1-1' }}/{{ getWeekTotal(row) | number:'1.1-1' }} km
+                } @else {
+                  {{ getWeekTotal(row) | number:'1.1-1' }} km
+                }
+              </td>
             </tr>
           }
         </tbody>
-      </table>
+      </table>      
+    </div>
+    <div class="schedule-add-week-bar schedule-add-week-bar--bottom">
+      <button type="button" class="btn secondary schedule-add-week-btn" (click)="addWeekAtEnd()"
+        title="Add a week at the end" aria-label="Add week below">+ Add week below</button>
     </div>
   } @else if (runnerPlan.userHasGenerated()) {
     <p class="hint">Add runs in <strong>Plan</strong> (Repeated + Generate, or Smart plan + upload JSON), or import from Runner settings.</p>
   } @else {
     <p class="hint">Create a plan in <strong>Plan</strong> (download template and upload JSON for a smart plan, or generate a repeated plan), or use <strong>Upload plan</strong> in Runner settings.</p>
+  }
+  @if (contextMenu(); as ctx) {
+    <div class="schedule-context-menu" (click)="$event.stopPropagation()"
+         [style.left.px]="ctx.x" [style.top.px]="ctx.y" role="menu">
+      <button type="button" class="schedule-context-menu-item" (click)="contextMenuEdit(ctx.date)" role="menuitem">Edit</button>
+      <button type="button" class="schedule-context-menu-item" (click)="contextMenuDelete(ctx.date)" role="menuitem">Delete</button>
+    </div>
   }
 </section>

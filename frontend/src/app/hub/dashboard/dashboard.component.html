@@ -4,8 +4,22 @@
   <ng-container main>
     <section class="dashboard-widgets">
       @for (widget of selectedWidgets(); track widget.id) {
-        <div class="dashboard-widget-wrapper" [class.dashboard-widget-span-3]="widget.columns === 3">
-          <ng-container *ngComponentOutlet="widget.component" />
+        <div
+          class="dashboard-widget-wrapper"
+          [class.dashboard-widget-wrapper--dragging]="draggedWidgetId() === widget.id"
+          [class.dashboard-widget-span-3]="widget.columns === 3"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(widget, $event)">
+          <span
+            class="dashboard-widget-drag-handle"
+            draggable="true"
+            (dragstart)="onDragStart(widget, $event)"
+            (dragend)="onDragEnd()"
+            title="Drag to reorder"
+            aria-label="Drag to reorder widget">⋮⋮</span>
+          <div class="dashboard-widget-slot">
+            <ng-container *ngComponentOutlet="widget.component" />
+          </div>
         </div>
       }
       @if (selectedWidgets().length === 0) {

@@ -61,7 +61,7 @@ export class MyProfileComponent implements OnInit {
       ? {
           name: typeof p.name === 'string' ? p.name : '',
           emoji: typeof p.emoji === 'string' ? p.emoji : '👤',
-          theme: (p.theme === 'light' || p.theme === 'dark' ? p.theme : 'dark') as ThemeMode,
+          theme: (p.theme === 'light' || p.theme === 'dark' || p.theme === 'classic' ? p.theme : 'dark') as ThemeMode,
           visiblePluginIds: Array.isArray(p.visiblePluginIds) ? p.visiblePluginIds : [],
           pluginOrderIds: Array.isArray(p.pluginOrderIds) ? p.pluginOrderIds : [],
         }

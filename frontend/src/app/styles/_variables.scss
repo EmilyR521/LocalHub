@@ -23,3 +23,14 @@
   --accent: #0969da;
   --error: #cf222e;
 }
+
+// Classic – paper-like, vintage feel (warm cream, sepia tones)
+:root[data-theme='classic'] {
+  --bg: #f2ede5;
+  --surface: #faf8f4;
+  --border: #c9b896;
+  --text: #3d3632;
+  --text-muted: #7d7268;
+  --accent: #8b6914;
+  --error: #a63d2e;
+}

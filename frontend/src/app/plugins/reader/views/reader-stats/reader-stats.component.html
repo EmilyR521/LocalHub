@@ -1,0 +1,54 @@
+<div class="reader-stats">
+  <div class="reader-stats-row">
+    <section class="card reader-stats-card">
+      <h2 class="card-title">Top Authors</h2>
+      @if (topAuthors().length === 0) {
+        <p class="hint">No finished books yet. Stats include only books marked as finished.</p>
+      } @else {
+        <ul class="reader-stats-list">
+          @for (item of topAuthors(); track item.name) {
+            <li class="reader-stats-item">
+              <span class="reader-stats-name">{{ item.name }}</span>
+              <span class="reader-stats-count">{{ item.count }} {{ item.count === 1 ? 'book' : 'books' }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+    <section class="card reader-stats-card reader-stats-genres-card">
+      <h2 class="card-title">Top Genres</h2>
+      <div class="reader-stats-genres-columns">
+        <div class="reader-stats-genres-column">
+          <h3 class="reader-stats-genres-column-title">Fiction</h3>
+          @if (topGenresFiction().length === 0) {
+            <p class="hint">No fiction genres yet. Add the “Fiction” tag and other tags to finished books.</p>
+          } @else {
+            <ul class="reader-stats-list">
+              @for (item of topGenresFiction(); track item.name) {
+                <li class="reader-stats-item">
+                  <span class="reader-stats-name">{{ item.name }}</span>
+                  <span class="reader-stats-count">{{ item.count }} {{ item.count === 1 ? 'book' : 'books' }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+        <div class="reader-stats-genres-column">
+          <h3 class="reader-stats-genres-column-title">Non-Fiction</h3>
+          @if (topGenresNonFiction().length === 0) {
+            <p class="hint">No non-fiction genres yet. Add the “Non-Fiction” tag and other tags to finished books.</p>
+          } @else {
+            <ul class="reader-stats-list">
+              @for (item of topGenresNonFiction(); track item.name) {
+                <li class="reader-stats-item">
+                  <span class="reader-stats-name">{{ item.name }}</span>
+                  <span class="reader-stats-count">{{ item.count }} {{ item.count === 1 ? 'book' : 'books' }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

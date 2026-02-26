@@ -55,6 +55,12 @@ export class StravaService {
         this.activities.set([]);
       }
     });
+    effect(() => {
+      const id = this.userProfile.profile().id;
+      if (id) {
+        this.checkConnection().subscribe();
+      }
+    });
   }
 
   private headers(): { [key: string]: string } {

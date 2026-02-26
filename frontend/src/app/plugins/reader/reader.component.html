@@ -10,13 +10,15 @@
         (viewBook)="openEdit($event)"
         (addBook)="openAdd()" />
     } @else if (activeTab() === 'collections') {
-    <section class="card card-table-scroll">
-      <app-reader-collections (viewBook)="openEdit($event)" />
-    </section>
+      <section class="card card-table-scroll">
+        <app-reader-collections (viewBook)="openEdit($event)" />
+      </section>
+    } @else if (activeTab() === 'stats') {
+      <app-reader-stats />
     } @else {
-    <section class="card card-table-scroll">
-      <app-reader-timeline (viewBook)="openEdit($event)" />
-    </section>
+      <section class="card card-table-scroll">
+        <app-reader-timeline (viewBook)="openEdit($event)" />
+      </section>
     }
 
     @if (panelOpen()) {

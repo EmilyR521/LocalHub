@@ -216,6 +216,16 @@ router.get('/google/events', async (req: Request, res: Response) => {
   }
 });
 
+/** Next day in YYYY-MM-DD (for all-day event end; Google API end date is exclusive). */
+function nextDay(dateStr: string): string {
+  const d = new Date(dateStr + 'T12:00:00Z');
+  d.setUTCDate(d.getUTCDate() + 1);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 /** Body: { events: [{ date, title?, description? }], colorId?: string } — colorId 1–11 for event colour */
 router.post('/google/events', async (req: Request, res: Response) => {
   const userId = req.headers[userIdHeader] as string | undefined;
@@ -248,7 +258,7 @@ router.post('/google/events', async (req: Request, res: Response) => {
       summary: title,
       description: typeof e.description === 'string' ? e.description : undefined,
       start: { date },
-      end: { date },
+      end: { date: nextDay(date) },
     };
     if (colorId) payload.colorId = colorId;
     try {

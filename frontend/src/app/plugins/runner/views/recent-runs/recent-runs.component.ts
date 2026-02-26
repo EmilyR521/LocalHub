@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserProfileService } from '../../../../core/services/user-profile.service';
 import { StravaService, type StravaActivity } from '../../services/strava.service';
@@ -33,6 +33,14 @@ export class RecentRunsComponent implements OnInit {
   readonly currentYear = new Date().getFullYear();
   readonly queryMessage = signal<string | null>(null);
   readonly queryIsError = signal(false);
+
+  constructor() {
+    effect(() => {
+      if (this.strava.connected()) {
+        this.strava.loadActivities(1, 30).subscribe();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.userProfile.load();

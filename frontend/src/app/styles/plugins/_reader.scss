@@ -1,3 +1,71 @@
+// Stats view – rows of stat cards
+.reader-stats {
+  margin-bottom: 1.5rem;
+}
+
+.reader-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.reader-stats-card {
+  flex: 1 1 20rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.reader-stats-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.reader-stats-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.reader-stats-name {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.reader-stats-count {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.reader-stats-genres-card {
+  flex: 1 1 32rem;
+}
+
+.reader-stats-genres-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.reader-stats-genres-column {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.reader-stats-genres-column-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 // Collection cards (e.g. Reader collections view)
 .collections-header {
   display: flex;
