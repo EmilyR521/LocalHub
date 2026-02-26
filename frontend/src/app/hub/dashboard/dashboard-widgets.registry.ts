@@ -4,6 +4,7 @@ import { DashboardCountdownWidgetComponent } from './widgets/countdown-widget/da
 import { DashboardCurrentlyReadingWidgetComponent } from './widgets/currently-reading-widget/dashboard-currently-reading-widget.component';
 import { DashboardLastRunWidgetComponent } from './widgets/last-run-widget/dashboard-last-run-widget.component';
 import { DashboardNextRunWidgetComponent } from './widgets/next-run-widget/dashboard-next-run-widget.component';
+import { DashboardTodayHabitsWidgetComponent } from './widgets/today-habits-widget/dashboard-today-habits-widget.component';
 
 export interface DashboardWidgetDef {
   id: string;
@@ -46,6 +47,12 @@ export const DASHBOARD_WIDGETS: DashboardWidgetDef[] = [
     name: 'Countdown',
     component: DashboardCountdownWidgetComponent,
     pluginId: 'dashboard',
+  },
+  {
+    id: 'today-habits',
+    name: "Today's habits",
+    component: DashboardTodayHabitsWidgetComponent,
+    pluginId: 'habits',
   },
 ];
 

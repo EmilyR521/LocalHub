@@ -1,8 +1,15 @@
-<section class="habit-today-section">
-  <h2 class="habit-today-title">Today's habits</h2>
-    <ul class="habit-today-list" aria-label="Today's habits">
+<div class="dashboard-widget dashboard-widget-today-habits">
+  <h2 class="dashboard-widget-title">
+    <span class="dashboard-widget-title-emoji" aria-hidden="true">✓</span>
+    Today's habits
+    <a routerLink="/plugins/habits" class="dashboard-widget-title-link">Habits</a>
+  </h2>
+  @if (habits().length === 0) {
+    <p class="hint">No habits yet. <a routerLink="/plugins/habits">Add habits</a> to track daily.</p>
+  } @else {
+    <ul class="habit-today-list habit-today-list--vertical" aria-label="Today's habits">
       @for (habit of habits(); track habit.id) {
-        <li class="habit-today-item">
+        <li class="habit-today-item habit-today-item--vertical">
           <button
             type="button"
             class="habit-today-circle"
@@ -23,4 +30,5 @@
         </li>
       }
     </ul>
-</section>
+  }
+</div>
