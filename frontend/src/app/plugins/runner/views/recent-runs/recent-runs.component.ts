@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal, computed, effect } from '@angular/co
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserProfileService } from '../../../../core/services/user-profile.service';
 import { StravaService, type StravaActivity } from '../../services/strava.service';
-import { formatDistance as formatDist, formatDuration as formatDur } from '../../utils/activity-format';
+import { formatDistance as formatDist, formatDuration as formatDur, formatPace as formatPaceFn } from '../../utils/activity-format';
 
 @Component({
   selector: 'app-recent-runs',
@@ -79,6 +79,10 @@ export class RecentRunsComponent implements OnInit {
 
   formatDuration(seconds?: number): string {
     return formatDur(seconds);
+  }
+
+  formatPace(distanceM?: number, movingTimeS?: number): string {
+    return formatPaceFn(distanceM, movingTimeS);
   }
 
   formatDate(iso?: string): string {

@@ -37,7 +37,19 @@ export class ReaderComponent implements OnInit {
   editingBook = signal<Book | null>(null);
   activeTab = signal<'books' | 'collections' | 'timeline' | 'stats'>('timeline');
 
+  /** Pending filter to apply when switching to books tab (from stats author/genre click). */
+  pendingFilter = signal<{ author?: string; tag?: string } | null>(null);
+
   constructor(private reader: ReaderService) {}
+
+  navigateToBooksWithFilter(filter: { author?: string; tag?: string }): void {
+    this.pendingFilter.set(filter);
+    this.activeTab.set('books');
+  }
+
+  clearPendingFilters(): void {
+    this.pendingFilter.set(null);
+  }
 
   ngOnInit(): void {
     this.reader.load();

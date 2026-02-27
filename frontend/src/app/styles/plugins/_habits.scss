@@ -70,6 +70,8 @@
 
   .habit-today-item--vertical & {
     align-items: flex-start;
+    flex-direction: row;
+    justify-content:center;
   }
 }
 

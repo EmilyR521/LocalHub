@@ -26,6 +26,7 @@
               <th>Type</th>
               <th>Distance</th>
               <th>Time</th>
+              <th>Pace</th>
             </tr>
           </thead>
           <tbody>
@@ -36,6 +37,7 @@
                 <td>{{ a.sport_type ?? a.type ?? '—' }}</td>
                 <td>{{ formatDistance(a.distance) }}</td>
                 <td>{{ formatDuration(a.moving_time ?? a.elapsed_time) }}</td>
+                <td>{{ formatPace(a.distance, a.moving_time ?? a.elapsed_time) }}</td>
               </tr>
             }
           </tbody>

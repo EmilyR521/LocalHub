@@ -1,5 +1,17 @@
 <div class="reader-stats">
   @if (chartConfig(); as config) {
+    <div class="runner-trends-chart-period runner-trends-chart-period--global">
+      <span class="runner-trends-period-label">Period:</span>
+      @for (period of [3, 6, 12]; track period) {
+        <button
+          type="button"
+          class="btn runner-trends-period-btn"
+          [class.runner-trends-period-btn--active]="chartPeriodMonths() === period"
+          (click)="chartPeriodMonths.set(period)">
+          {{ period }} months
+        </button>
+      }
+    </div>
     <div class="reader-stats-row">
       <section class="card reader-stats-card">
         <div class="runner-trends-chart-container">
@@ -64,18 +76,6 @@
               }
             </svg>
           </div>
-        </div>
-        <div class="runner-trends-chart-period">
-          <span class="runner-trends-period-label">Period:</span>
-          @for (period of [3, 6, 12]; track period) {
-            <button
-              type="button"
-              class="btn runner-trends-period-btn"
-              [class.runner-trends-period-btn--active]="chartPeriodMonths() === period"
-              (click)="chartPeriodMonths.set(period)">
-              {{ period }} months
-            </button>
-          }
         </div>
       </section>
       @if (paceChartConfig(); as paceConfig) {
@@ -146,18 +146,6 @@
                 }
               </svg>
             </div>
-          </div>
-          <div class="runner-trends-chart-period">
-            <span class="runner-trends-period-label">Period:</span>
-            @for (period of [3, 6, 12]; track period) {
-              <button
-                type="button"
-                class="btn runner-trends-period-btn"
-                [class.runner-trends-period-btn--active]="chartPeriodMonths() === period"
-                (click)="chartPeriodMonths.set(period)">
-                {{ period }} months
-              </button>
-            }
           </div>
         </section>
       }

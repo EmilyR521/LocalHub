@@ -8,7 +8,7 @@
         <ul class="reader-stats-list">
           @for (item of topAuthors(); track item.name) {
             <li class="reader-stats-item">
-              <span class="reader-stats-name">{{ item.name }}</span>
+              <button type="button" class="reader-stats-name reader-stats-link" (click)="navigateToBooks.emit({ author: item.name })">{{ item.name }}</button>
               <span class="reader-stats-count">{{ item.count }} {{ item.count === 1 ? 'book' : 'books' }}</span>
             </li>
           }
@@ -26,7 +26,7 @@
             <ul class="reader-stats-list">
               @for (item of topGenresFiction(); track item.name) {
                 <li class="reader-stats-item">
-                  <span class="reader-stats-name">{{ item.name }}</span>
+                  <button type="button" class="reader-stats-name reader-stats-link" (click)="navigateToBooks.emit({ tag: item.name })">{{ item.name }}</button>
                   <span class="reader-stats-count">{{ item.count }} {{ item.count === 1 ? 'book' : 'books' }}</span>
                 </li>
               }
@@ -41,7 +41,7 @@
             <ul class="reader-stats-list">
               @for (item of topGenresNonFiction(); track item.name) {
                 <li class="reader-stats-item">
-                  <span class="reader-stats-name">{{ item.name }}</span>
+                  <button type="button" class="reader-stats-name reader-stats-link" (click)="navigateToBooks.emit({ tag: item.name })">{{ item.name }}</button>
                   <span class="reader-stats-count">{{ item.count }} {{ item.count === 1 ? 'book' : 'books' }}</span>
                 </li>
               }
@@ -49,6 +49,69 @@
           }
         </div>
       </div>
+    </section>
+    <section class="card reader-stats-card">
+      <h2 class="card-title">Genre Breakdown</h2>
+        @if (donutChartConfig().hasData) {
+        <div class="reader-stats-donut-wrap">
+          <svg class="reader-stats-donut" [attr.viewBox]="'0 0 ' + donutChartConfig().size + ' ' + donutChartConfig().size"
+            aria-label="Top genres: fiction and non-fiction books with genre breakdown">
+            @for (seg of donutChartConfig().outerSegments; track seg.label) {
+              <path
+                [attr.d]="seg.pathD"
+                [attr.fill]="seg.color"
+                class="reader-stats-donut-outer reader-stats-donut-segment"
+                [attr.aria-label]="seg.label + ': ' + seg.count + ' books'"
+                (mouseenter)="hoveredSegment.set({ label: seg.label, count: seg.count })"
+                (mouseleave)="hoveredSegment.set(null)" />
+            }
+            @for (seg of donutChartConfig().innerSegments; track seg.name + seg.category) {
+              <path
+                [attr.d]="seg.pathD"
+                [attr.fill]="seg.color"
+                class="reader-stats-donut-inner reader-stats-donut-segment"
+                [attr.aria-label]="seg.name + ': ' + seg.count + ' books'"
+                (mouseenter)="hoveredSegment.set({ label: seg.name, count: seg.count })"
+                (mouseleave)="hoveredSegment.set(null)" />
+            }
+            @for (seg of donutChartConfig().outerSegments; track seg.label) {
+              <text
+                [attr.x]="seg.labelX"
+                [attr.y]="seg.labelY"
+                class="reader-stats-donut-outer-label"
+                text-anchor="middle"
+                dominant-baseline="middle"
+                [attr.transform]="'rotate(' + seg.labelRotation + ', ' + seg.labelX + ', ' + seg.labelY + ')'">{{ seg.label }}</text>
+            }
+            <g class="reader-stats-donut-tooltip">
+              @if (hoveredSegment(); as h) {
+                <text [attr.x]="donutChartConfig().cx" [attr.y]="donutChartConfig().cy - 6" text-anchor="middle" dominant-baseline="middle" class="reader-stats-donut-tooltip-label">{{ h.label }}</text>
+                <text [attr.x]="donutChartConfig().cx" [attr.y]="donutChartConfig().cy + 8" text-anchor="middle" dominant-baseline="middle" class="reader-stats-donut-tooltip-count">{{ h.count }} {{ h.count === 1 ? 'book' : 'books' }}</text>
+              }
+            </g>
+          </svg>
+        </div>
+        <div class="reader-stats-donut-legend">
+          <div class="reader-stats-donut-legend-outer">
+            @for (seg of donutChartConfig().outerSegments; track seg.label) {
+            <span class="reader-stats-donut-legend-item">
+              <span class="reader-stats-donut-legend-swatch" [style.background]="seg.color"></span>
+              {{ seg.label }} ({{ seg.count }})
+            </span>
+            }
+          </div>
+          @if (donutChartConfig().innerSegments.length > 0) {
+          <div class="reader-stats-donut-legend-inner">
+            @for (seg of donutChartConfig().innerSegments; track seg.name + seg.category) {
+            <span class="reader-stats-donut-legend-item reader-stats-donut-legend-item--genre">
+              <span class="reader-stats-donut-legend-swatch" [style.background]="seg.color"></span>
+              {{ seg.name }} ({{ seg.count }})
+            </span>
+            }
+          </div>
+          }
+        </div>
+        }
     </section>
   </div>
 </div>

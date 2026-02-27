@@ -1,15 +1,63 @@
 <section class="card card-table-scroll">
-  <div class="actions" style="margin-bottom: 1rem;">
-    <button type="button" class="btn primary" (click)="onAddBook()">Add book</button>
-    <div class="plugin-actions" style="margin-bottom: 0;">
-      <label>
-        <span class="hint" style="margin: 0 0.5rem 0 0;">Status:</span>
-        <select class="form-select" [value]="statusFilter()" (change)="setStatusFilter($any($event.target).value)">
-          @for (s of statusOptions; track s) {
-            <option [value]="s">{{ s || 'All' }}</option>
-          }
-        </select>
-      </label>
+  <div class="vocabulist-filters-collapsible">
+    <div style="display:flex;flex-direction: row; width: 100%; justify-content: space-between;"><button type="button" class="vocabulist-filters-toggle btn secondary" (click)="toggleFilters()"
+      [attr.aria-expanded]="filtersOpen()" aria-controls="reader-books-tag-filters-panel">
+      Filters
+      @if (activeFilterCount() > 0) {
+      <span class="vocabulist-filters-badge">({{ activeFilterCount() }})</span>
+      }
+      <span class="vocabulist-filters-chevron" [class.vocabulist-filters-chevron--open]="filtersOpen()"
+        aria-hidden="true">▼</span>
+    </button>
+  <button type="button" class="btn primary" (click)="onAddBook()"> + Add book</button>
+  </div>
+   
+    <div
+      id="reader-books-tag-filters-panel"
+      class="vocabulist-filter-panel"
+      [class.vocabulist-filter-panel--open]="filtersOpen()"
+      [hidden]="!filtersOpen()"
+    >
+      <div class="vocabulist-filter">
+        <div class="vocabulist-filter-group">
+          <span class="vocabulist-filter-label">Status:</span>
+          <div class="vocabulist-tag-multiselect">
+            @for (s of statusOptions; track s) {
+              <button
+                type="button"
+                class="vocabulist-tag-chip"
+                [class.vocabulist-tag-chip--selected]="isStatusSelected(s)"
+                (click)="toggleStatus(s)"
+              >
+                {{ s }}
+              </button>
+            }
+          </div>
+        </div>
+        @if (authorFilter(); as author) {
+          <div class="vocabulist-filter-group">
+            <span class="vocabulist-filter-label">Author:</span>
+            <button type="button" class="vocabulist-tag-chip vocabulist-tag-chip--selected" (click)="clearAuthorFilter()">{{ author }}</button>
+          </div>
+        }
+        @if (allTags().length > 0) {
+          <div class="vocabulist-filter-group">
+            <span class="vocabulist-filter-label">Tags:</span>
+            <div class="vocabulist-tag-multiselect">
+              @for (tag of allTags(); track tag) {
+                <button
+                  type="button"
+                  class="vocabulist-tag-chip"
+                  [class.vocabulist-tag-chip--selected]="isTagSelected(tag)"
+                  (click)="toggleTag(tag)"
+                >
+                  {{ tag }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
     </div>
   </div>
 
@@ -29,16 +77,36 @@
         @for (book of filteredAndSortedBooks(); track book.id) {
           <tr class="clickable" (click)="onViewBook(book)">
             <td>{{ book.title }}</td>
-            <td>{{ book.author }}</td>
-            <td><span class="status-badge">{{ book.status }}</span></td>
+            <td class="reader-books-table-filter-cell">
+              @if (book.author.trim()) {
+                <button type="button" class="reader-books-table-filter-link" (click)="applyAuthorFilter(book.author); $event.stopPropagation()" [class.reader-books-table-filter-link--active]="isAuthorFilterActive(book.author)">{{ book.author }}</button>
+              } @else {
+                —
+              }
+            </td>
+            <td class="reader-books-table-filter-cell">
+              <button type="button" class="reader-books-table-filter-link reader-books-table-status-badge" (click)="applyStatusFilter(book.status); $event.stopPropagation()" [class.reader-books-table-filter-link--active]="isStatusSelected(book.status)">
+                <span class="status-badge">{{ book.status }}</span>
+              </button>
+            </td>
             <td class="empty-cell">{{ formatDate(book.readingEndDate) }}</td>
             <td><span class="rating-icon">{{ ratingIcon(book.rating) || '—' }}</span></td>
-            <td class="empty-cell">{{ (book.tags ?? []).length ? (book.tags ?? []).join(', ') : '—' }}</td>
+            <td class="reader-books-table-filter-cell empty-cell">
+              @if ((book.tags ?? []).length) {
+                @for (tag of book.tags; track tag) {
+                  @if (tag?.trim(); as t) {
+                    <button type="button" class="vocabulist-tag-chip reader-books-table-tag-chip" [class.vocabulist-tag-chip--selected]="isTagSelected(t)" (click)="toggleTag(t); $event.stopPropagation()">{{ t }}</button>
+                  }
+                }
+              } @else {
+                —
+              }
+            </td>
           </tr>
         }
         @if (filteredAndSortedBooks().length === 0) {
           <tr>
-            <td colspan="6" class="empty-cell">{{ statusFilter() ? 'No books match the filter' : 'No books yet. Add one above.' }}</td>
+            <td colspan="6" class="empty-cell">{{ activeFilterCount() > 0 ? 'No books match the filter' : 'No books yet. Add one above.' }}</td>
           </tr>
         }
       </tbody>

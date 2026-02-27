@@ -217,13 +217,14 @@ export class RunningTrendsComponent implements OnInit {
     const barGap = 4;
     const totalGap = (data.length - 1) * barGap;
     const barWidth = Math.max(1, (innerWidth - totalGap) / data.length);
-    const bottomY = padding.top + innerHeight;
 
     const yScaleMinPace = paces.length > 0 ? Math.floor(Math.min(...paces) * 2) / 2 - 0.5 : 4;
     const yScaleMaxPace = paces.length > 0 ? Math.ceil(Math.max(...paces) * 2) / 2 + 0.5 : 8;
     const yRange = Math.max(yScaleMaxPace - yScaleMinPace, 1);
+    // Inverted Y: faster pace (lower min/km) at top, slower pace (higher min/km) at bottom.
+    const topY = padding.top;
     const paceToY = (pace: number) =>
-      bottomY - ((pace - yScaleMinPace) / yRange) * innerHeight;
+      topY + ((pace - yScaleMinPace) / yRange) * innerHeight;
 
     const indexPacePairs: [number, number][] = data
       .map((d, i) => (d.avgPaceMinPerKm != null ? ([i, d.avgPaceMinPerKm] as [number, number]) : null))

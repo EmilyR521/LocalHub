@@ -21,6 +21,17 @@ export function filterBooksByStatus(
 }
 
 /**
+ * Filter books by selected statuses. Returns all if the set is empty.
+ */
+export function filterBooksByStatusSet(
+  books: Book[],
+  selectedStatuses: Set<BookStatus>
+): Book[] {
+  if (selectedStatuses.size === 0) return books;
+  return books.filter((b) => selectedStatuses.has(b.status));
+}
+
+/**
  * Sort books by field and direction. Returns a new sorted array.
  */
 export function sortBooks(

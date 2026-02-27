@@ -7,6 +7,8 @@
 
     @if (activeTab() === 'books') {
       <app-reader-books-table
+        [initialFilter]="pendingFilter()"
+        (filtersApplied)="clearPendingFilters()"
         (viewBook)="openEdit($event)"
         (addBook)="openAdd()" />
     } @else if (activeTab() === 'collections') {
@@ -14,7 +16,7 @@
         <app-reader-collections (viewBook)="openEdit($event)" />
       </section>
     } @else if (activeTab() === 'stats') {
-      <app-reader-stats />
+      <app-reader-stats (navigateToBooks)="navigateToBooksWithFilter($any($event))" />
     } @else {
       <section class="card card-table-scroll">
         <app-reader-timeline (viewBook)="openEdit($event)" />
