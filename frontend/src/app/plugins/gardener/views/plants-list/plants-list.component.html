@@ -1,0 +1,87 @@
+<section class="card card-table-scroll">
+  <div class="actions" style="margin-bottom: 1rem;">
+    <button type="button" class="btn primary" (click)="openAdd()">Add plant</button>
+  </div>
+  @if (zones().length > 0) {
+    <div class="gardener-zone-filter" style="margin-bottom: 1rem;">
+      <span class="gardener-zone-filter-label">Filter by zone:</span>
+      @for (zone of zones(); track zone.id) {
+        <button
+          type="button"
+          class="gardener-zone-chip"
+          [class.gardener-zone-chip--active]="selectedZoneIds().has(zone.id)"
+          (click)="toggleZoneFilter(zone.id)"
+        >
+          {{ zone.name }}
+        </button>
+      }
+      @if (selectedZoneIds().size > 0) {
+        <button type="button" class="btn secondary gardener-zone-clear" (click)="clearZoneFilter()">Clear</button>
+      }
+    </div>
+  }
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th>Species</th>
+          <th>Zones</th>
+          <th>Hardiness</th>
+          <th>Lifecycle</th>
+          <th>Added</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (plant of filteredPlants(); track plant.id) {
+          <tr class="clickable" (click)="openEdit(plant)">
+            <td class="gardener-plant-thumb-cell">
+              @if (getSpeciesImageUrl(plant.speciesData?.default_image); as imgUrl) {
+                <img class="gardener-plant-thumb" [src]="imgUrl" alt="" />
+              } @else {
+                <span class="gardener-plant-thumb-placeholder">—</span>
+              }
+            </td>
+            <td>{{ getDisplayCommonName(plant) }}</td>
+            <td class="empty-cell">{{ getDisplayScientificName(plant) || '—' }}</td>
+            <td class="empty-cell">
+              @for (zoneName of getZoneNames(plant); track zoneName) {
+                <span class="gardener-zone-badge">{{ zoneName }}</span>
+              }
+              @if (getZoneNames(plant).length === 0) {
+                <span>—</span>
+              }
+            </td>
+            <td class="empty-cell">{{ plant.hardiness || '—' }}</td>
+            <td class="empty-cell">{{ plant.lifecycle || '—' }}</td>
+            <td class="empty-cell">{{ plant.addedDate }}</td>
+            <td class="empty-cell">
+              <button type="button" class="btn secondary" (click)="openEdit(plant); $event.stopPropagation()">Edit</button>
+              <button type="button" class="btn secondary" (click)="gardener.removePlant(plant.id); $event.stopPropagation()">Delete</button>
+            </td>
+          </tr>
+        }
+        @if (filteredPlants().length === 0) {
+          <tr>
+            <td colspan="8" class="empty-cell">{{ selectedZoneIds().size > 0 ? 'No plants in selected zone(s).' : 'No plants yet. Add one above.' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (panelOpen()) {
+    <div class="panel-overlay" (click)="closePanel()">
+      <div class="panel" (click)="$event.stopPropagation()">
+        <app-plant-form
+          [plant]="editingPlant()"
+          [zones]="zones()"
+          (save)="onPlantSave($event)"
+          (cancel)="closePanel()"
+          (delete)="onPlantDelete()"
+        />
+      </div>
+    </div>
+  }
+</section>

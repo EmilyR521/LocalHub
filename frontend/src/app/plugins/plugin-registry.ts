@@ -17,5 +17,6 @@ export const PLUGINS: PluginManifest[] = [
   { id: 'habits', name: 'Habits', path: 'habits', icon: '✔️', order: 5 },
   { id: 'vocabulist', name: 'Vocabulist', path: 'vocabulist', icon: '📚', order: 6 },
   { id: 'journal', name: 'Journal', path: 'journal', icon: '📓', order: 7 },
+  { id: 'gardener', name: 'Gardener', path: 'gardener', icon: '🌱', order: 8 },
   { id: 'user-management', name: 'User management', path: 'user-management', icon: '👤', order: 99 },
 ];

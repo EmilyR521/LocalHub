@@ -1,0 +1,122 @@
+<section class="card card-table-scroll">
+  <div class="actions" style="margin-bottom: 1rem;">
+    <button type="button" class="btn primary" (click)="openAdd()">Add job</button>
+  </div>
+  <p class="hint" style="margin-bottom: 1rem;">Plan garden jobs with a date or time window (e.g. first week of June), materials and costs, zone, and linked plants.</p>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Period</th>
+          <th>Zone</th>
+          <th>Plants</th>
+          <th>Materials / cost</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (job of sortedJobs(); track job.id) {
+          <tr class="clickable" (click)="openEdit(job)">
+            <td>{{ job.title }}</td>
+            <td class="empty-cell">{{ formatPeriod(job) }}</td>
+            <td class="empty-cell">{{ job.zoneId ? getZoneName(job.zoneId) : '—' }}</td>
+            <td class="empty-cell">{{ getPlantsSummary(job) }}</td>
+            <td class="empty-cell">{{ getMaterialsSummary(job) }}</td>
+            <td class="empty-cell">
+              <button type="button" class="btn secondary" (click)="openEdit(job); $event.stopPropagation()">Edit</button>
+              <button type="button" class="btn secondary" (click)="gardener.removeJob(job.id); $event.stopPropagation()">Delete</button>
+            </td>
+          </tr>
+        }
+        @if (jobs().length === 0) {
+          <tr>
+            <td colspan="6" class="empty-cell">No jobs yet. Add one to plan work by date or period, with materials, zone, and plants.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (panelOpen()) {
+    <div class="panel-overlay" (click)="closePanel()">
+      <div class="panel" (click)="$event.stopPropagation()">
+        <h2 class="card-title">{{ editingJob() ? 'Edit job' : 'Add job' }}</h2>
+        <form (ngSubmit)="save()">
+          <div class="field">
+            <label for="job-title">Title</label>
+            <input id="job-title" type="text" class="form-input" [(ngModel)]="formTitle" name="formTitle" placeholder="e.g. Mulch borders" required />
+          </div>
+          <div class="field">
+            <label for="job-start">From date</label>
+            <input id="job-start" type="date" class="form-input form-input--compact" [(ngModel)]="formStartDate" name="formStartDate" required />
+            <p class="hint" style="margin-top: 0.25rem;">Start of the period (e.g. 1 June for “first week of June”).</p>
+          </div>
+          <div class="field">
+            <label for="job-end">To date (optional)</label>
+            <input id="job-end" type="date" class="form-input form-input--compact" [(ngModel)]="formEndDate" name="formEndDate" />
+            <p class="hint" style="margin-top: 0.25rem;">Leave blank for a single day; set for a range (e.g. 7 June = first week of June).</p>
+          </div>
+          <div class="field">
+            <label for="job-zone">Zone</label>
+            <select id="job-zone" class="form-select" [(ngModel)]="formZoneId" name="formZoneId">
+              <option value="">—</option>
+              @for (zone of zones(); track zone.id) {
+                <option [value]="zone.id">{{ zone.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="field gardener-job-plants-field">
+            <label for="job-plant-search">Plants</label>
+            <div class="plugin-actions gardener-zone-search-actions">
+              <input
+                id="job-plant-search"
+                type="text"
+                [ngModel]="plantSearchInput()"
+                (ngModelChange)="plantSearchInput.set($event)"
+                name="jobPlantSearch"
+                placeholder="Search and add plants..."
+                (focus)="plantSearchFocused.set(true)"
+                (blur)="plantSearchFocused.set(false)"
+                (keydown.enter)="$event.preventDefault()"
+              />
+            </div>
+            @if (plantSearchFocused() && plantsToAdd().length > 0) {
+              <ul class="gardener-zone-add-list">
+                @for (p of plantsToAdd(); track p.id) {
+                  <li>
+                    <button type="button" class="gardener-zone-add-btn" (mousedown)="addPlantToForm(p); $event.preventDefault()">{{ getPlantDisplayName(p) }}</button>
+                  </li>
+                }
+              </ul>
+            }
+            @if (formPlantsForDisplay().length > 0) {
+              <div class="plugin-list" style="margin-top: 0.5rem;">
+                @for (plant of formPlantsForDisplay(); track plant.id) {
+                  <span class="tag-chip">{{ getPlantDisplayName(plant) }} <button type="button" class="tag-remove" (click)="removePlantFromForm(plant.id)" aria-label="Remove plant">×</button></span>
+                }
+              </div>
+            }
+          </div>
+          <div class="field gardener-jobs-materials">
+            <label>Materials and costs</label>
+            @for (row of formMaterials; track $index) {
+              <div class="gardener-jobs-material-row">
+                <input type="text" class="form-input" [(ngModel)]="row.name" [name]="'mat-name-' + $index" placeholder="Material" />
+                <input type="number" step="0.01" min="0" class="form-input form-input--compact gardener-jobs-cost" [(ngModel)]="row.cost" [name]="'mat-cost-' + $index" placeholder="Cost" />
+                <button type="button" class="btn secondary gardener-jobs-remove-row" (click)="removeMaterialRow($index)" [disabled]="formMaterials.length <= 1" aria-label="Remove row">×</button>
+              </div>
+            }
+            <button type="button" class="btn secondary" (click)="addMaterialRow()">Add row</button>
+          </div>
+          <div class="panel-actions">
+            @if (editingJob()) {
+              <button type="button" class="btn secondary" (click)="delete()">Delete</button>
+            }
+            <button type="button" class="btn secondary" (click)="closePanel()">Cancel</button>
+            <button type="submit" class="btn primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</section>

@@ -22,14 +22,26 @@ export class DashboardSettingsComponent {
   readonly newCountdownDate = signal('');
 
   isSelected(id: string): boolean {
-    return this.selectedIds().has(id);
+    const ids = this.selectedIds();
+    if (id === 'last-next-run') {
+      return ids.has('last-next-run') || ids.has('last-run') || ids.has('next-run');
+    }
+    return ids.has(id);
   }
 
   toggle(widgetId: string): void {
     const ids = this.userProfile.dashboardWidgetIds();
     const next = new Set(ids);
-    if (next.has(widgetId)) next.delete(widgetId);
-    else next.add(widgetId);
+    if (widgetId === 'last-next-run') {
+      const hasCombined = next.has('last-next-run') || next.has('last-run') || next.has('next-run');
+      next.delete('last-next-run');
+      next.delete('last-run');
+      next.delete('next-run');
+      if (!hasCombined) next.add('last-next-run');
+    } else {
+      if (next.has(widgetId)) next.delete(widgetId);
+      else next.add(widgetId);
+    }
     this.userProfile.updateProfile({ dashboardWidgetIds: Array.from(next) });
   }
 

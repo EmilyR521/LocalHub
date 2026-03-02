@@ -1,0 +1,68 @@
+<section class="card card-table-scroll">
+  <div class="actions" style="margin-bottom: 1rem;">
+    <button type="button" class="btn primary" (click)="openAdd()">Add zone</button>
+  </div>
+  <p class="hint" style="margin-bottom: 1rem;">Zones act like tags: assign plants to zones in the Plants List, then filter or view plants by zone.</p>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Plants</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (zone of zones(); track zone.id) {
+          <tr class="clickable" (click)="openEdit(zone)">
+            <td>{{ zone.name }}</td>
+            <td class="empty-cell">{{ zone.description || '—' }}</td>
+            <td class="empty-cell">
+              @if (getPlantCountForZone(zone.id) > 0) {
+                <button type="button" class="gardener-zone-link" (click)="viewPlantsInZone(zone); $event.stopPropagation()">
+                  {{ getPlantCountForZone(zone.id) }} plant(s)
+                </button>
+              } @else {
+                <span>0</span>
+              }
+            </td>
+            <td class="empty-cell">
+              <button type="button" class="btn secondary" (click)="openEdit(zone); $event.stopPropagation()">Edit</button>
+              <button type="button" class="btn secondary" (click)="gardener.removeZone(zone.id); $event.stopPropagation()">Delete</button>
+            </td>
+          </tr>
+        }
+        @if (zones().length === 0) {
+          <tr>
+            <td colspan="4" class="empty-cell">No zones yet. Add one to group plants by area (e.g. "Patio", "Greenhouse").</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (panelOpen()) {
+    <div class="panel-overlay" (click)="closePanel()">
+      <div class="panel" (click)="$event.stopPropagation()">
+        <h2 class="card-title">{{ editingZone() ? 'Edit zone' : 'Add zone' }}</h2>
+        <form (ngSubmit)="save()">
+          <div class="field">
+            <label for="zone-name">Name</label>
+            <input id="zone-name" type="text" class="form-input" [(ngModel)]="formName" name="formName" placeholder="e.g. Patio, Greenhouse" />
+          </div>
+          <div class="field">
+            <label for="zone-desc">Description</label>
+            <input id="zone-desc" type="text" class="form-input" [(ngModel)]="formDescription" name="formDescription" placeholder="Optional" />
+          </div>
+          <div class="panel-actions">
+            @if (editingZone()) {
+              <button type="button" class="btn secondary" (click)="delete()">Delete</button>
+            }
+            <button type="button" class="btn secondary" (click)="closePanel()">Cancel</button>
+            <button type="submit" class="btn primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</section>

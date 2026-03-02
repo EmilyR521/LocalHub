@@ -80,11 +80,13 @@ export class MyProfileComponent implements OnInit {
       Array.isArray(savedOrder) &&
       savedOrder.length > 0 &&
       savedOrder.every((id) => knownIds.has(id));
-    this.orderedPluginIds.set(
-      validOrder
-        ? savedOrder.filter((id) => knownIds.has(id))
-        : [...this.defaultPluginOrder]
-    );
+    const baseOrder = validOrder
+      ? savedOrder.filter((id) => knownIds.has(id))
+      : [...this.defaultPluginOrder];
+    // Append any plugin IDs from registry not yet in the list (e.g. newly added plugins like Gardener)
+    const inBase = new Set(baseOrder);
+    const appended = this.defaultPluginOrder.filter((id) => !inBase.has(id));
+    this.orderedPluginIds.set([...baseOrder, ...appended]);
   }
 
   isSelected(pluginId: string): boolean {

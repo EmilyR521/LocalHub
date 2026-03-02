@@ -2,8 +2,7 @@ import type { Type } from '@angular/core';
 import { DashboardCalendarWidgetComponent } from './widgets/calendar-widget/dashboard-calendar-widget.component';
 import { DashboardCountdownWidgetComponent } from './widgets/countdown-widget/dashboard-countdown-widget.component';
 import { DashboardCurrentlyReadingWidgetComponent } from './widgets/currently-reading-widget/dashboard-currently-reading-widget.component';
-import { DashboardLastRunWidgetComponent } from './widgets/last-run-widget/dashboard-last-run-widget.component';
-import { DashboardNextRunWidgetComponent } from './widgets/next-run-widget/dashboard-next-run-widget.component';
+import { DashboardRunWidgetComponent } from './widgets/run-widget/dashboard-run-widget.component';
 import { DashboardTodayHabitsWidgetComponent } from './widgets/today-habits-widget/dashboard-today-habits-widget.component';
 
 export interface DashboardWidgetDef {
@@ -24,15 +23,9 @@ export const DASHBOARD_WIDGETS: DashboardWidgetDef[] = [
     pluginId: 'reader',
   },
   {
-    id: 'next-run',
-    name: 'Next run',
-    component: DashboardNextRunWidgetComponent,
-    pluginId: 'runner',
-  },
-  {
-    id: 'last-run',
-    name: 'Last run',
-    component: DashboardLastRunWidgetComponent,
+    id: 'last-next-run',
+    name: 'Last run / Next run',
+    component: DashboardRunWidgetComponent,
     pluginId: 'runner',
   },
   {

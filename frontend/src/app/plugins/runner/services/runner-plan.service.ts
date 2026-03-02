@@ -271,7 +271,16 @@ export class RunnerPlanService {
   addRunsToCalendar(runs: ScheduledRun[]): Observable<AddToCalendarResult> {
     const userId = this.userProfile.profile().id;
     if (!userId) return of({ created: 0, failed: runs.length, errors: ['Not signed in'] });
-    const events = runs.map((r) => ({ date: r.date, title: r.title, description: `Run ${r.distanceKm} km` }));
+    const events = runs.map((r) => {
+      const dist =
+        Number.isFinite(r.distanceKm) && r.distanceKm > 0
+          ? r.distanceKm % 1 === 0
+            ? String(r.distanceKm)
+            : r.distanceKm.toFixed(1)
+          : String(r.distanceKm);
+      const title = `${dist}km ${r.title}`.trim();
+      return { date: r.date, title, description: `Run ${r.distanceKm} km` };
+    });
     const colorId = this.eventColorId();
     const body = colorId ? { events, colorId } : { events };
     const headers = { 'X-User-Id': userId };

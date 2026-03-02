@@ -5,6 +5,7 @@ import { Router, Request, Response } from 'express';
 import * as store from './store';
 import calendarGoogleRouter from './calendar-google';
 import stravaRouter from './strava';
+import gardenerRouter from './gardener';
 
 const router = Router();
 
@@ -12,6 +13,7 @@ const userIdHeader = 'x-user-id';
 
 router.use('/calendar', calendarGoogleRouter);
 router.use('/strava', stravaRouter);
+router.use('/gardener', gardenerRouter);
 
 /** List users (user-management plugin): returns { users: { id, name, emoji }[] }. */
 router.get('/user-management/users', (_req: Request, res: Response) => {

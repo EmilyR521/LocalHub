@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { UserProfileService } from '../../../../core/services/user-profile.service';
 import { daysFromToday } from '../../../../core/utils/date-format';
 import type { CountdownItem } from '../../../../core/services/user-profile.service';
@@ -12,7 +12,18 @@ import type { CountdownItem } from '../../../../core/services/user-profile.servi
 export class DashboardCountdownWidgetComponent {
   private userProfile = inject(UserProfileService);
 
-  readonly countdowns = this.userProfile.countdownItems;
+  /** Countdown events ordered by shortest time until (soonest first; past events last, most recent past first). */
+  readonly countdowns = computed(() => {
+    const items = [...this.userProfile.countdownItems()];
+    return items.sort((a, b) => {
+      const aDays = daysFromToday(a.eventDate);
+      const bDays = daysFromToday(b.eventDate);
+      if (aDays >= 0 && bDays < 0) return -1;
+      if (aDays < 0 && bDays >= 0) return 1;
+      if (aDays >= 0 && bDays >= 0) return aDays - bDays;
+      return bDays - aDays;
+    });
+  });
 
   /** e.g. "5 days until Holiday" or "Today: Holiday" or "Holiday was 2 days ago" */
   countdownLabel(item: CountdownItem): string {

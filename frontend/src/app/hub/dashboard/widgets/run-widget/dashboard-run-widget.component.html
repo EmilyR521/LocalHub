@@ -1,0 +1,33 @@
+<div class="dashboard-widget dashboard-widget-run">
+  <h2 class="dashboard-widget-title"><span class="dashboard-widget-title-emoji" aria-hidden="true">🏃</span> Running</h2>
+  <div class="dashboard-widget-run-columns">
+    <div class="dashboard-widget-run-col">
+      <h3 class="dashboard-widget-run-col-title">Last run</h3>
+      @if (lastRun(); as run) {
+        <a [routerLink]="['/plugins/runner', 'recent']" class="dashboard-widget-link">
+          <span class="widget-last-run-date">{{ daysAgoLabel(run) }}</span>
+          <span class="widget-last-run-when">{{ formatLastRunDate(run) }}</span>
+          <hr>
+          <span class="widget-last-run-name">{{ run.name || 'Run' }}</span>
+          <span class="widget-last-run-meta">{{ formatDistance(run) }} · {{ formatDuration(run) }}</span>
+        </a>
+      } @else if (!connected()) {
+        <p class="hint">Connect Strava in <a routerLink="/plugins/runner">Runner settings</a>.</p>
+      } @else {
+        <p class="hint">No activities yet. <a routerLink="/plugins/runner/recent">Recent runs</a></p>
+      }
+    </div>
+    <div class="dashboard-widget-run-col">
+      <h3 class="dashboard-widget-run-col-title">Next run</h3>
+      @if (nextRun(); as run) {
+        <a [routerLink]="['/plugins/runner', 'planner']" class="dashboard-widget-link">
+          <span class="widget-next-run-date">{{ inDays(run.date) }}</span>
+          <span class="widget-next-run-when">{{ formatNextRunDate(run.date) }}</span>
+          <span class="widget-next-run-distance">{{ run.distanceKm }} km</span>
+        </a>
+      } @else {
+        <p class="hint">No upcoming run. <a routerLink="/plugins/runner/planner">Run Planner</a></p>
+      }
+    </div>
+  </div>
+</div>

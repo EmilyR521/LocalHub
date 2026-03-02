@@ -1,0 +1,438 @@
+// Gardener plugin – schedule calendar and task list
+.gardener-schedule-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.gardener-schedule-month-title {
+  margin: 0;
+  font-size: 1.25rem;
+  min-width: 12rem;
+  text-align: center;
+}
+
+.gardener-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 1.5rem;
+}
+
+.gardener-calendar-cell {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.gardener-calendar-header {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.gardener-calendar-day {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.5rem;
+
+  &:hover {
+    border-color: var(--accent);
+    background: rgba(88, 166, 255, 0.06);
+  }
+}
+
+.gardener-calendar-day--current {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.gardener-calendar-day--selected {
+  border-color: var(--accent);
+  background: rgba(88, 166, 255, 0.12);
+  color: var(--accent);
+}
+
+.gardener-calendar-day-num {
+  font-weight: 500;
+}
+
+.gardener-calendar-day-badge {
+  font-size: 0.7rem;
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: 50%;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gardener-schedule-tasks {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.gardener-task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gardener-task-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+
+  &:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.gardener-task-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.gardener-task-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+// Plants list – species lookup (Perenual)
+.gardener-species-lookup {
+  margin-bottom: 0.5rem;
+}
+
+.gardener-species-selected {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(88, 166, 255, 0.08);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.gardener-species-selected-img {
+  width: 4rem;
+  height: 4rem;
+  object-fit: cover;
+  border-radius: var(--radius);
+  flex-shrink: 0;
+  background: var(--bg);
+}
+
+.gardener-species-selected-main {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.gardener-species-base-label {
+  font-size: 0.9rem;
+  color: var(--text-muted, #666);
+}
+
+.gardener-species-override-input {
+  margin-top: 0.5rem;
+  width: 100%;
+  max-width: 24rem;
+}
+
+.gardener-species-details {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.875rem;
+
+  .gardener-species-detail {
+    margin: 0 0 0.35rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.gardener-pruning-months {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+}
+
+.gardener-pruning-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+
+  &.gardener-pruning-box--active {
+    background: #2d6a2d;
+    border-color: #2d6a2d;
+    color: #fff;
+  }
+}
+
+.gardener-species-search {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+
+  .form-input {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.gardener-species-results {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  max-height: 12rem;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.gardener-species-result-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9375rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(88, 166, 255, 0.08);
+  }
+}
+
+.gardener-species-result-img {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: cover;
+  border-radius: var(--radius);
+  flex-shrink: 0;
+  background: var(--bg);
+}
+
+.gardener-species-result-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.gardener-species-result-scientific {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+// Plants table – species image thumbnail
+.gardener-plant-thumb-cell {
+  width: 3rem;
+  padding-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.gardener-plant-thumb {
+  width: 2.25rem;
+  height: 2.25rem;
+  object-fit: cover;
+  border-radius: var(--radius);
+  display: block;
+  background: var(--bg);
+}
+
+.gardener-plant-thumb-placeholder {
+  display: inline-block;
+  width: 2.25rem;
+  height: 2.25rem;
+  line-height: 2.25rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+// Zones – filter chips and badges
+.gardener-zone-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gardener-zone-filter-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-right: 0.25rem;
+}
+
+.gardener-zone-chip {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent);
+    background: rgba(88, 166, 255, 0.08);
+  }
+
+  &.gardener-zone-chip--active {
+    border-color: var(--accent);
+    background: rgba(88, 166, 255, 0.15);
+    color: var(--accent);
+  }
+}
+
+.gardener-zone-clear {
+  margin-left: 0.25rem;
+}
+
+.gardener-zone-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-right: 0.25rem;
+  margin-bottom: 0.15rem;
+}
+
+// Plant form: align with book form (.field, .plugin-actions, .tag-chip)
+.gardener-field-name-actions {
+  input {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+.gardener-zone-field,
+.gardener-job-plants-field {
+  position: relative;
+}
+
+.gardener-zone-search-actions {
+  input {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+.gardener-zone-add-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  max-height: 10rem;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gardener-zone-add-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9375rem;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(88, 166, 255, 0.1);
+  }
+}
+
+// Zones view – link to plants
+.gardener-zone-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+// Jobs view – materials list in form
+.gardener-jobs-materials {
+  .gardener-jobs-material-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    .form-input {
+      flex: 1;
+      min-width: 0;
+    }
+    .gardener-jobs-cost {
+      width: 6rem;
+      flex-shrink: 0;
+    }
+    .gardener-jobs-remove-row {
+      flex-shrink: 0;
+      width: 2rem;
+      padding: 0.25rem;
+      min-width: 0;
+    }
+  }
+}

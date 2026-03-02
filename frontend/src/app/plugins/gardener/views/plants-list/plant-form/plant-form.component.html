@@ -1,0 +1,148 @@
+<div class="card">
+  <h2 class="card-title">{{ isEditMode ? 'Edit plant' : 'Add plant' }}</h2>
+  <form (ngSubmit)="onSave()">
+    <div class="field">
+      <label for="plant-name">Name</label>
+      <div class="plugin-actions gardener-field-name-actions">
+        <input id="plant-name" type="text" [(ngModel)]="formName" name="formName" placeholder="Plant name" (keyup.enter)="searchSpecies(); $event.preventDefault()" />
+        <button type="button" class="btn secondary" (click)="searchSpecies()" [disabled]="speciesSearchLoading()">
+          {{ speciesSearchLoading() ? 'Searching…' : 'Search species' }}
+        </button>
+      </div>    
+    </div>
+    <div class="field">
+      <label for="plant-species">Species / variety</label>
+      <div class="gardener-species-lookup">
+        @if (formSpeciesData) {
+          <div class="gardener-species-selected">
+            @if (getSpeciesImageUrl(formSpeciesData.default_image); as imgUrl) {
+              <img class="gardener-species-selected-img" [src]="imgUrl" alt="" />
+            }
+            <div class="gardener-species-selected-main">
+              <span class="gardener-species-base-label">Base from Perenual: {{ getBaseSpeciesLabel(formSpeciesData) }}</span>
+              <button type="button" class="btn secondary" (click)="clearSpeciesData()">Clear</button>
+            </div>
+          </div>
+          <p class="hint" style="margin-top: 0.35rem;">Override species or add variety/cultivar below (e.g. <em>Briza media</em> 'Pixie').</p>
+          <input id="plant-species" type="text" [(ngModel)]="formSpecies" name="formSpecies" placeholder="Species or variety name" class="gardener-species-override-input" />
+          @if (formSpeciesData.family || formSpeciesData.sunlight?.length || formSpeciesData.origin?.length || formSpeciesData.propagation?.length || formSpeciesData.pruning_month?.length) {
+            <div class="gardener-species-details">
+              @if (formSpeciesData.family) {
+                <p class="gardener-species-detail"><strong>Family:</strong> {{ formSpeciesData.family }}</p>
+              }
+              @if (formatSpeciesArray(formSpeciesData.sunlight)) {
+                <p class="gardener-species-detail"><strong>Sunlight:</strong> {{ formatSpeciesArray(formSpeciesData.sunlight) }}</p>
+              }
+              @if (formatSpeciesArray(formSpeciesData.origin)) {
+                <p class="gardener-species-detail"><strong>Origin:</strong> {{ formatSpeciesArray(formSpeciesData.origin) }}</p>
+              }
+              @if (formatSpeciesArray(formSpeciesData.propagation)) {
+                <p class="gardener-species-detail"><strong>Propagation:</strong> {{ formatSpeciesArray(formSpeciesData.propagation) }}</p>
+              }
+              @if (formSpeciesData.pruning_month?.length) {
+                <p class="gardener-species-detail"><strong>Pruning months</strong></p>
+                <div class="gardener-pruning-months" aria-label="Pruning months">
+                  @for (letter of monthLetters; track $index) {
+                    <span
+                      class="gardener-pruning-box"
+                      [class.gardener-pruning-box--active]="isPruningMonth($index, formSpeciesData.pruning_month)"
+                      [title]="isPruningMonth($index, formSpeciesData.pruning_month) ? monthNames[$index] : ''"
+                    >{{ letter }}</span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        } @else {
+          <input id="plant-species" type="text" [(ngModel)]="formSpecies" name="formSpecies" placeholder="e.g. Monstera deliciosa (or use Search above)" />
+        }
+      </div>
+      @if (speciesSearchLoading()) {
+        <p class="hint">Searching…</p>
+      }
+      @if (speciesSearchError()) {
+        <p class="hint error-msg">{{ speciesSearchError() }}</p>
+      }
+      @if (speciesSearchResults().length > 0) {
+        <ul class="gardener-species-results">
+          @for (item of speciesSearchResults(); track item.id) {
+            <li>
+              <button type="button" class="gardener-species-result-btn" (click)="selectSpecies(item)">
+                @if (getSpeciesImageUrl(item.default_image); as imgUrl) {
+                  <img class="gardener-species-result-img" [src]="imgUrl" alt="" />
+                }
+                <span class="gardener-species-result-text">
+                  {{ item.common_name ?? (item.scientific_name && item.scientific_name[0]) ?? 'Unknown' }}
+                  @if ((item.scientific_name ?? [])[0]; as sciName) {
+                    <span class="gardener-species-result-scientific">{{ sciName }}</span>
+                  }
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+    <div class="field gardener-zone-field">
+      <label for="plant-zone-search">Zones</label>
+      <div class="plugin-actions gardener-zone-search-actions">
+        <input
+          id="plant-zone-search"
+          type="text"
+          [ngModel]="zoneSearchInput()"
+          (ngModelChange)="zoneSearchInput.set($event)"
+          name="zoneSearchInput"
+          placeholder="Search and add zones..."
+          (focus)="zoneSearchFocused.set(true)"
+          (blur)="zoneSearchFocused.set(false)"
+          (keydown.enter)="$event.preventDefault()"
+        />
+      </div>
+      @if (zoneSearchFocused() && zonesToAdd().length > 0) {
+        <ul class="gardener-zone-add-list">
+          @for (z of zonesToAdd(); track z.id) {
+            <li>
+              <button type="button" class="gardener-zone-add-btn" (mousedown)="addZoneToForm(z); $event.preventDefault()">{{ z.name }}</button>
+            </li>
+          }
+        </ul>
+      }
+      @if (formZonesForDisplay().length > 0) {
+        <div class="plugin-list" style="margin-top: 0.5rem;">
+          @for (zone of formZonesForDisplay(); track zone.id) {
+            <span class="tag-chip">{{ zone.name }} <button type="button" class="tag-remove" (click)="removeZoneFromForm(zone.id)" aria-label="Remove zone">×</button></span>
+          }
+        </div>
+      }
+    </div>
+    <div class="field">
+      <label for="plant-hardiness">Hardiness</label>
+      <select id="plant-hardiness" class="form-select" [(ngModel)]="formHardiness" name="formHardiness">
+        <option value="">—</option>
+        @for (opt of hardinessOptions; track opt) {
+          <option [value]="opt">{{ opt }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label for="plant-lifecycle">Lifecycle</label>
+      <select id="plant-lifecycle" class="form-select" [(ngModel)]="formLifecycle" name="formLifecycle">
+        <option value="">—</option>
+        @for (opt of lifecycleOptions; track opt) {
+          <option [value]="opt">{{ opt }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label for="plant-notes">Notes</label>
+      <textarea id="plant-notes" [(ngModel)]="formNotes" name="formNotes" rows="3" placeholder="Optional notes"></textarea>
+    </div>
+    <div class="panel-actions">
+      <button type="submit" class="btn primary">Save</button>
+      <button type="button" class="btn secondary" (click)="onCancel()">Cancel</button>
+      @if (isEditMode) {
+        <button type="button" class="btn secondary" (click)="onDelete()">Delete</button>
+      }
+    </div>
+  </form>
+</div>

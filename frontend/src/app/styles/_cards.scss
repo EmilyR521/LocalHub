@@ -23,32 +23,29 @@
   color: var(--text-muted);
 }
 
-// Dashboard widgets – three columns; widgets stack in a column and overflow into the next
+// Dashboard widgets – CSS Grid so 3 columns are used at medium width and up (avoids column-count quirks)
 .dashboard-widgets {
-  column-count: 1;
-  column-gap: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
   padding-top: 0.5rem;
 
   @media (min-width: 32rem) {
-    column-count: 2;
+    grid-template-columns: repeat(2, 1fr);
   }
-  @media (min-width: 56rem) {
-    column-count: 3;
+  @media (min-width: 48rem) {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 .dashboard-widget-wrapper {
   position: relative;
-  break-inside: avoid;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
+  min-width: 0;
 }
 
 .dashboard-widget-wrapper--dragging {
   opacity: 0.6;
-}
-
-.dashboard-widgets > .dashboard-widget-wrapper:last-child {
-  margin-bottom: 0;
 }
 
 .dashboard-widget-drag-handle {
@@ -78,20 +75,22 @@
 }
 
 .dashboard-widget-span-3 {
-  column-span: all;
+  grid-column: 1 / -1;
 }
 
 .dashboard-widget {
   @extend %card-surface;
-  break-inside: avoid;
   min-height: 15rem;
-  margin-bottom: 1.5rem;
   padding: 1.25rem 1.5rem;
 }
 
-.dashboard-widgets > .dashboard-widget-wrapper:last-child .dashboard-widget {
-  margin-bottom: 0;
+// Normalised height for all widgets except calendar (calendar grows with content)
+.dashboard-widget:not(.dashboard-widget-calendar) {
+  height: 16rem;
+  min-height: 16rem;
+  overflow: auto;
 }
+
 
 .dashboard-widget-title {
   display: flex;
@@ -235,28 +234,45 @@
   margin-top: 0.25rem;
 }
 
-// Run widgets: shared line styles (date = primary, when/meta = muted)
-.dashboard-widget-next-run .widget-next-run-date,
-.dashboard-widget-last-run .widget-last-run-date {
+// Run widget: shared line styles (date = primary, when/meta = muted)
+.dashboard-widget-run .widget-next-run-date,
+.dashboard-widget-run .widget-last-run-date {
   display: block;
   font-weight: 500;
   font-size: 1rem;
 }
 
-.dashboard-widget-next-run .widget-next-run-when,
-.dashboard-widget-next-run .widget-next-run-distance,
-.dashboard-widget-last-run .widget-last-run-when,
-.dashboard-widget-last-run .widget-last-run-meta {
+.dashboard-widget-run .widget-next-run-when,
+.dashboard-widget-run .widget-next-run-distance,
+.dashboard-widget-run .widget-last-run-when,
+.dashboard-widget-run .widget-last-run-meta {
   display: block;
   font-size: 0.875rem;
   color: var(--text-muted);
   margin-top: 0.125rem;
 }
 
-.dashboard-widget-last-run .widget-last-run-name {
+.dashboard-widget-run .widget-last-run-name {
   display: block;
   font-size: 0.9375rem;
   margin-top: 0.125rem;
+}
+
+// Run widget: two columns (Last run | Next run)
+.dashboard-widget-run-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 0.25rem;
+}
+
+.dashboard-widget-run-col-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 // Countdown widget: list of "x days until eventname"

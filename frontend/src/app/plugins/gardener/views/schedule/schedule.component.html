@@ -1,0 +1,82 @@
+<section class="card">
+  <div class="gardener-schedule-nav">
+    <button type="button" class="btn secondary" (click)="prevMonth()" aria-label="Previous month">←</button>
+    <h2 class="gardener-schedule-month-title">{{ monthLabel() }}</h2>
+    <button type="button" class="btn secondary" (click)="nextMonth()" aria-label="Next month">→</button>
+  </div>
+  <div class="gardener-calendar-grid">
+    @for (day of DAY_NAMES; track day) {
+      <div class="gardener-calendar-cell gardener-calendar-header">{{ day }}</div>
+    }
+    @for (cell of calendarDays(); track cell.date + cell.isCurrentMonth) {
+      <button
+        type="button"
+        class="gardener-calendar-cell gardener-calendar-day"
+        [class.gardener-calendar-day--current]="cell.isCurrentMonth"
+        [class.gardener-calendar-day--selected]="selectedDate() === cell.date"
+        (click)="selectDate(cell.date)"
+      >
+        <span class="gardener-calendar-day-num">{{ cell.day }}</span>
+        @if (taskCountByDate().get(cell.date); as count) {
+          <span class="gardener-calendar-day-badge">{{ count }}</span>
+        }
+      </button>
+    }
+  </div>
+  <div class="gardener-schedule-tasks">
+    @if (selectedDate(); as date) {
+      <h3 class="card-title">Tasks for {{ date }}</h3>
+      <div class="actions" style="margin-bottom: 0.5rem;">
+        <button type="button" class="btn primary" (click)="openAddTask()">Add task</button>
+      </div>
+      @if (selectedDateTasks().length > 0) {
+        <ul class="gardener-task-list">
+          @for (task of selectedDateTasks(); track task.id) {
+            <li class="gardener-task-item">
+              <div class="gardener-task-content">
+                <strong>{{ task.title }}</strong>
+                @if (task.notes) {
+                  <p class="hint" style="margin: 0.25rem 0 0;">{{ task.notes }}</p>
+                }
+              </div>
+              <div class="gardener-task-actions">
+                <button type="button" class="btn secondary" (click)="openEditTask(task)">Edit</button>
+                <button type="button" class="btn secondary" (click)="gardener.removeTask(task.id)">Delete</button>
+              </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="hint">No tasks for this day. Click Add task to schedule something.</p>
+      }
+    } @else {
+      <p class="hint">Click a day on the calendar to view or add tasks.</p>
+    }
+  </div>
+  @if (panelOpen()) {
+    <div class="panel-overlay" (click)="closePanel()">
+      <div class="panel" (click)="$event.stopPropagation()">
+        <h2 class="card-title">{{ editingTask() ? 'Edit task' : 'Add task' }}</h2>
+        <div class="form-group">
+          <label for="task-date">Date</label>
+          <input id="task-date" type="date" class="form-input" [(ngModel)]="formDate" />
+        </div>
+        <div class="form-group">
+          <label for="task-title">Title</label>
+          <input id="task-title" type="text" class="form-input" [(ngModel)]="formTitle" placeholder="e.g. Water tomatoes" />
+        </div>
+        <div class="form-group">
+          <label for="task-notes">Notes</label>
+          <textarea id="task-notes" class="form-input" [(ngModel)]="formNotes" rows="3" placeholder="Optional"></textarea>
+        </div>
+        <div class="panel-actions">
+          @if (editingTask()) {
+            <button type="button" class="btn secondary" (click)="deleteTask()">Delete</button>
+          }
+          <button type="button" class="btn secondary" (click)="closePanel()">Cancel</button>
+          <button type="button" class="btn primary" (click)="saveTask()">Save</button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

@@ -20,12 +20,17 @@ export class DashboardComponent {
 
   readonly draggedWidgetId = signal<string | null>(null);
 
-  readonly selectedWidgets = computed(() =>
-    this.userProfile
-      .dashboardWidgetIds()
+  /** Normalize legacy last-run/next-run to combined last-next-run and dedupe. */
+  readonly selectedWidgets = computed(() => {
+    const ids = this.userProfile.dashboardWidgetIds();
+    const normalized = ids.map((id) =>
+      id === 'last-run' || id === 'next-run' ? 'last-next-run' : id
+    );
+    const deduped = normalized.filter((id, i) => normalized.indexOf(id) === i);
+    return deduped
       .map((id) => getDashboardWidgetById(id))
-      .filter((w): w is DashboardWidgetDef => w != null)
-  );
+      .filter((w): w is DashboardWidgetDef => w != null);
+  });
 
   onDragStart(widget: DashboardWidgetDef, event: DragEvent): void {
     if (!event.dataTransfer) return;
