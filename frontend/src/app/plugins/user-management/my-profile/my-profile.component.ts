@@ -1,9 +1,26 @@
 import { Component, OnInit, inject, signal, computed, effect, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { UserProfileService, UserProfile, type ThemeMode } from '../../../core/services/user-profile.service';
+import {
+  UserProfileService,
+  UserProfile,
+  type ThemeMode,
+  type CustomThemeKey,
+  CUSTOM_THEME_KEYS,
+} from '../../../core/services/user-profile.service';
 import { PLUGINS } from '../../plugin-registry';
 import { EmojiGridComponent } from '../../../shared/components/emoji-grid/emoji-grid.component';
+
+/** Default values for custom theme (dark theme base). */
+const DEFAULT_CUSTOM_THEME: Record<CustomThemeKey, string> = {
+  '--bg': '#0f1419',
+  '--surface': '#1a2332',
+  '--border': '#2d3a4d',
+  '--text': '#e6edf3',
+  '--text-muted': '#8b949e',
+  '--accent': '#58a6ff',
+  '--error': '#f85149',
+};
 
 /** Display names for connected app IDs. */
 const CONNECTED_APP_LABELS: Record<string, string> = {
@@ -16,6 +33,7 @@ const DEFAULT_PROFILE = {
   emoji: '👤',
   theme: 'dark' as ThemeMode,
   visiblePluginIds: [] as string[],
+  customTheme: {} as Partial<Record<CustomThemeKey, string>>,
 };
 
 @Component({
@@ -31,6 +49,8 @@ export class MyProfileComponent implements OnInit {
   readonly name = signal('');
   readonly emoji = signal('👤');
   readonly theme = signal<ThemeMode>('dark');
+  /** Editable custom theme colors (used when theme is 'custom'). */
+  readonly customThemeValues = signal<Partial<Record<CustomThemeKey, string>>>({});
   readonly selectedPluginIds = signal<Set<string>>(new Set());
   readonly saveStatus = signal<'idle' | 'saving' | 'saved' | 'error'>('idle');
   readonly disconnectingAppId = signal<string | null>(null);
@@ -51,6 +71,19 @@ export class MyProfileComponent implements OnInit {
   readonly plugins = computed(() =>
     [...PLUGINS].sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
   );
+
+  readonly customThemeKeys = CUSTOM_THEME_KEYS;
+
+  /** Labels for custom theme color inputs. */
+  readonly customThemeLabels: Record<CustomThemeKey, string> = {
+    '--bg': 'Background',
+    '--surface': 'Surface',
+    '--border': 'Border',
+    '--text': 'Text',
+    '--text-muted': 'Muted text',
+    '--accent': 'Accent',
+    '--error': 'Error',
+  };
 
   /** Plugin IDs in display order (sidebar order). Edited by user and saved as pluginOrderIds. */
   readonly orderedPluginIds = signal<string[]>([]);
@@ -88,14 +121,20 @@ export class MyProfileComponent implements OnInit {
       ? {
           name: typeof p.name === 'string' ? p.name : '',
           emoji: typeof p.emoji === 'string' ? p.emoji : '👤',
-          theme: (p.theme === 'light' || p.theme === 'dark' || p.theme === 'classic' ? p.theme : 'dark') as ThemeMode,
+          theme: (p.theme === 'light' || p.theme === 'dark' || p.theme === 'classic' || p.theme === 'custom' ? p.theme : 'dark') as ThemeMode,
           visiblePluginIds: Array.isArray(p.visiblePluginIds) ? p.visiblePluginIds : [],
           pluginOrderIds: Array.isArray(p.pluginOrderIds) ? p.pluginOrderIds : [],
+          customTheme: p.customTheme && typeof p.customTheme === 'object' ? p.customTheme : {},
         }
       : DEFAULT_PROFILE;
     this.name.set(profile.name);
     this.emoji.set(profile.emoji);
     this.theme.set(profile.theme);
+    const customTheme =
+      profile.customTheme && Object.keys(profile.customTheme).length > 0
+        ? { ...DEFAULT_CUSTOM_THEME, ...profile.customTheme }
+        : { ...DEFAULT_CUSTOM_THEME };
+    this.customThemeValues.set(customTheme);
     this.selectedPluginIds.set(
       profile.visiblePluginIds.length > 0
         ? new Set(profile.visiblePluginIds)
@@ -137,7 +176,39 @@ export class MyProfileComponent implements OnInit {
 
   setTheme(mode: ThemeMode): void {
     this.theme.set(mode);
-    this.userProfile.updateProfile({ theme: mode });
+    if (mode === 'custom') {
+      const current = this.customThemeValues();
+      const hasValues = Object.keys(current).length > 0;
+      if (!hasValues) this.customThemeValues.set({ ...DEFAULT_CUSTOM_THEME });
+      this.userProfile.updateProfile({
+        theme: mode,
+        customTheme: hasValues ? current : { ...DEFAULT_CUSTOM_THEME },
+      });
+    } else {
+      this.userProfile.updateProfile({ theme: mode });
+    }
+  }
+
+  private static readonly HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
+
+  setCustomThemeColor(key: CustomThemeKey, value: string): void {
+    const trimmed = value.trim();
+    const next = { ...this.customThemeValues(), [key]: trimmed };
+    this.customThemeValues.set(next);
+    if (this.theme() === 'custom' && trimmed && MyProfileComponent.HEX_COLOR.test(trimmed)) {
+      this.userProfile.updateProfile({ customTheme: next });
+    }
+  }
+
+  resetCustomThemeToDefault(): void {
+    this.customThemeValues.set({ ...DEFAULT_CUSTOM_THEME });
+    if (this.theme() === 'custom') {
+      this.userProfile.updateProfile({ customTheme: { ...DEFAULT_CUSTOM_THEME } });
+    }
+  }
+
+  getCustomThemeValue(key: CustomThemeKey): string {
+    return this.customThemeValues()[key] ?? DEFAULT_CUSTOM_THEME[key];
   }
 
   movePlugin(index: number, direction: 1 | -1): void {
@@ -155,12 +226,15 @@ export class MyProfileComponent implements OnInit {
   save(): void {
     this.saveStatus.set('saving');
     const current = this.userProfile.profile();
+    const theme = this.theme();
+    const customTheme = theme === 'custom' ? this.customThemeValues() : undefined;
     const profile: UserProfile = {
       ...(current?.id && { id: current.id }),
       name: this.name().trim(),
       emoji: this.emoji().trim() || '👤',
       visiblePluginIds: [...this.selectedPluginIds()],
-      theme: this.theme(),
+      theme,
+      customTheme,
       pluginOrderIds: this.orderedPluginIds().length > 0 ? [...this.orderedPluginIds()] : undefined,
       ...(Array.isArray(current?.dashboardWidgetIds) && {
         dashboardWidgetIds: current.dashboardWidgetIds,

@@ -16,7 +16,40 @@
       <button type="button" class="btn secondary" [class.active]="theme() === 'light'" (click)="setTheme('light')">Light</button>
       <button type="button" class="btn secondary" [class.active]="theme() === 'dark'" (click)="setTheme('dark')">Dark</button>
       <button type="button" class="btn secondary" [class.active]="theme() === 'classic'" (click)="setTheme('classic')">Classic</button>
+      <button type="button" class="btn secondary" [class.active]="theme() === 'custom'" (click)="setTheme('custom')">Custom</button>
     </div>
+    @if (theme() === 'custom') {
+      <div class="custom-theme-editor">
+        <p class="hint">Choose colors for your theme. Changes apply immediately.</p>
+        <ul class="custom-theme-list" aria-label="Custom theme colors">
+          @for (key of customThemeKeys; track key) {
+            <li class="custom-theme-row">
+              <label [for]="'custom-theme-' + key">{{ customThemeLabels[key] }}</label>
+              <div class="custom-theme-inputs">
+                <input
+                  [id]="'custom-theme-' + key"
+                  type="color"
+                  [value]="getCustomThemeValue(key)"
+                  (input)="setCustomThemeColor(key, $any($event.target).value)"
+                  class="custom-theme-color-input"
+                  [attr.aria-label]="'Color for ' + customThemeLabels[key]"
+                />
+                <input
+                  type="text"
+                  [value]="customThemeValues()[key] ?? ''"
+                  (input)="setCustomThemeColor(key, $any($event.target).value)"
+                  class="custom-theme-hex-input"
+                  placeholder="#000000"
+                  maxlength="7"
+                  [attr.aria-label]="'Hex for ' + customThemeLabels[key]"
+                />
+              </div>
+            </li>
+          }
+        </ul>
+        <button type="button" class="btn secondary btn-sm" (click)="resetCustomThemeToDefault()">Reset to default</button>
+      </div>
+    }
   </div>
   </section>
 

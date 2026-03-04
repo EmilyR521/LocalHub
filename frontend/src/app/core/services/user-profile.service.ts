@@ -2,7 +2,20 @@ import { Injectable, signal, computed } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { PluginStoreService } from './plugin-store.service';
 
-export type ThemeMode = 'light' | 'dark' | 'classic';
+export type ThemeMode = 'light' | 'dark' | 'classic' | 'custom';
+
+/** CSS variable names that users can customize in a custom theme. */
+export const CUSTOM_THEME_KEYS = [
+  '--bg',
+  '--surface',
+  '--border',
+  '--text',
+  '--text-muted',
+  '--accent',
+  '--error',
+] as const;
+
+export type CustomThemeKey = (typeof CUSTOM_THEME_KEYS)[number];
 
 export interface CountdownItem {
   id: string;
@@ -21,8 +34,10 @@ export interface UserProfile {
   dashboardWidgetIds?: string[];
   /** Countdown widgets: title, emoji, event date. */
   countdownItems?: CountdownItem[];
-  /** UI theme. Defaults to 'dark' when unset. */
+  /** UI theme. Defaults to 'dark' when unset. Use 'custom' with customTheme for user-defined colors. */
   theme?: ThemeMode;
+  /** When theme is 'custom', these CSS variable overrides are applied (e.g. { '--bg': '#0f1419' }). */
+  customTheme?: Partial<Record<CustomThemeKey, string>>;
   /** Plugin IDs that have external API authorisation (e.g. 'calendar', 'strava'). */
   connectedApps?: string[];
   /** Plugin IDs in sidebar order. When set, sidebar uses this order; otherwise default registry order. */
@@ -82,7 +97,13 @@ export class UserProfileService {
 
   readonly theme = computed(() => {
     const t = this.profileSignal().theme;
-    return t === 'light' || t === 'dark' || t === 'classic' ? t : 'dark';
+    return t === 'light' || t === 'dark' || t === 'classic' || t === 'custom' ? t : 'dark';
+  });
+
+  readonly customTheme = computed(() => {
+    const ct = this.profileSignal().customTheme;
+    if (!ct || typeof ct !== 'object') return {};
+    return { ...ct };
   });
 
   readonly connectedApps = computed(() => {
@@ -197,7 +218,11 @@ export class UserProfileService {
 
   private normalize(p: UserProfile | null | undefined): UserProfile {
     if (!p || typeof p !== 'object') return DEFAULT_PROFILE;
-    const theme = p.theme === 'light' || p.theme === 'dark' || p.theme === 'classic' ? p.theme : undefined;
+    const theme =
+      p.theme === 'light' || p.theme === 'dark' || p.theme === 'classic' || p.theme === 'custom'
+        ? p.theme
+        : undefined;
+    const customTheme = this.normalizeCustomTheme(p.customTheme);
     return {
       id: typeof p.id === 'string' && p.id.trim().length > 0 ? p.id.trim() : undefined,
       name: typeof p.name === 'string' ? p.name : DEFAULT_PROFILE.name,
@@ -210,6 +235,7 @@ export class UserProfileService {
         : DEFAULT_PROFILE.dashboardWidgetIds,
       countdownItems: normalizeCountdownItems(p.countdownItems),
       theme,
+      customTheme: Object.keys(customTheme).length > 0 ? customTheme : undefined,
       connectedApps: Array.isArray(p.connectedApps)
         ? p.connectedApps.filter((id) => typeof id === 'string')
         : DEFAULT_PROFILE.connectedApps,
@@ -217,5 +243,21 @@ export class UserProfileService {
         ? p.pluginOrderIds.filter((id) => typeof id === 'string')
         : undefined,
     };
+  }
+
+  private static readonly HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
+
+  private normalizeCustomTheme(
+    ct: Partial<Record<CustomThemeKey, string>> | null | undefined
+  ): Partial<Record<CustomThemeKey, string>> {
+    if (!ct || typeof ct !== 'object') return {};
+    const out: Partial<Record<CustomThemeKey, string>> = {};
+    for (const key of CUSTOM_THEME_KEYS) {
+      const v = ct[key];
+      if (typeof v === 'string' && UserProfileService.HEX_COLOR.test(v.trim())) {
+        out[key] = v.trim();
+      }
+    }
+    return out;
   }
 }
