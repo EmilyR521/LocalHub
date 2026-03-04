@@ -4,6 +4,8 @@ import { catchError } from 'rxjs/operators';
 import { PluginStoreService } from '../../../core/services/plugin-store.service';
 import { UserProfileService } from '../../../core/services/user-profile.service';
 import { StravaService } from '../../runner/services/strava.service';
+import { toDateKey } from '../../../core/utils/date-format';
+import { generateId } from '../../../core/utils/id';
 import type { Habit, HabitTarget, DateKey } from '../models/habit.model';
 
 const RUNNING_HABIT_NAME = 'Running';
@@ -12,13 +14,8 @@ const PLUGIN_ID = 'habits';
 const HABITS_KEY = 'habits';
 const COMPLETIONS_KEY = 'completions';
 
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
-
-export function toDateKey(d: Date): DateKey {
-  return d.toISOString().slice(0, 10);
-}
+/** Re-export for consumers that need DateKey-typed key. */
+export { toDateKey };
 
 export const DEFAULT_HABIT_COLORS = [
   '#58a6ff', '#3fb950', '#d29922', '#db6d28', '#bc8cff', '#f85149', '#79c0ff',

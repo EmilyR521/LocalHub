@@ -1,5 +1,5 @@
 import type { VocabWord } from '../models/word.model';
-import { generateId } from './vocabulist-store.constants';
+import { generateId } from '../../../core/utils/id';
 
 /** Duolingo export JSON shape. exportedAt is not persisted. */
 export interface DuolingoExport {

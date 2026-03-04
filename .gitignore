@@ -9,3 +9,6 @@ dist/
 !.env.example
 backend/.env
 set-env-local.ps1
+
+# Data
+backend/data/

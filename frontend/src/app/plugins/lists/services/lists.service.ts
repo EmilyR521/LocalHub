@@ -1,14 +1,11 @@
 import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { PluginStoreService } from '../../../core/services/plugin-store.service';
 import { UserProfileService } from '../../../core/services/user-profile.service';
+import { generateId } from '../../../core/utils/id';
 import type { List, ListItem } from '../models/list.model';
 
 const PLUGIN_ID = 'lists';
 const STORE_KEY = 'lists';
-
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
 
 @Injectable({ providedIn: 'root' })
 export class ListsService {

@@ -9,9 +9,7 @@ Book and reading list tracking: maintain a list of books with status (to read, r
 - **Books**: Full CRUD; table view with sort (title, author, status, added date, finished date) and status filter; add/edit/delete via slide-out panel and book form (title, author, status, rating, reading dates, notes, tags).
 - **Collections**: Create, rename, delete; add/remove books; list view with books per collection; click book to open edit panel.
 - **Timeline**: View books grouped by month (by finished or start date); only books with a reading start date appear; stats (to read / reading / finished / total); book cards with cover, dates, status, rating.
-- **Import / export**:
-  - **CSV**: Export template or data; import from CSV (Title, Author required; status, dates, notes, tags supported); duplicates skipped by title+author.
-  - **JSON**: Export backup (books + collections); import with **Replace** (overwrite) or **Merge** (dedupe by title+author for books, by name for collections; collection book IDs remapped).
+- **Import / export**: **CSV** — export template or data; import from CSV (Title, Author required; status, dates, notes, tags supported); duplicates skipped by title+author. Full backup/restore is handled by user-level backup in User management.
 - **Settings**: Cog opens drawer with import/export only (no separate settings model).
 - **Per-user storage**: Books and collections are stored per user (`X-User-Id` header). Each user has `books.json` and `collections.json` under `data/plugins/reader/{userId}/`.
 
@@ -87,9 +85,8 @@ No custom backend routes; all persistence via the shared plugin store. The front
 
 - **Single responsibility / maintainability**:
   - **ReaderPersistenceService**: Only loads and persists books/collections for the current user (signals, effect for “load when user id available”, `saveBooks` / `saveCollections`). No domain logic.
-  - **ReaderService**: Facade for domain operations (add/update/remove book, collections CRUD, replaceAll, mergeFromExport). Delegates persistence to `ReaderPersistenceService` and bulk-merge logic to a helper. Components depend only on `ReaderService`.
-  - **reader-store.constants.ts**: Plugin id, store keys, and `generateId()` in one place.
-  - **reader-merge.helper.ts**: Pure functions for ensuring book/collection ids and for merging imports (dedupe, id mapping). No Angular; easy to test.
+  - **ReaderService**: Facade for domain operations (add/update/remove book, collections CRUD). Delegates persistence to `ReaderPersistenceService`. Components depend only on `ReaderService`.
+  - **reader-store.constants.ts**: Plugin id and store keys in one place.
   - **reader-csv.parser.ts**: CSV build/parse (headers, rows, escaping, dates, status). Keeps **ReaderImportExportService** focused on file I/O (FileReader, download) and flow (parse → process → emit).
   - **reader-books-list.helper.ts**: Filter and sort books (by status, by field/direction). Used by the main Reader component so the component stays thin.
 - **Timeline**: **TimelineService** builds month groups from books (filter by start date, sort, group by month). Presentational components (timeline header, timeline book item) stay dumb; **ReaderTimelineComponent** composes them and uses `ReaderService.books()`.
@@ -123,8 +120,7 @@ ReaderService (facade)
 ├── load() → ReaderPersistenceService.load()
 ├── addBook / updateBook / removeBook → persistence.saveBooks (and collections when removing)
 ├── createCollection, addBookToCollection, removeBookFromCollection, updateCollection, deleteCollection
-├── replaceAll, mergeFromExport (delegate to reader-merge.helper)
-└── No UI; single responsibility: coordinate CRUD and bulk operations
+└── No UI; single responsibility: coordinate CRUD
 
 ReaderPersistenceService
 ├── booksSignal, collectionsSignal (readonly exposed)
@@ -136,7 +132,7 @@ ReaderPersistenceService
 ReaderTimelineComponent → ReaderService.books, TimelineService.buildTimeline(); (viewBook) → parent
 ReaderCollectionsComponent → ReaderService.collections/books, CRUD; (viewBook) → parent
 BookFormComponent → presentational; (save)/(cancel)/(delete) → parent
-ReaderSettingsComponent → ReaderImportExportService, ReaderService.replaceAll/mergeFromExport
+ReaderSettingsComponent → ReaderImportExportService (CSV import/export only)
 TimelineService → pure: buildTimeline(books) → TimelineGroup[]
 ```
 

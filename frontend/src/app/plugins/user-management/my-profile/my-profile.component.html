@@ -75,6 +75,64 @@
     </ul>
   </section>
 
+  <section class="card">
+    <h2 class="card-title">Backup &amp; restore</h2>
+    <p class="hint">Download a zip of your data for selected plugins, or restore from a previous backup.</p>
+    <div class="backup-restore-section">
+      <h3 class="backup-restore-subtitle">Backup</h3>
+      @if (backupAvailablePluginIds().length === 0) {
+        <p class="hint">You don't have any plugin data to back up yet.</p>
+      } @else {
+        <p class="hint">Select which plugins to include, then download the zip.</p>
+        <div class="plugin-actions">
+          <button type="button" class="btn secondary" (click)="selectAllBackup()">Select all</button>
+          <button type="button" class="btn secondary" (click)="selectNoneBackup()">Select none</button>
+        </div>
+        <ul class="plugin-list">
+          @for (pluginId of backupAvailablePluginIds(); track pluginId) {
+            @if (getPluginById(pluginId); as plugin) {
+              <li>
+                <label class="checkbox-label">
+                  <input type="checkbox" [checked]="isBackupPluginSelected(pluginId)" (change)="toggleBackupPlugin(pluginId)" />
+                  <span>{{ plugin.icon }} {{ plugin.name }}</span>
+                </label>
+              </li>
+            }
+          }
+        </ul>
+        <button type="button" class="btn primary" (click)="downloadBackup()" [disabled]="backupStatus() === 'downloading' || backupPluginIds().size === 0">
+          {{ backupStatus() === 'downloading' ? 'Preparing…' : 'Download backup' }}
+        </button>
+        @if (backupStatus() === 'error') {
+          <p class="error-msg">Backup failed. Try again.</p>
+        }
+      }
+    </div>
+    <div class="backup-restore-section">
+      <h3 class="backup-restore-subtitle">Restore</h3>
+      <p class="hint">Choose a backup zip file. Existing data for the same plugins will be overwritten.</p>
+      <div class="restore-actions">
+        <input
+          #restoreFileInput
+          type="file"
+          accept=".zip"
+          (change)="onRestoreFile(restoreFileInput)"
+          class="restore-file-input"
+          aria-label="Choose backup file"
+        />
+        <button type="button" class="btn secondary" (click)="restoreFileInput.click()" [disabled]="restoreStatus() === 'uploading'">
+          Choose file
+        </button>
+        @if (restoreStatus() === 'success' || restoreStatus() === 'error') {
+          <p [class.error-msg]="restoreStatus() === 'error'" class="restore-message">{{ restoreMessage() }}</p>
+        }
+      </div>
+      @if (restoreStatus() === 'uploading') {
+        <p class="hint">Restoring…</p>
+      }
+    </div>
+  </section>
+
   @if (connectedApps().length > 0) {
     <section class="card">
     <h2 class="card-title">Connected applications</h2>

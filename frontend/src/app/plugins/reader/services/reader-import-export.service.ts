@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import type { Book } from '../models/book.model';
-import type { Collection } from '../models/collection.model';
 import type { ImportResult } from '../models/import-result.model';
 import {
   booksToCsv,
@@ -10,8 +9,7 @@ import {
 } from './reader-csv.parser';
 
 /**
- * Handles file I/O and format conversion for reader import/export.
- * CSV/JSON parsing is delegated to reader-csv.parser and simple JSON.parse.
+ * Handles file I/O and format conversion for reader CSV import/export.
  */
 @Injectable({ providedIn: 'root' })
 export class ReaderImportExportService {
@@ -43,57 +41,6 @@ export class ReaderImportExportService {
         }
       };
       reader.onerror = () => observer.error(new Error('Failed to read file'));
-      reader.readAsText(file, 'UTF-8');
-    });
-  }
-
-  exportToJSON(
-    books: Book[],
-    collections: Collection[],
-    filename = 'reader-backup.json'
-  ): void {
-    const data = {
-      metadata: {
-        exportedAt: new Date().toISOString(),
-        source: 'LocalHub Reader',
-      },
-      books,
-      collections,
-    };
-    const json = JSON.stringify(data, null, 2);
-    this.download(json, filename, 'application/json');
-  }
-
-  parseJSONFile(
-    file: File
-  ): Observable<{ books: Book[]; collections: Collection[] }> {
-    return new Observable((observer) => {
-      if (
-        file.type !== 'application/json' &&
-        !file.name.toLowerCase().endsWith('.json')
-      ) {
-        observer.error(new Error('Please select a valid JSON file.'));
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        try {
-          const text = (e.target?.result as string) ?? '';
-          const data = JSON.parse(text);
-          if (!Array.isArray(data.books))
-            throw new Error('Invalid JSON: books must be an array');
-          if (!Array.isArray(data.collections))
-            throw new Error('Invalid JSON: collections must be an array');
-          observer.next({ books: data.books, collections: data.collections });
-          observer.complete();
-        } catch (err: unknown) {
-          observer.error(
-            err instanceof Error ? err : new Error('Invalid JSON format')
-          );
-        }
-      };
-      reader.onerror = () =>
-        observer.error(new Error('Failed to read file'));
       reader.readAsText(file, 'UTF-8');
     });
   }

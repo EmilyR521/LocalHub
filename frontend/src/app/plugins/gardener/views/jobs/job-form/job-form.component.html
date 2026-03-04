@@ -1,0 +1,74 @@
+<h2 class="card-title">{{ isEditMode ? 'Edit job' : 'Add job' }}</h2>
+<form (ngSubmit)="onSave()">
+  <div class="field">
+    <label for="job-title">Title</label>
+    <input id="job-title" type="text" class="form-input" [(ngModel)]="formTitle" name="formTitle" placeholder="e.g. Mulch borders" required />
+  </div>
+  <div class="field">
+    <label for="job-start">From date</label>
+    <input id="job-start" type="date" class="form-input form-input--compact" [(ngModel)]="formStartDate" name="formStartDate" required />
+  </div>
+  <div class="field">
+    <label for="job-end">To date (optional)</label>
+    <input id="job-end" type="date" class="form-input form-input--compact" [(ngModel)]="formEndDate" name="formEndDate" />
+  </div>
+  <div class="field">
+    <label for="job-zone">Zone</label>
+    <select id="job-zone" class="form-select" [(ngModel)]="formZoneId" name="formZoneId">
+      <option value="">—</option>
+      @for (zone of zonesList; track zone.id) {
+        <option [value]="zone.id">{{ zone.name }}</option>
+      }
+    </select>
+  </div>
+  <div class="field gardener-job-plants-field">
+    <label for="job-plant-search">Plants</label>
+    <div class="plugin-actions gardener-zone-search-actions">
+      <input
+        id="job-plant-search"
+        type="text"
+        [ngModel]="plantSearchInput()"
+        (ngModelChange)="plantSearchInput.set($event)"
+        name="jobPlantSearch"
+        placeholder="Search and add plants..."
+        (focus)="plantSearchFocused.set(true)"
+        (blur)="plantSearchFocused.set(false)"
+        (keydown.enter)="$event.preventDefault()"
+      />
+    </div>
+    @if (plantSearchFocused() && plantsToAdd().length > 0) {
+      <ul class="gardener-zone-add-list">
+        @for (p of plantsToAdd(); track p.id) {
+          <li>
+            <button type="button" class="gardener-zone-add-btn" (mousedown)="addPlantToForm(p); $event.preventDefault()">{{ getPlantDisplayName(p) }}</button>
+          </li>
+        }
+      </ul>
+    }
+    @if (formPlantsForDisplay().length > 0) {
+      <div class="plugin-list" style="margin-top: 0.5rem;">
+        @for (plant of formPlantsForDisplay(); track plant.id) {
+          <span class="tag-chip">{{ getPlantDisplayName(plant) }} <button type="button" class="tag-remove" (click)="removePlantFromForm(plant.id)" aria-label="Remove plant">×</button></span>
+        }
+      </div>
+    }
+  </div>
+  <div class="field gardener-jobs-materials">
+    <label>Materials and costs</label>
+    @for (row of formMaterials; track $index) {
+      <div class="gardener-jobs-material-row">
+        <input type="text" class="form-input" [(ngModel)]="row.name" [name]="'mat-name-' + $index" placeholder="Material" />
+        <input type="number" step="0.01" min="0" class="form-input form-input--compact gardener-jobs-cost" [(ngModel)]="row.cost" [name]="'mat-cost-' + $index" placeholder="Cost" />
+        <button type="button" class="btn secondary gardener-jobs-remove-row" (click)="removeMaterialRow($index)" [disabled]="formMaterials.length <= 1" aria-label="Remove row">×</button>
+      </div>
+    }
+    <button type="button" class="btn secondary" (click)="addMaterialRow()">Add row</button>
+  </div>
+  <div class="panel-actions">
+    @if (isEditMode) {
+      <button type="button" class="btn secondary" (click)="onDelete()">Delete</button>
+    }
+    <button type="button" class="btn secondary" (click)="onCancel()">Cancel</button>
+    <button type="submit" class="btn primary">Save</button>
+  </div>
+</form>

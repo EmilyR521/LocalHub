@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, effect, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { UserProfileService, UserProfile, type ThemeMode } from '../../../core/services/user-profile.service';
@@ -35,6 +35,15 @@ export class MyProfileComponent implements OnInit {
   readonly saveStatus = signal<'idle' | 'saving' | 'saved' | 'error'>('idle');
   readonly disconnectingAppId = signal<string | null>(null);
 
+  /** Backup: which plugins to include (set of plugin ids). */
+  readonly backupPluginIds = signal<Set<string>>(new Set());
+  readonly backupStatus = signal<'idle' | 'downloading' | 'error'>('idle');
+  /** Restore result message. */
+  readonly restoreStatus = signal<'idle' | 'uploading' | 'success' | 'error'>('idle');
+  readonly restoreMessage = signal('');
+  /** Plugin IDs that have data (for backup selection). Filled on load. */
+  readonly backupAvailablePluginIds = signal<string[]>([]);
+
   private defaultPluginOrder = [...PLUGINS]
     .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
     .map((p) => p.id);
@@ -54,6 +63,24 @@ export class MyProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.userProfile.load();
+    this.loadBackupPlugins();
+  }
+
+  private loadBackupPlugins(): void {
+    const userId = this.userProfile.profile()?.id;
+    if (!userId) return;
+    this.http
+      .get<{ pluginIds: string[] }>('/api/plugins/user-management/backup/plugins', {
+        headers: { 'X-User-Id': userId },
+      })
+      .subscribe({
+        next: (res) => {
+          const ids = res.pluginIds ?? [];
+          this.backupAvailablePluginIds.set(ids);
+          if (ids.length > 0 && this.backupPluginIds().size === 0) this.backupPluginIds.set(new Set(ids));
+        },
+        error: () => this.backupAvailablePluginIds.set([]),
+      });
   }
 
   private applyProfile(p: UserProfile | null): void {
@@ -151,6 +178,87 @@ export class MyProfileComponent implements OnInit {
 
   getConnectedAppLabel(appId: string): string {
     return CONNECTED_APP_LABELS[appId] ?? appId;
+  }
+
+  isBackupPluginSelected(pluginId: string): boolean {
+    return this.backupPluginIds().has(pluginId);
+  }
+
+  toggleBackupPlugin(pluginId: string): void {
+    const next = new Set(this.backupPluginIds());
+    if (next.has(pluginId)) next.delete(pluginId);
+    else next.add(pluginId);
+    this.backupPluginIds.set(next);
+  }
+
+  selectAllBackup(): void {
+    const ids = this.backupAvailablePluginIds().length > 0
+      ? this.backupAvailablePluginIds()
+      : this.plugins().map((p) => p.id);
+    this.backupPluginIds.set(new Set(ids));
+  }
+
+  selectNoneBackup(): void {
+    this.backupPluginIds.set(new Set());
+  }
+
+  downloadBackup(): void {
+    const userId = this.userProfile.profile()?.id;
+    if (!userId) return;
+    this.backupStatus.set('downloading');
+    const selected = this.backupPluginIds();
+    const pluginIds = selected.size === 0 || selected.size >= this.plugins().length
+      ? ['all']
+      : Array.from(selected);
+    this.http
+      .post('/api/plugins/user-management/backup', { pluginIds }, {
+        headers: { 'X-User-Id': userId },
+        responseType: 'blob',
+      })
+      .subscribe({
+        next: (blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `localhub-backup-${new Date().toISOString().slice(0, 10)}.zip`;
+          a.click();
+          URL.revokeObjectURL(url);
+          this.backupStatus.set('idle');
+        },
+        error: () => this.backupStatus.set('error'),
+      });
+  }
+
+  onRestoreFile(inputRef: ElementRef<HTMLInputElement> | HTMLInputElement): void {
+    const input = inputRef && 'nativeElement' in inputRef ? inputRef.nativeElement : inputRef;
+    const file = input.files?.[0];
+    if (!file) return;
+    const userId = this.userProfile.profile()?.id;
+    if (!userId) return;
+    this.restoreStatus.set('uploading');
+    this.restoreMessage.set('');
+    const formData = new FormData();
+    formData.append('file', file);
+    this.http
+      .post<{ restored: number; errors?: string[] }>('/api/plugins/user-management/restore', formData, {
+        headers: { 'X-User-Id': userId },
+      })
+      .subscribe({
+        next: (res) => {
+          this.restoreStatus.set('success');
+          const msg = res.errors?.length
+            ? `Restored ${res.restored} file(s). Some issues: ${res.errors.slice(0, 3).join('; ')}`
+            : `Restored ${res.restored} file(s).`;
+          this.restoreMessage.set(msg);
+          this.userProfile.refreshProfile();
+          input.value = '';
+        },
+        error: (err) => {
+          this.restoreStatus.set('error');
+          this.restoreMessage.set(err?.error?.error ?? err?.message ?? 'Restore failed');
+          input.value = '';
+        },
+      });
   }
 
   disconnectApp(appId: string): void {

@@ -13,7 +13,7 @@ import {
   intervalDaysToIndex,
   SRS_INTERVAL_DAYS,
 } from './srs.helper';
-import { generateId } from './vocabulist-store.constants';
+import { generateId } from '../../../core/utils/id';
 
 /**
  * Facade for vocabulist: languages, words, CRUD, import, SRS.

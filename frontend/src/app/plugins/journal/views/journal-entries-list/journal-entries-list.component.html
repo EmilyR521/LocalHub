@@ -1,7 +1,41 @@
 <section class="card journal-entries-list">
   <h2 class="journal-entries-list-title">Previous entries</h2>
+  <div class="journal-entries-list-search">
+    <label for="journal-search" class="journal-entries-list-search-label">Search</label>
+    <input
+      id="journal-search"
+      type="search"
+      class="form-input journal-entries-list-search-input"
+      [ngModel]="searchQuery()"
+      (ngModelChange)="onSearchInput($event)"
+      name="journalSearch"
+      placeholder="Search in journal entries (min 2 characters)"
+      autocomplete="off"
+    />
+  </div>
   @if (entryDates().length === 0) {
     <p class="hint">No journal entries yet. <a routerLink="/plugins/journal">Write your first entry</a>.</p>
+  } @else if (showSearchResults()) {
+    @if (loadingSearch()) {
+      <p class="hint journal-entries-list-loading">Loading entries for search…</p>
+    } @else if (searchResults().length === 0) {
+      <p class="hint">No entries match "{{ searchQuery().trim() }}".</p>
+    } @else {
+      <ul class="journal-entries-list-ul journal-entries-list-search-results">
+        @for (result of searchResults(); track result.dateKey) {
+          <li class="journal-entries-list-li journal-entries-list-search-li">
+            <a [routerLink]="['/plugins/journal']" [queryParams]="{ date: result.dateKey }" class="journal-entries-list-link journal-entries-list-search-link">
+              <span class="journal-entries-list-date">{{ formatDateShort(result.dateKey) }}</span>
+              <span class="journal-entries-list-arrow" aria-hidden="true">→</span>
+              <span class="journal-entries-list-snippet">
+                @let parts = getSnippetParts(result);
+                {{ parts[0] }}<mark class="journal-search-hit">{{ parts[1] }}</mark>{{ parts[2] }}
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
   } @else {
     <ul class="journal-entries-list-ul">
       @for (key of entryDates(); track key) {

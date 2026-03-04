@@ -9,7 +9,6 @@ import { ReaderImportExportService } from '../../services/reader-import-export.s
 })
 export class ReaderImportExportComponent {
   csvLoading = signal(false);
-  jsonLoading = signal(false);
 
   constructor(
     private reader: ReaderService,
@@ -51,39 +50,6 @@ export class ReaderImportExportComponent {
           input.value = '';
         },
       });
-  }
-
-  exportJSON(): void {
-    this.importExport.exportToJSON(this.reader.books(), this.reader.collections());
-  }
-
-  onJSONFile(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-    this.jsonLoading.set(true);
-    this.importExport.parseJSONFile(file).subscribe({
-      next: (data) => {
-        this.jsonLoading.set(false);
-        input.value = '';
-        const replace = confirm(
-          `Import ${data.books.length} book(s) and ${data.collections.length} collection(s).\n\n` +
-            'OK = Replace existing data\nCancel = Merge with existing data'
-        );
-        if (replace) {
-          this.reader.replaceAll(data.books, data.collections);
-          alert('Data replaced successfully.');
-        } else {
-          const r = this.reader.mergeFromExport(data.books, data.collections);
-          alert(`Merged: ${r.booksAdded} book(s) and ${r.collectionsAdded} collection(s) added.`);
-        }
-      },
-      error: (err: Error) => {
-        this.jsonLoading.set(false);
-        alert(`JSON import failed: ${err.message}`);
-        input.value = '';
-      },
-    });
   }
 
   private showResult(label: string, success: number, errors: string[]): void {

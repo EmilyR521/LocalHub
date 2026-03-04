@@ -40,3 +40,41 @@
     }
   }
 }
+
+// Backup & restore (My profile)
+.backup-restore-section {
+  margin-bottom: 1.25rem;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.backup-restore-subtitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: var(--text-muted);
+}
+
+.restore-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.restore-file-input {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.restore-message {
+  width: 100%;
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+}

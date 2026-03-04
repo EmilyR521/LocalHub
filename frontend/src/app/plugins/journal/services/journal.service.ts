@@ -1,6 +1,9 @@
 import { Injectable, inject, signal, computed, effect } from '@angular/core';
+import { Observable, of, forkJoin } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { PluginStoreService } from '../../../core/services/plugin-store.service';
 import { UserProfileService } from '../../../core/services/user-profile.service';
+import { toDateKey } from '../../../core/utils/date-format';
 
 const PLUGIN_ID = 'journal';
 
@@ -11,13 +14,7 @@ export interface JournalEntry {
   content: string;
 }
 
-/** Format a Date as YYYY-MM-DD for store key. */
-export function toDateKey(d: Date): DateKey {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
+export { toDateKey };
 
 function normalizeEntry(raw: unknown): JournalEntry {
   if (raw && typeof raw === 'object' && 'content' in raw) {
@@ -115,5 +112,28 @@ export class JournalService {
   /** Call after load() to set initial date to today. */
   setInitialDateToToday(): void {
     if (!this.currentDateKey()) this.goToToday();
+  }
+
+  /** Fetch one entry by date key without changing current entry (e.g. for search). */
+  getEntryContent(dateKey: DateKey): Observable<JournalEntry | null> {
+    const id = this.userId();
+    if (!id) return of(null);
+    return this.store.get<unknown>(PLUGIN_ID, dateKey, id).pipe(
+      map((data) => normalizeEntry(data ?? null)),
+      catchError(() => of(null))
+    );
+  }
+
+  /** Load content for all known entry dates (for search). */
+  loadAllEntriesContent(): Observable<{ dateKey: string; entry: JournalEntry }[]> {
+    const dates = this.entryDatesSignal();
+    if (dates.length === 0) return of([]);
+    return forkJoin(
+      dates.map((dateKey) =>
+        this.getEntryContent(dateKey).pipe(
+          map((entry) => ({ dateKey, entry: entry ?? { content: '' } }))
+        )
+      )
+    );
   }
 }

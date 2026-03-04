@@ -3,8 +3,8 @@ import type { Plant } from '../models/plant.model';
 import type { GardeningTask } from '../models/gardening-task.model';
 import type { Zone } from '../models/zone.model';
 import type { GardenJob } from '../models/garden-job.model';
+import { generateId } from '../../../core/utils/id';
 import { GardenerPersistenceService } from './gardener-persistence.service';
-import { generateId } from './gardener-store.constants';
 
 @Injectable({ providedIn: 'root' })
 export class GardenerService {

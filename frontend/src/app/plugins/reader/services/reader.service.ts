@@ -3,17 +3,10 @@ import type { Book } from '../models/book.model';
 import type { Collection } from '../models/collection.model';
 import { BookStatus } from '../models/book-status.model';
 import { ReaderPersistenceService } from './reader-persistence.service';
-import { generateId } from './reader-store.constants';
-import {
-  ensureBookIds,
-  ensureCollectionIds,
-  mergeImport,
-} from './reader-merge.helper';
+import { generateId } from '../../../core/utils/id';
 
 /**
- * Facade for reader domain operations. Delegates persistence to ReaderPersistenceService
- * and import/merge logic to reader-merge.helper. Single responsibility: coordinate
- * books/collections CRUD and bulk operations.
+ * Facade for reader domain operations. Delegates persistence to ReaderPersistenceService.
  */
 @Injectable({ providedIn: 'root' })
 export class ReaderService {
@@ -99,33 +92,5 @@ export class ReaderService {
   deleteCollection(id: string): void {
     const list = this.persistence.collections().filter((c) => c.id !== id);
     this.persistence.saveCollections(list);
-  }
-
-  /** Replace all books and collections (e.g. JSON import "Replace"). */
-  replaceAll(books: Book[], collections: Collection[]): void {
-    this.persistence.saveBooks(ensureBookIds(books));
-    this.persistence.saveCollections(ensureCollectionIds(collections));
-  }
-
-  /**
-   * Merge imported books and collections into existing data.
-   * Returns counts of books and collections added.
-   */
-  mergeFromExport(
-    importedBooks: Book[],
-    importedCollections: Collection[]
-  ): { booksAdded: number; collectionsAdded: number } {
-    const result = mergeImport(
-      importedBooks,
-      importedCollections,
-      this.persistence.books(),
-      this.persistence.collections()
-    );
-    this.persistence.saveBooks(result.newBooks);
-    this.persistence.saveCollections(result.newCollections);
-    return {
-      booksAdded: result.booksAdded,
-      collectionsAdded: result.collectionsAdded,
-    };
   }
 }

@@ -19,22 +19,3 @@
     </label>
   </div>
 </div>
-
-<div class="card settings-import-card">
-  <h2 class="card-title">JSON</h2>
-  <p class="hint">Full backup: export or import all books and collections as JSON. On import you can replace existing data or merge.</p>
-  <div class="settings-import-actions">
-    <button type="button" class="btn secondary" (click)="exportJSON()" [disabled]="jsonLoading()">
-      Export JSON
-    </button>
-    <label class="btn secondary" [class.disabled]="jsonLoading()">
-      {{ jsonLoading() ? 'Importing…' : 'Import from JSON' }}
-      <input
-        type="file"
-        accept=".json,application/json"
-        (change)="onJSONFile($event)"
-        style="display: none;"
-        [disabled]="jsonLoading()" />
-    </label>
-  </div>
-</div>

@@ -3,7 +3,7 @@
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export function ordinal(n: number): string {
+function ordinal(n: number): string {
   const s = n % 10;
   const t = n % 100;
   if (s === 1 && t !== 11) return `${n}st`;
@@ -18,6 +18,14 @@ export function formatMonDayMonth(date: Date): string {
   const day = ordinal(date.getDate());
   const month = MONTHS[date.getMonth()];
   return `${dow}, ${day} ${month}`;
+}
+
+/** Format a Date as YYYY-MM-DD (local date). Use for store keys and date comparisons. */
+export function toDateKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 /** Days from today (positive = future, negative = past). */
@@ -37,8 +45,9 @@ export function daysAgo(date: Date): number {
   return Math.round((today.getTime() - d.getTime()) / (24 * 60 * 60 * 1000));
 }
 
+/** Today's date as YYYY-MM-DD (local). */
 export function todayYMD(): string {
-  return new Date().toISOString().slice(0, 10);
+  return toDateKey(new Date());
 }
 
 /** "today" | "in 1 day" | "in N days". */

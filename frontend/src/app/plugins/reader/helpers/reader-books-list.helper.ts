@@ -10,17 +10,6 @@ export type BooksSortField =
 export type SortDirection = 'asc' | 'desc';
 
 /**
- * Filter books by status. Returns all if status is empty.
- */
-export function filterBooksByStatus(
-  books: Book[],
-  status: BookStatus | ''
-): Book[] {
-  if (!status) return books;
-  return books.filter((b) => b.status === status);
-}
-
-/**
  * Filter books by selected statuses. Returns all if the set is empty.
  */
 export function filterBooksByStatusSet(

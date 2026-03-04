@@ -1,33 +1,20 @@
 /**
- * Plugin loader & registry. Mounts store API routes, calendar Google OAuth, and Strava OAuth.
+ * Plugin loader & registry. Mounts store API routes, calendar Google OAuth, Strava OAuth, gardener, user-management.
  */
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import * as store from './store';
 import calendarGoogleRouter from './calendar-google';
 import stravaRouter from './strava';
 import gardenerRouter from './gardener';
+import userManagementRouter from './user-management';
 
 const router = Router();
-
 const userIdHeader = 'x-user-id';
 
 router.use('/calendar', calendarGoogleRouter);
 router.use('/strava', stravaRouter);
 router.use('/gardener', gardenerRouter);
-
-/** List users (user-management plugin): returns { users: { id, name, emoji }[] }. */
-router.get('/user-management/users', (_req: Request, res: Response) => {
-  const userIds = store.listUserIds('user-management');
-  const users = userIds.map((id) => {
-    const p = store.read<{ name?: string; emoji?: string }>('user-management', 'profile', id);
-    return {
-      id,
-      name: typeof p?.name === 'string' ? p.name : '',
-      emoji: typeof p?.emoji === 'string' ? p.emoji : '👤',
-    };
-  });
-  res.json({ users });
-});
+router.use('/user-management', userManagementRouter);
 
 router.get('/:pluginId/store', (req, res) => {
   const { pluginId } = req.params;
