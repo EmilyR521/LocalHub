@@ -91,8 +91,7 @@ export class JobsComponent {
   }
 
   getPlantDisplayName(plant: Plant): string {
-    const common = plant.speciesData?.common_name;
-    if (common != null && String(common).trim()) return String(common).trim();
+    if (plant.variety?.trim()) return `${plant.name} '${plant.variety.trim()}'`;
     return plant.name;
   }
 }

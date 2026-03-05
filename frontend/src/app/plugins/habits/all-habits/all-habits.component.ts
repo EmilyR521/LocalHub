@@ -18,8 +18,8 @@ export interface YearMonthBlock {
 
 /**
  * Returns the last four weeks as a 4×7 grid (row = week, col = weekday Mon–Sun).
- * Top row = current week, only up to and including today (future days are null).
- * Rows 1–3 = previous three full weeks.
+ * Top row = oldest week (3 weeks ago), bottom row = current week (latest).
+ * Current week row only has days up to and including today (future days are null).
  */
 function getFourWeeksGrid(): DotCell[][] {
   const today = new Date();
@@ -56,7 +56,8 @@ function getFourWeeksGrid(): DotCell[][] {
     grid.push(row);
   }
 
-  return grid;
+  // Reverse so oldest week is top, latest week (current) is bottom
+  return grid.reverse();
 }
 
 /** Monday = 0 .. Sunday = 6 (matches grid columns). */
@@ -219,6 +220,11 @@ export class AllHabitsComponent {
   /** Day-of-week letter for a date (M, T, W, T, F, S, S). */
   dayLetter(d: Date): string {
     return getDayLetter(d);
+  }
+
+  /** Whether the date is today (calendar day). */
+  isToday(d: Date): boolean {
+    return toDateKey(d) === toDateKey(new Date());
   }
 
   /**

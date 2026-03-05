@@ -10,21 +10,28 @@ export const vocabulistRoutes: Routes = [
         path: '',
         pathMatch: 'full',
         loadComponent: () =>
-          import('./vocab-home/vocab-home.component').then(
+          import('./views/vocab-home/vocab-home.component').then(
             (m) => m.VocabHomeComponent
           ),
       },
       {
         path: 'practice',
         loadComponent: () =>
-          import('./practice/practice.component').then(
+          import('./views/practice/practice.component').then(
             (m) => m.VocabulistPracticeComponent
+          ),
+      },
+      {
+        path: 'grammar',
+        loadComponent: () =>
+          import('./views/grammar/grammar.component').then(
+            (m) => m.VocabulistGrammarComponent
           ),
       },
       {
         path: 'word/:id',
         loadComponent: () =>
-          import('./word-detail/word-detail.component').then(
+          import('./components/word-detail/word-detail.component').then(
             (m) => m.WordDetailComponent
           ),
       },

@@ -1,0 +1,21 @@
+<div class="card settings-import-card">
+  <h2 class="card-title">CSV</h2>
+  <p class="hint">Export or import plants as CSV. Download a template to see the columns (Common name, Variety, Species name, Lifecycle, Hardiness, Watering, Pruning Months, Sowing Months, Harvest Months, Planting-out months, Preferred PH, Image URL, Location).</p>
+  <div class="settings-import-actions">
+    <button type="button" class="btn secondary" (click)="exportCsvTemplate()" [disabled]="csvLoading()">
+      Download template
+    </button>
+    <button type="button" class="btn secondary" (click)="exportCsv()" [disabled]="plantsCount === 0 || csvLoading()">
+      Export CSV ({{ plantsCount }} plants)
+    </button>
+    <label class="btn secondary" [class.disabled]="csvLoading()">
+      {{ csvLoading() ? 'Importing…' : 'Import from CSV' }}
+      <input
+        type="file"
+        accept=".csv,text/csv"
+        (change)="onCsvFile($event)"
+        style="display: none;"
+        [disabled]="csvLoading()" />
+    </label>
+  </div>
+</div>

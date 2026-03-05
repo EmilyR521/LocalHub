@@ -1,7 +1,9 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { GardenerService } from '../../services/gardener.service';
-import type { GardeningTask } from '../../models/gardening-task.model';
+import type { GardenJob } from '../../models/garden-job.model';
+import type { Plant } from '../../models/plant.model';
+import { JobFormComponent } from '../jobs/job-form/job-form.component';
+import type { JobFormPayload } from '../jobs/job-form/job-form.payload';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -33,7 +35,7 @@ function getDaysInMonth(year: number, month: number): { date: string; day: numbe
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [FormsModule],
+  imports: [JobFormComponent],
   templateUrl: './schedule.component.html',
 })
 export class ScheduleComponent {
@@ -43,13 +45,11 @@ export class ScheduleComponent {
   readonly viewMonth = signal(new Date().getMonth() + 1);
   readonly selectedDate = signal<string | null>(null);
   readonly panelOpen = signal(false);
-  readonly editingTask = signal<GardeningTask | null>(null);
+  readonly editingJob = signal<GardenJob | null>(null);
 
-  formDate = '';
-  formTitle = '';
-  formNotes = '';
-
-  readonly tasks = this.gardener.tasks;
+  readonly jobs = this.gardener.jobs;
+  readonly zones = this.gardener.zones;
+  readonly plants = this.gardener.plants;
 
   readonly monthLabel = computed(() => {
     const d = new Date(this.viewYear(), this.viewMonth() - 1, 1);
@@ -60,27 +60,34 @@ export class ScheduleComponent {
     getDaysInMonth(this.viewYear(), this.viewMonth())
   );
 
-  readonly tasksByDate = computed(() => {
-    const map = new Map<string, GardeningTask[]>();
-    for (const t of this.gardener.tasks()) {
-      const list = map.get(t.date) ?? [];
-      list.push(t);
-      map.set(t.date, list);
+  readonly jobsByDate = computed(() => {
+    const map = new Map<string, GardenJob[]>();
+    for (const job of this.gardener.jobs()) {
+      const start = new Date(job.startDate);
+      const end = job.endDate ? new Date(job.endDate) : new Date(job.startDate);
+      const dateStr = (d: Date) =>
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const key = dateStr(new Date(d));
+        const list = map.get(key) ?? [];
+        list.push(job);
+        map.set(key, list);
+      }
     }
-    for (const [, list] of map) list.sort((a, b) => a.title.localeCompare(b.title));
+    for (const [, list] of map) list.sort((a, b) => a.startDate.localeCompare(b.startDate) || a.title.localeCompare(b.title));
     return map;
   });
 
-  readonly selectedDateTasks = computed(() => {
+  readonly selectedDateJobs = computed(() => {
     const date = this.selectedDate();
     if (!date) return [];
-    return this.tasksByDate().get(date) ?? [];
+    return this.jobsByDate().get(date) ?? [];
   });
 
-  readonly taskCountByDate = computed(() => {
+  readonly jobCountByDate = computed(() => {
     const map = new Map<string, number>();
-    for (const t of this.gardener.tasks()) {
-      map.set(t.date, (map.get(t.date) ?? 0) + 1);
+    for (const [date, list] of this.jobsByDate()) {
+      map.set(date, list.length);
     }
     return map;
   });
@@ -111,55 +118,71 @@ export class ScheduleComponent {
 
   selectDate(date: string): void {
     this.selectedDate.set(date);
+    this.openAddJob(date);
   }
 
-  openAddTask(): void {
-    const date = this.selectedDate() ?? new Date().toISOString().slice(0, 10);
-    this.editingTask.set(null);
-    this.formDate = date;
-    this.formTitle = '';
-    this.formNotes = '';
+  openAddJob(initialDate?: string): void {
+    this.editingJob.set(null);
     this.panelOpen.set(true);
+    this.initialStartDateForForm.set(initialDate ?? this.selectedDate() ?? new Date().toISOString().slice(0, 10));
   }
 
-  openEditTask(task: GardeningTask): void {
-    this.editingTask.set(task);
-    this.formDate = task.date;
-    this.formTitle = task.title;
-    this.formNotes = task.notes ?? '';
+  /** Passed to job form when adding from schedule (so the form gets the clicked day as start date). */
+  readonly initialStartDateForForm = signal('');
+
+  openEditJob(job: GardenJob): void {
+    this.editingJob.set(job);
+    this.initialStartDateForForm.set('');
     this.panelOpen.set(true);
   }
 
   closePanel(): void {
     this.panelOpen.set(false);
-    this.editingTask.set(null);
+    this.editingJob.set(null);
+    this.initialStartDateForForm.set('');
   }
 
-  saveTask(): void {
-    const title = this.formTitle.trim();
-    if (!title || !this.formDate) return;
-    const task = this.editingTask();
-    if (task) {
-      this.gardener.updateTask(task.id, {
-        date: this.formDate,
-        title,
-        notes: this.formNotes.trim() || undefined,
-      });
+  onJobSave(payload: JobFormPayload): void {
+    const job = this.editingJob();
+    if (job) {
+      this.gardener.updateJob(job.id, payload);
     } else {
-      this.gardener.addTask({
-        date: this.formDate,
-        title,
-        notes: this.formNotes.trim() || undefined,
-      });
+      this.gardener.addJob(payload);
     }
     this.closePanel();
   }
 
-  deleteTask(): void {
-    const task = this.editingTask();
-    if (task) {
-      this.gardener.removeTask(task.id);
+  onJobDelete(): void {
+    const job = this.editingJob();
+    if (job) {
+      this.gardener.removeJob(job.id);
       this.closePanel();
     }
+  }
+
+  getZoneName(zoneId: string): string {
+    return this.zones().find((z) => z.id === zoneId)?.name ?? zoneId;
+  }
+
+  formatPeriod(job: GardenJob): string {
+    if (job.endDate && job.endDate !== job.startDate) {
+      return `${job.startDate} – ${job.endDate}`;
+    }
+    return job.startDate;
+  }
+
+  getPlantDisplayName(plant: Plant): string {
+    if (plant.variety?.trim()) return `${plant.name} '${plant.variety.trim()}'`;
+    return plant.name;
+  }
+
+  getPlantsSummary(job: GardenJob): string {
+    const ids = job.plantIds ?? [];
+    if (ids.length === 0) return '—';
+    const names = ids
+      .map((id) => this.plants().find((p) => p.id === id))
+      .filter((p): p is Plant => p != null)
+      .map((p) => this.getPlantDisplayName(p));
+    return names.length > 0 ? names.join(', ') : '—';
   }
 }

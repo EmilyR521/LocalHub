@@ -2,86 +2,56 @@
   <h2 class="card-title">{{ isEditMode ? 'Edit plant' : 'Add plant' }}</h2>
   <form (ngSubmit)="onSave()">
     <div class="field">
-      <label for="plant-name">Name</label>
-      <div class="plugin-actions gardener-field-name-actions">
-        <input id="plant-name" type="text" [(ngModel)]="formName" name="formName" placeholder="Plant name" (keyup.enter)="searchSpecies(); $event.preventDefault()" />
-        <button type="button" class="btn secondary" (click)="searchSpecies()" [disabled]="speciesSearchLoading()">
-          {{ speciesSearchLoading() ? 'Searching…' : 'Search species' }}
-        </button>
-      </div>    
+      <label for="plant-name">Common name</label>
+      <input id="plant-name" type="text" [(ngModel)]="formName" name="formName" placeholder="e.g. Japanese maple" required />
     </div>
     <div class="field">
-      <label for="plant-species">Species / variety</label>
-      <div class="gardener-species-lookup">
-        @if (formSpeciesData) {
-          <div class="gardener-species-selected">
-            @if (getSpeciesImageUrl(formSpeciesData.default_image); as imgUrl) {
-              <img class="gardener-species-selected-img" [src]="imgUrl" alt="" />
-            }
-            <div class="gardener-species-selected-main">
-              <span class="gardener-species-base-label">Base from Perenual: {{ getBaseSpeciesLabel(formSpeciesData) }}</span>
-              <button type="button" class="btn secondary" (click)="clearSpeciesData()">Clear</button>
-            </div>
-          </div>
-          <p class="hint" style="margin-top: 0.35rem;">Override species or add variety/cultivar below (e.g. <em>Briza media</em> 'Pixie').</p>
-          <input id="plant-species" type="text" [(ngModel)]="formSpecies" name="formSpecies" placeholder="Species or variety name" class="gardener-species-override-input" />
-          @if (formSpeciesData.family || formSpeciesData.sunlight?.length || formSpeciesData.origin?.length || formSpeciesData.propagation?.length || formSpeciesData.pruning_month?.length) {
-            <div class="gardener-species-details">
-              @if (formSpeciesData.family) {
-                <p class="gardener-species-detail"><strong>Family:</strong> {{ formSpeciesData.family }}</p>
-              }
-              @if (formatSpeciesArray(formSpeciesData.sunlight)) {
-                <p class="gardener-species-detail"><strong>Sunlight:</strong> {{ formatSpeciesArray(formSpeciesData.sunlight) }}</p>
-              }
-              @if (formatSpeciesArray(formSpeciesData.origin)) {
-                <p class="gardener-species-detail"><strong>Origin:</strong> {{ formatSpeciesArray(formSpeciesData.origin) }}</p>
-              }
-              @if (formatSpeciesArray(formSpeciesData.propagation)) {
-                <p class="gardener-species-detail"><strong>Propagation:</strong> {{ formatSpeciesArray(formSpeciesData.propagation) }}</p>
-              }
-              @if (formSpeciesData.pruning_month?.length) {
-                <p class="gardener-species-detail"><strong>Pruning months</strong></p>
-                <div class="gardener-pruning-months" aria-label="Pruning months">
-                  @for (letter of monthLetters; track $index) {
-                    <span
-                      class="gardener-pruning-box"
-                      [class.gardener-pruning-box--active]="isPruningMonth($index, formSpeciesData.pruning_month)"
-                      [title]="isPruningMonth($index, formSpeciesData.pruning_month) ? monthNames[$index] : ''"
-                    >{{ letter }}</span>
-                  }
-                </div>
-              }
-            </div>
-          }
-        } @else {
-          <input id="plant-species" type="text" [(ngModel)]="formSpecies" name="formSpecies" placeholder="e.g. Monstera deliciosa (or use Search above)" />
-        }
-      </div>
-      @if (speciesSearchLoading()) {
-        <p class="hint">Searching…</p>
-      }
-      @if (speciesSearchError()) {
-        <p class="hint error-msg">{{ speciesSearchError() }}</p>
-      }
-      @if (speciesSearchResults().length > 0) {
-        <ul class="gardener-species-results">
-          @for (item of speciesSearchResults(); track item.id) {
-            <li>
-              <button type="button" class="gardener-species-result-btn" (click)="selectSpecies(item)">
-                @if (getSpeciesImageUrl(item.default_image); as imgUrl) {
-                  <img class="gardener-species-result-img" [src]="imgUrl" alt="" />
-                }
-                <span class="gardener-species-result-text">
-                  {{ item.common_name ?? (item.scientific_name && item.scientific_name[0]) ?? 'Unknown' }}
-                  @if ((item.scientific_name ?? [])[0]; as sciName) {
-                    <span class="gardener-species-result-scientific">{{ sciName }}</span>
-                  }
-                </span>
-              </button>
-            </li>
-          }
-        </ul>
-      }
+      <label for="plant-variety">Variety</label>
+      <input id="plant-variety" type="text" [(ngModel)]="formVariety" name="formVariety" placeholder="e.g. Atropurpureum" />
+    </div>
+    <div class="field">
+      <label for="plant-species">Species name</label>
+      <input id="plant-species" type="text" [(ngModel)]="formSpeciesName" name="formSpeciesName" placeholder="e.g. Acer palmatum" />
+    </div>
+    <div class="field">
+      <label for="plant-lifecycle">Lifecycle</label>
+      <input id="plant-lifecycle" type="text" [(ngModel)]="formLifecycle" name="formLifecycle" placeholder="e.g. tree, perennial, annual, shrub, climber" />
+    </div>
+    <div class="field">
+      <label for="plant-hardiness">Hardiness</label>
+      <input id="plant-hardiness" type="text" [(ngModel)]="formHardiness" name="formHardiness" placeholder="e.g. hardy, half-hardy, tender" />
+    </div>
+    <div class="field">
+      <label for="plant-watering">Watering</label>
+      <input id="plant-watering" type="text" [(ngModel)]="formWatering" name="formWatering" placeholder="e.g. low, medium, high" />
+    </div>
+    <div class="field">
+      <label for="plant-pruning">Pruning months</label>
+      <input id="plant-pruning" type="text" [(ngModel)]="formPruningMonths" name="formPruningMonths" placeholder="e.g. Jul Aug" />
+    </div>
+    <div class="field">
+      <label for="plant-sowing">Sowing months</label>
+      <input id="plant-sowing" type="text" [(ngModel)]="formSowingMonths" name="formSowingMonths" placeholder="e.g. Mar Apr" />
+    </div>
+    <div class="field">
+      <label for="plant-harvest">Harvest months</label>
+      <input id="plant-harvest" type="text" [(ngModel)]="formHarvestMonths" name="formHarvestMonths" placeholder="e.g. Sep Oct" />
+    </div>
+    <div class="field">
+      <label for="plant-planting-out">Planting-out months</label>
+      <input id="plant-planting-out" type="text" [(ngModel)]="formPlantingOutMonths" name="formPlantingOutMonths" placeholder="e.g. Apr May" />
+    </div>
+    <div class="field">
+      <label for="plant-ph">Preferred PH</label>
+      <input id="plant-ph" type="text" [(ngModel)]="formPreferredPh" name="formPreferredPh" placeholder="e.g. slightly acidic to neutral" />
+    </div>
+    <div class="field">
+      <label for="plant-image">Image URL</label>
+      <input id="plant-image" type="url" [(ngModel)]="formImageUrl" name="formImageUrl" placeholder="https://..." />
+    </div>
+    <div class="field">
+      <label for="plant-location">Location</label>
+      <input id="plant-location" type="text" [(ngModel)]="formLocation" name="formLocation" placeholder="Where in the garden" />
     </div>
     <div class="field gardener-zone-field">
       <label for="plant-zone-search">Zones</label>
@@ -114,24 +84,6 @@
           }
         </div>
       }
-    </div>
-    <div class="field">
-      <label for="plant-hardiness">Hardiness</label>
-      <select id="plant-hardiness" class="form-select" [(ngModel)]="formHardiness" name="formHardiness">
-        <option value="">—</option>
-        @for (opt of hardinessOptions; track opt) {
-          <option [value]="opt">{{ opt }}</option>
-        }
-      </select>
-    </div>
-    <div class="field">
-      <label for="plant-lifecycle">Lifecycle</label>
-      <select id="plant-lifecycle" class="form-select" [(ngModel)]="formLifecycle" name="formLifecycle">
-        <option value="">—</option>
-        @for (opt of lifecycleOptions; track opt) {
-          <option [value]="opt">{{ opt }}</option>
-        }
-      </select>
     </div>
     <div class="field">
       <label for="plant-notes">Notes</label>

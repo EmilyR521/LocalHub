@@ -1,0 +1,121 @@
+<section class="card vocabulist-practice">
+  @if (showSetup() && !sessionStarted()) {
+    <div class="vocabulist-practice-setup">
+      <h2 class="card-title">Practice</h2>
+      <p class="hint">Choose the language and question direction, then start your session.</p>
+      <div class="vocabulist-practice-setup-fields">
+        <div class="field">
+          <label for="practice-lang">Language</label>
+          <select
+            id="practice-lang"
+            class="form-select"
+            [value]="lang() ?? ''"
+            (change)="setLang($any($event.target).value)"
+          >
+            <option value="">— Select language —</option>
+            @for (l of languages(); track l) {
+              <option [value]="l">{{ languageLabel(l) }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <span class="vocabulist-practice-setup-label">Question direction</span>
+          <div class="vocabulist-practice-direction-options">
+            <label class="vocabulist-practice-direction-option">
+              <input
+                type="radio"
+                name="practice-direction"
+                [checked]="direction() === 'word_to_translation'"
+                (change)="setDirection('word_to_translation')"
+              />
+              @if (lang()) {
+                <span class="hint">{{ languageLabel(lang()) }} → English</span>
+              }
+            </label>
+            <label class="vocabulist-practice-direction-option">
+              <input
+                type="radio"
+                name="practice-direction"
+                [checked]="direction() === 'translation_to_word'"
+                (change)="setDirection('translation_to_word')"
+              />
+              @if (lang()) {
+                <span class="hint">English → {{ languageLabel(lang()) }}</span>
+              }
+            </label>
+          </div>
+        </div>
+        @if (allTagsForPractice().length > 0) {
+          <div class="field">
+            <label for="practice-tag">Filter by tag (optional)</label>
+            <select
+              id="practice-tag"
+              class="form-select"
+              [value]="tag()"
+              (change)="setTag($any($event.target).value)"
+            >
+              <option value="">All words</option>
+              @for (t of allTagsForPractice(); track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+          </div>
+        }
+        <button
+          type="button"
+          class="btn primary"
+          [disabled]="!lang()"
+          (click)="startSession()"
+        >
+          Start practice
+        </button>
+      </div>
+    </div>
+  } @else if (sessionStarted() && sessionWords().length === 0 && reviewed() === 0) {
+    <p class="hint">No words due for this selection. Try a different tag or add more vocabulary.</p>
+    <button type="button" class="btn secondary" (click)="practiceAgain()">Back to setup</button>
+  } @else if (isDone()) {
+    <div class="vocabulist-practice-done">
+      <p>Session complete. You reviewed {{ reviewed() }} word(s), {{ correctCount() }} correct.</p>
+      <div class="vocabulist-practice-done-actions">
+        <button type="button" class="btn primary" (click)="practiceAgain()">Practice again</button>
+        <button type="button" class="btn secondary" (click)="backToList()">
+          Back to {{ languageLabel(lang()) }}
+        </button>
+      </div>
+    </div>
+  } @else if (currentWord()) {
+    <div class="vocabulist-practice-header">
+      <a
+        [routerLink]="['/plugins/vocabulist']"
+        [queryParams]="lang() ? { lang: lang() } : {}"
+        class="btn secondary"
+      >
+        ← Back to {{ languageLabel(lang()) }}
+      </a>
+      <span class="vocabulist-practice-progress">{{ progressLabel() }}</span>
+    </div>
+    <div class="vocabulist-practice-card">
+      <p class="vocabulist-practice-prompt">{{ directionLabel() }}:</p>
+      <p class="vocabulist-practice-word">{{ promptText() }}</p>
+      @if (showBack()) {
+        <p class="vocabulist-practice-back">{{ answerText() }}</p>
+        <div class="vocabulist-practice-actions">
+          <button type="button" class="btn secondary" (click)="record(false)">
+            Wrong
+          </button>
+          <button type="button" class="btn primary" (click)="record(true)">
+            Correct
+          </button>
+        </div>
+      } @else {
+        <button type="button" class="btn primary" (click)="toggleBack()">
+          Show answer
+        </button>
+      }
+    </div>
+  } @else {
+    <p class="hint">No words to practice. Select a language above and start a session.</p>
+    <a routerLink="/plugins/vocabulist" class="btn secondary">Back to vocabulary</a>
+  }
+</section>

@@ -276,6 +276,52 @@
 }
 
 // Practice
+.vocabulist-practice-setup {
+  margin-bottom: 1rem;
+
+  .card-title {
+    margin-bottom: 0.5rem;
+  }
+
+  .hint {
+    margin-bottom: 1.25rem;
+  }
+}
+
+.vocabulist-practice-setup-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 24rem;
+}
+
+.vocabulist-practice-setup-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-muted);
+}
+
+.vocabulist-practice-direction-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vocabulist-practice-direction-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9375rem;
+
+  .hint {
+    margin: 0;
+    font-size: 0.8125rem;
+  }
+}
+
 .vocabulist-practice-header {
   display: flex;
   align-items: center;
@@ -318,6 +364,16 @@
 
 .vocabulist-practice-done {
   padding: 1.5rem 0;
+
+  p {
+    margin-bottom: 1rem;
+  }
+}
+
+.vocabulist-practice-done-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 // Word detail
@@ -374,4 +430,147 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+// Grammar reference view
+.vocabulist-grammar {
+  .card-title {
+    margin-bottom: 0.5rem;
+  }
+
+  .hint {
+    margin-bottom: 1.25rem;
+
+    a {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+  }
+}
+
+.vocabulist-grammar-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vocabulist-grammar-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.vocabulist-grammar-block-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+
+  &:hover {
+    background: var(--bg);
+  }
+}
+
+.vocabulist-grammar-block-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.vocabulist-grammar-chevron {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  transition: transform 0.2s ease;
+  color: var(--text-muted);
+
+  &.vocabulist-grammar-chevron--open {
+    transform: rotate(-180deg);
+  }
+}
+
+.vocabulist-grammar-block-content {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.table-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.row{display: flex;}
+
+.vocabulist-grammar-intro {
+  margin: 1rem 0 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.vocabulist-grammar-subtitle {
+  margin: 1.25rem 0 0.35rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.vocabulist-grammar-table-wrap {
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+
+.vocabulist-grammar-table {
+  width: 80%;
+  margin-left:5%;
+  min-width: 15rem;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  th,
+  td {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border);
+    text-align: left;
+    max-width: 5rem;
+  }
+
+  th {
+    background: var(--surface);
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  td {
+    color: var(--text);
+  }
+
+  tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  :root[data-theme='light'] & tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.vocabulist-grammar-list {
+  margin: 0.75rem 0;
+  padding-left: 1.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text);
+
+  li {
+    margin-bottom: 0.35rem;
+  }
 }

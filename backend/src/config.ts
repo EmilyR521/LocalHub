@@ -20,9 +20,6 @@ const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET ?? '';
 const stravaClientId = process.env.STRAVA_CLIENT_ID ?? '';
 const stravaClientSecret = process.env.STRAVA_CLIENT_SECRET ?? '';
 
-/** Perenual Plant API for Gardener plugin species lookup (optional). Get key at https://perenual.com/user/developer */
-const perenualApiKey = process.env.PERENUAL_API_KEY ?? '';
-
 export const config = {
   port,
   dataDir,
@@ -33,7 +30,6 @@ export const config = {
   googleClientSecret,
   stravaClientId,
   stravaClientSecret,
-  perenualApiKey,
 } as const;
 
 export function isPluginIdAllowed(pluginId: string): boolean {

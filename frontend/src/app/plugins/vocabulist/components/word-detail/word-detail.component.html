@@ -1,0 +1,84 @@
+<section class="card vocabulist-detail">
+  <div class="plugin-actions vocabulist-detail-actions">
+    <a
+      [routerLink]="['/plugins/vocabulist']"
+      [queryParams]="lang() ? { lang: lang() } : {}"
+      class="btn secondary"
+    >
+      ← Back to {{ languageLabel(lang()) }}
+    </a>
+  </div>
+
+  @if (word(); as w) {
+    <form class="vocabulist-detail-form" (ngSubmit)="save()">
+      <div class="field">
+        <label>Word</label>
+        <input
+          type="text"
+          class="form-input"
+          [ngModel]="editWord()"
+          (ngModelChange)="editWord.set($event)"
+          name="word"
+        />
+        @if (word(); as w) {
+          @if (wordDisplay(w, lang() ?? '') !== w.word) {
+            <p class="hint vocabulist-word-display-hint">Shown in list: {{ wordDisplay(w, lang() ?? '') }}</p>
+          }
+        }
+      </div>
+      <div class="field">
+        <label>Translation</label>
+        <input
+          type="text"
+          class="form-input"
+          [ngModel]="editTranslation()"
+          (ngModelChange)="editTranslation.set($event)"
+          name="translation"
+        />
+      </div>
+      <div class="field">
+        <label>Topic tags</label>
+        <div class="vocabulist-tags-edit">
+          @for (tag of editTags(); track tag) {
+            <span class="vocabulist-tag vocabulist-tag-edit">
+              {{ tag }}
+              <button
+                type="button"
+                class="vocabulist-tag-remove"
+                (click)="removeTag(tag)"
+                aria-label="Remove tag"
+              >
+                ×
+              </button>
+            </span>
+          }
+          <div class="vocabulist-tag-add">
+            <input
+              type="text"
+              class="form-input vocabulist-tag-input"
+              [ngModel]="newTag()"
+              (ngModelChange)="newTag.set($event)"
+              (keydown.enter)="addTag(); $event.preventDefault()"
+              placeholder="Add tag"
+              name="newTag"
+            />
+            <button type="button" class="btn secondary" (click)="addTag()">
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="vocabulist-detail-actions-bottom">
+        <button type="button" class="btn secondary" (click)="deleteWord()">
+          Delete
+        </button>
+        <button type="submit" class="btn primary">Save</button>
+      </div>
+    </form>
+  } @else {
+    <p class="hint">Word not found.</p>
+    <a [routerLink]="['/plugins/vocabulist']" [queryParams]="lang() ? { lang: lang() } : {}" class="btn secondary">
+      Back to {{ languageLabel(lang()) }}
+    </a>
+  }
+</section>

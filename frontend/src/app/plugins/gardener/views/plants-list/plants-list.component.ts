@@ -1,11 +1,13 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GardenerService } from '../../services/gardener.service';
-import { getSpeciesImageUrl } from '../../services/gardener-perenual.service';
 import type { Plant } from '../../models/plant.model';
 import type { Zone } from '../../models/zone.model';
 import type { PlantFormPayload } from './plant-form/plant-form.component';
 import { PlantFormComponent } from './plant-form/plant-form.component';
+
+/** Default image for plants without a valid imageUrl. */
+const PLACEHOLDER_PLANT_IMAGE = 'assets/placeholder_plant.jpg';
 
 @Component({
   selector: 'app-plants-list',
@@ -17,6 +19,7 @@ export class PlantsListComponent implements OnInit {
   private route = inject(ActivatedRoute);
   readonly gardener = inject(GardenerService);
 
+  readonly placeholderPlantUrl = PLACEHOLDER_PLANT_IMAGE;
   readonly plants = this.gardener.plants;
   readonly zones = this.gardener.zones;
   readonly selectedZoneIds = signal<Set<string>>(new Set());
@@ -28,8 +31,6 @@ export class PlantsListComponent implements OnInit {
   });
   readonly panelOpen = signal(false);
   readonly editingPlant = signal<Plant | null>(null);
-
-  readonly getSpeciesImageUrl = getSpeciesImageUrl;
 
   ngOnInit(): void {
     const zone = this.route.snapshot.queryParamMap.get('zone');
@@ -53,22 +54,13 @@ export class PlantsListComponent implements OnInit {
     return zoneIds.map((id) => zoneList.find((z) => z.id === id)?.name ?? id).filter(Boolean);
   }
 
-  getDisplayCommonName(plant: Plant): string {
-    const common = plant.speciesData?.common_name;
-    if (common != null && String(common).trim()) return String(common).trim();
+  getDisplayName(plant: Plant): string {
+    if (plant.variety?.trim()) return `${plant.name} '${plant.variety.trim()}'`;
     return plant.name;
   }
 
-  /** Show overridden species/variety when set, otherwise base scientific name from Perenual. */
-  getDisplayScientificName(plant: Plant): string {
-    const override = plant.species?.trim();
-    if (override) return override;
-    const sn = plant.speciesData?.scientific_name;
-    if (sn != null) {
-      if (Array.isArray(sn)) return sn.map((s) => String(s).trim()).filter(Boolean).join(', ');
-      return String(sn).trim();
-    }
-    return '';
+  getDisplaySpecies(plant: Plant): string {
+    return plant.speciesName?.trim() ?? '';
   }
 
   openAdd(): void {

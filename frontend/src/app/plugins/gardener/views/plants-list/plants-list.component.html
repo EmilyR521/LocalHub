@@ -38,14 +38,14 @@
         @for (plant of filteredPlants(); track plant.id) {
           <tr class="clickable" (click)="openEdit(plant)">
             <td class="gardener-plant-thumb-cell">
-              @if (getSpeciesImageUrl(plant.speciesData?.default_image); as imgUrl) {
-                <img class="gardener-plant-thumb" [src]="imgUrl" alt="" />
-              } @else {
-                <span class="gardener-plant-thumb-placeholder">—</span>
-              }
+              <img
+                class="gardener-plant-thumb"
+                [src]="plant.imageUrl?.trim() || placeholderPlantUrl"
+                alt=""
+              />
             </td>
-            <td>{{ getDisplayCommonName(plant) }}</td>
-            <td class="empty-cell">{{ getDisplayScientificName(plant) || '—' }}</td>
+            <td>{{ getDisplayName(plant) }}</td>
+            <td class="empty-cell">{{ getDisplaySpecies(plant) || '—' }}</td>
             <td class="empty-cell">
               @for (zoneName of getZoneNames(plant); track zoneName) {
                 <span class="gardener-zone-badge">{{ zoneName }}</span>

@@ -22,6 +22,8 @@ import type { JobFormPayload } from './job-form.payload';
 })
 export class JobFormComponent implements OnChanges {
   @Input() job: GardenJob | null = null;
+  /** When adding a new job, optionally pre-fill the start date (e.g. from schedule day click). */
+  @Input() initialStartDate = '';
   @Input() set zones(value: Zone[]) {
     this.zonesSignal.set(value ?? []);
   }
@@ -47,6 +49,9 @@ export class JobFormComponent implements OnChanges {
 
   ngOnChanges(): void {
     this.initFromJob(this.job);
+    if (!this.job && this.initialStartDate) {
+      this.formStartDate = this.initialStartDate;
+    }
   }
 
   get isEditMode(): boolean {
@@ -72,8 +77,7 @@ export class JobFormComponent implements OnChanges {
   });
 
   getPlantDisplayName(plant: Plant): string {
-    const common = plant.speciesData?.common_name;
-    if (common != null && String(common).trim()) return String(common).trim();
+    if (plant.variety?.trim()) return `${plant.name} '${plant.variety.trim()}'`;
     return plant.name;
   }
 
@@ -89,7 +93,7 @@ export class JobFormComponent implements OnChanges {
         : [{ name: '', cost: '' }];
     } else {
       this.formTitle = '';
-      this.formStartDate = '';
+      this.formStartDate = this.initialStartDate || '';
       this.formEndDate = '';
       this.formZoneId = '';
       this.formPlantIds.set([]);

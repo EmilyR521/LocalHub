@@ -1,0 +1,209 @@
+<section class="card vocabulist-grammar">
+  <h2 class="card-title">Grammar reference</h2>
+  <p class="hint">
+    Verb conjugation and noun declension tables for Modern Greek. Based on
+    <a href="https://www.greekpod101.com/blog/2020/10/05/greek-conjugations/" target="_blank" rel="noopener noreferrer">Greek verb conjugation</a>
+    and common reference patterns.
+  </p>
+
+  <div class="vocabulist-grammar-sections">
+    <section class="vocabulist-grammar-block">
+      <button
+        type="button"
+        class="vocabulist-grammar-block-toggle"
+        [attr.aria-expanded]="isExpanded('verb')"
+        (click)="toggleSection('verb')"
+      >
+        <h3 class="vocabulist-grammar-block-title">Verb conjugation</h3>
+        <span class="vocabulist-grammar-chevron" [class.vocabulist-grammar-chevron--open]="isExpanded('verb')" aria-hidden="true">▼</span>
+      </button>
+      @if (isExpanded('verb')) {
+        <div class="vocabulist-grammar-block-content">
+          <p class="vocabulist-grammar-intro">
+            Greek verbs change by <strong>person</strong> (1st, 2nd, 3rd), <strong>number</strong> (singular, plural),
+            <strong>tense</strong>, <strong>mood</strong>, and <strong>voice</strong> (active, passive).
+            Two main conjugation groups: <strong>A</strong> (‑ω / ‑ομαι) and <strong>B</strong> (‑ώ / ‑ιέμαι or ‑ούμαι).
+          </p>
+          <div class="row">
+          <div class="table-col">
+            <h4 class="vocabulist-grammar-subtitle">Conjugation A — λύνω (to solve)</h4>
+            <p class="hint">Active voice, indicative: present, simple past (αόριστος), simple future.</p>
+            <div class="vocabulist-grammar-table-wrap">
+              <table class="vocabulist-grammar-table" aria-label="Conjugation A verb lambda upsilon nu omega">
+                <thead>
+                  <tr>
+                    <th>Person</th>
+                    <th>Present (Ενεστώτας)</th>
+                    <th>Simple past (Αόριστος)</th>
+                    <th>Simple future</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>εγώ (I)</td><td>λύνω</td><td>έλυσα</td><td>θα λύσω</td></tr>
+                  <tr><td>εσύ (you sg.)</td><td>λύνεις</td><td>έλυσες</td><td>θα λύσεις</td></tr>
+                  <tr><td>αυτός/αυτή/αυτό (he/she/it)</td><td>λύνει</td><td>έλυσε</td><td>θα λύσει</td></tr>
+                  <tr><td>εμείς (we)</td><td>λύνουμε</td><td>λύσαμε</td><td>θα λύσουμε</td></tr>
+                  <tr><td>εσείς (you pl.)</td><td>λύνετε</td><td>λύσατε</td><td>θα λύσετε</td></tr>
+                  <tr><td>αυτοί/αυτές/αυτά (they)</td><td>λύνουν(ε)</td><td>έλυσαν / λύσανε</td><td>θα λύσουν(ε)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="table-col">
+            <h4 class="vocabulist-grammar-subtitle">Conjugation B (1st class) — αγαπώ (to love)</h4>
+            <p class="hint">Active voice, indicative. Verbs in ‑ώ (accented) with passive in ‑ιέμαι.</p>
+            <div class="vocabulist-grammar-table-wrap">
+              <table class="vocabulist-grammar-table" aria-label="Conjugation B verb alpha gamma alpha pi omega">
+                <thead>
+                  <tr>
+                    <th>Person</th>
+                    <th>Present</th>
+                    <th>Simple past</th>
+                    <th>Simple future</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>εγώ</td><td>αγαπώ / αγαπάω</td><td>αγάπησα</td><td>θα αγαπήσω</td></tr>
+                  <tr><td>εσύ</td><td>αγαπάς</td><td>αγάπησες</td><td>θα αγαπήσεις</td></tr>
+                  <tr><td>αυτός/αυτή/αυτό</td><td>αγαπά / αγαπάει</td><td>αγάπησε</td><td>θα αγαπήσει</td></tr>
+                  <tr><td>εμείς</td><td>αγαπάμε / αγαπούμε</td><td>αγαπήσαμε</td><td>θα αγαπήσουμε</td></tr>
+                  <tr><td>εσείς</td><td>αγαπάτε</td><td>αγαπήσατε</td><td>θα αγαπήσετε</td></tr>
+                  <tr><td>αυτοί/αυτές/αυτά</td><td>αγαπούν(ε) / αγαπάνε</td><td>αγάπησαν</td><td>θα αγαπήσουν(ε)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+          <h4 class="vocabulist-grammar-subtitle">Tenses and moods (summary)</h4>
+          <ul class="vocabulist-grammar-list">
+            <li><strong>Ενεστώτας</strong> — Present (simple & continuous)</li>
+            <li><strong>Αόριστος</strong> — Simple past</li>
+            <li><strong>Παρατατικός</strong> — Past continuous</li>
+            <li><strong>Στιγμιαίος Μέλλοντας</strong> — Simple future (with θα)</li>
+            <li><strong>Οριστική</strong> — Indicative · <strong>Υποτακτική</strong> — Subjunctive (να) · <strong>Προστακτική</strong> — Imperative</li>
+            <li><strong>Ενεργητική φωνή</strong> — Active · <strong>Παθητική φωνή</strong> — Passive</li>
+          </ul>
+        </div>
+      }
+    </section>
+
+    <section class="vocabulist-grammar-block">
+      <button
+        type="button"
+        class="vocabulist-grammar-block-toggle"
+        [attr.aria-expanded]="isExpanded('noun')"
+        (click)="toggleSection('noun')"
+      >
+        <h3 class="vocabulist-grammar-block-title">Noun declension</h3>
+        <span class="vocabulist-grammar-chevron" [class.vocabulist-grammar-chevron--open]="isExpanded('noun')" aria-hidden="true">▼</span>
+      </button>
+      @if (isExpanded('noun')) {
+        <div class="vocabulist-grammar-block-content">
+          <p class="vocabulist-grammar-intro">
+            Greek nouns decline by <strong>case</strong> (nominative, genitive, accusative, vocative), <strong>number</strong> (singular, plural),
+            and <strong>gender</strong> (masculine, feminine, neuter). The definite article agrees with the noun.
+          </p>
+          <h4 class="vocabulist-grammar-subtitle">Example: ο φίλος (the friend, m.)</h4>
+          <div class="vocabulist-grammar-table-wrap">
+            <table class="vocabulist-grammar-table" aria-label="Noun declension phi iota lambda omicron sigma">
+              <thead>
+                <tr>
+                  <th>Case</th>
+                  <th>Singular</th>
+                  <th>Plural</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Nominative</td><td>ο φίλος</td><td>οι φίλοι</td></tr>
+                <tr><td>Genitive</td><td>του φίλου</td><td>των φίλων</td></tr>
+                <tr><td>Accusative</td><td>τον φίλο</td><td>τους φίλους</td></tr>
+                <tr><td>Vocative</td><td>φίλε</td><td>φίλοι</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h4 class="vocabulist-grammar-subtitle">Example: η γλώσσα (the language, f.)</h4>
+          <div class="vocabulist-grammar-table-wrap">
+            <table class="vocabulist-grammar-table" aria-label="Noun declension gamma lambda omega sigma sigma alpha">
+              <thead>
+                <tr>
+                  <th>Case</th>
+                  <th>Singular</th>
+                  <th>Plural</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Nominative</td><td>η γλώσσα</td><td>οι γλώσσες</td></tr>
+                <tr><td>Genitive</td><td>της γλώσσας</td><td>των γλωσσών</td></tr>
+                <tr><td>Accusative</td><td>τη γλώσσα</td><td>τις γλώσσες</td></tr>
+                <tr><td>Vocative</td><td>γλώσσα</td><td>γλώσσες</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="vocabulist-grammar-block">
+      <button
+        type="button"
+        class="vocabulist-grammar-block-toggle"
+        [attr.aria-expanded]="isExpanded('articles')"
+        (click)="toggleSection('articles')"
+      >
+        <h3 class="vocabulist-grammar-block-title">Definite articles</h3>
+        <span class="vocabulist-grammar-chevron" [class.vocabulist-grammar-chevron--open]="isExpanded('articles')" aria-hidden="true">▼</span>
+      </button>
+      @if (isExpanded('articles')) {
+        <div class="vocabulist-grammar-block-content">
+          <p class="vocabulist-grammar-intro">
+            The definite article (the) agrees in gender, number, and case with the noun.
+          </p>
+          <div class="vocabulist-grammar-table-wrap">
+            <table class="vocabulist-grammar-table" aria-label="Greek definite articles">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Masculine</th>
+                  <th>Feminine</th>
+                  <th>Neuter</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Nom. sg.</td><td>ο</td><td>η</td><td>το</td></tr>
+                <tr><td>Gen. sg.</td><td>του</td><td>της</td><td>του</td></tr>
+                <tr><td>Acc. sg.</td><td>τον</td><td>τη(ν)</td><td>το</td></tr>
+                <tr><td>Nom. pl.</td><td>οι</td><td>οι</td><td>τα</td></tr>
+                <tr><td>Gen. pl.</td><td>των</td><td>των</td><td>των</td></tr>
+                <tr><td>Acc. pl.</td><td>τους</td><td>τις</td><td>τα</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="vocabulist-grammar-block">
+      <button
+        type="button"
+        class="vocabulist-grammar-block-toggle"
+        [attr.aria-expanded]="isExpanded('patterns')"
+        (click)="toggleSection('patterns')"
+      >
+        <h3 class="vocabulist-grammar-block-title">Key patterns</h3>
+        <span class="vocabulist-grammar-chevron" [class.vocabulist-grammar-chevron--open]="isExpanded('patterns')" aria-hidden="true">▼</span>
+      </button>
+      @if (isExpanded('patterns')) {
+        <div class="vocabulist-grammar-block-content">
+          <ul class="vocabulist-grammar-list">
+            <li><strong>Future</strong> uses the particle <strong>θα</strong> + verb form (e.g. θα λύσω).</li>
+            <li><strong>Present perfect</strong> uses auxiliary <strong>έχω</strong> (have) + infinitive (e.g. έχω λύσει).</li>
+            <li><strong>Past perfect</strong> uses <strong>είχα</strong> (had) + infinitive.</li>
+            <li><strong>Subjunctive</strong> often uses particle <strong>να</strong> (e.g. να λύνω).</li>
+            <li><strong>Conjugation A</strong>: verb ending ‑ω (no accent) → active; ‑ομαι → passive.</li>
+            <li><strong>Conjugation B</strong>: verb ending ‑ώ (accented) → active; ‑ιέμαι or ‑ούμαι/‑άμαι/‑ώμαι → passive.</li>
+          </ul>
+        </div>
+      }
+    </section>
+  </div>
+</section>
