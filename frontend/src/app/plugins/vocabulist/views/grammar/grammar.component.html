@@ -1,12 +1,48 @@
 <section class="card vocabulist-grammar">
   <h2 class="card-title">Grammar reference</h2>
-  <p class="hint">
-    Verb conjugation and noun declension tables for Modern Greek. Based on
-    <a href="https://www.greekpod101.com/blog/2020/10/05/greek-conjugations/" target="_blank" rel="noopener noreferrer">Greek verb conjugation</a>
-    and common reference patterns.
-  </p>
+
+  <div class="vocabulist-grammar-lang-select">
+    <span class="vocabulist-grammar-lang-label">Language</span>
+    <div class="vocabulist-grammar-lang-buttons" role="group" aria-label="Grammar language">
+      <button type="button" class="btn secondary" [class.active]="selectedLang() === 'greek'" (click)="setGrammarLang('greek')">Greek</button>
+      <button type="button" class="btn secondary" [class.active]="selectedLang() === 'german'" (click)="setGrammarLang('german')">German</button>
+    </div>
+  </div>
+
+  @if (selectedLang() === 'greek') {
+    <p class="hint">
+      Verb conjugation and noun declension for Modern Greek. Based on
+      <a href="https://www.greekpod101.com/blog/2020/10/05/greek-conjugations/" target="_blank" rel="noopener noreferrer">Greek verb conjugation</a>.
+      Click any underlined term to see an explanation.
+    </p>
+  }
+  @if (selectedLang() === 'german') {
+    <p class="hint">
+      Declension tables and tenses for German. Based on
+      <a href="https://germanforenglishspeakers.com/reference/complete-declension-tables/" target="_blank" rel="noopener noreferrer">Complete Declension Tables</a>
+      and <a href="https://germanforenglishspeakers.com/verbs/tenses-and-moods/" target="_blank" rel="noopener noreferrer">Tenses &amp; Moods</a> (German for English Speakers).
+      Click any underlined term to see an explanation.
+    </p>
+  }
+
+  @if (currentHintId()) {
+    <div class="vocabulist-grammar-hint-overlay" (click)="closeHint()" role="presentation">
+      <div
+        class="vocabulist-grammar-hint-panel"
+        role="status"
+        aria-live="polite"
+        [style.top.px]="hintPosition()?.top"
+        [style.left.px]="hintPosition()?.left"
+        (click)="$event.stopPropagation()"
+      >
+        <p class="vocabulist-grammar-hint-text">{{ currentHintText() }}</p>
+        <button type="button" class="btn secondary btn-sm vocabulist-grammar-hint-close" (click)="closeHint()" aria-label="Close hint">Close</button>
+      </div>
+    </div>
+  }
 
   <div class="vocabulist-grammar-sections">
+    @if (selectedLang() === 'greek') {
     <section class="vocabulist-grammar-block">
       <button
         type="button"
@@ -33,9 +69,9 @@
                 <thead>
                   <tr>
                     <th>Person</th>
-                    <th>Present (Ενεστώτας)</th>
-                    <th>Simple past (Αόριστος)</th>
-                    <th>Simple future</th>
+                    <th><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('present-a')" (click)="toggleHint('present-a', $event)">Present (Ενεστώτας)</button></th>
+                    <th><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('simple-past-a')" (click)="toggleHint('simple-past-a', $event)">Simple past (Αόριστος)</button></th>
+                    <th><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('simple-future-a')" (click)="toggleHint('simple-future-a', $event)">Simple future</button></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -57,9 +93,9 @@
                 <thead>
                   <tr>
                     <th>Person</th>
-                    <th>Present</th>
-                    <th>Simple past</th>
-                    <th>Simple future</th>
+                    <th><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('present-b')" (click)="toggleHint('present-b', $event)">Present</button></th>
+                    <th><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('simple-past-b')" (click)="toggleHint('simple-past-b', $event)">Simple past</button></th>
+                    <th><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('simple-future-b')" (click)="toggleHint('simple-future-b', $event)">Simple future</button></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -103,6 +139,8 @@
             Greek nouns decline by <strong>case</strong> (nominative, genitive, accusative, vocative), <strong>number</strong> (singular, plural),
             and <strong>gender</strong> (masculine, feminine, neuter). The definite article agrees with the noun.
           </p>
+          <div class="row">
+          <div class="table-col">
           <h4 class="vocabulist-grammar-subtitle">Example: ο φίλος (the friend, m.)</h4>
           <div class="vocabulist-grammar-table-wrap">
             <table class="vocabulist-grammar-table" aria-label="Noun declension phi iota lambda omicron sigma">
@@ -114,13 +152,15 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td>Nominative</td><td>ο φίλος</td><td>οι φίλοι</td></tr>
-                <tr><td>Genitive</td><td>του φίλου</td><td>των φίλων</td></tr>
-                <tr><td>Accusative</td><td>τον φίλο</td><td>τους φίλους</td></tr>
-                <tr><td>Vocative</td><td>φίλε</td><td>φίλοι</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('case-nominative')" (click)="toggleHint('case-nominative', $event)">Nominative</button></td><td>ο φίλος</td><td>οι φίλοι</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('case-genitive')" (click)="toggleHint('case-genitive', $event)">Genitive</button></td><td>του φίλου</td><td>των φίλων</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('case-accusative')" (click)="toggleHint('case-accusative', $event)">Accusative</button></td><td>τον φίλο</td><td>τους φίλους</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('case-vocative')" (click)="toggleHint('case-vocative', $event)">Vocative</button></td><td>φίλε</td><td>φίλοι</td></tr>
               </tbody>
             </table>
           </div>
+          </div>
+          <div class="table-col">
           <h4 class="vocabulist-grammar-subtitle">Example: η γλώσσα (the language, f.)</h4>
           <div class="vocabulist-grammar-table-wrap">
             <table class="vocabulist-grammar-table" aria-label="Noun declension gamma lambda omega sigma sigma alpha">
@@ -132,13 +172,15 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td>Nominative</td><td>η γλώσσα</td><td>οι γλώσσες</td></tr>
-                <tr><td>Genitive</td><td>της γλώσσας</td><td>των γλωσσών</td></tr>
-                <tr><td>Accusative</td><td>τη γλώσσα</td><td>τις γλώσσες</td></tr>
-                <tr><td>Vocative</td><td>γλώσσα</td><td>γλώσσες</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('case-nominative')" (click)="toggleHint('case-nominative', $event)">Nominative</button></td><td>η γλώσσα</td><td>οι γλώσσες</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('case-genitive')" (click)="toggleHint('case-genitive', $event)">Genitive</button></td><td>της γλώσσας</td><td>των γλωσσών</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('case-accusative')" (click)="toggleHint('case-accusative', $event)">Accusative</button></td><td>τη γλώσσα</td><td>τις γλώσσες</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('case-vocative')" (click)="toggleHint('case-vocative', $event)">Vocative</button></td><td>γλώσσα</td><td>γλώσσες</td></tr>
               </tbody>
             </table>
           </div>
+        </div>
+        </div>
         </div>
       }
     </section>
@@ -169,12 +211,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td>Nom. sg.</td><td>ο</td><td>η</td><td>το</td></tr>
-                <tr><td>Gen. sg.</td><td>του</td><td>της</td><td>του</td></tr>
-                <tr><td>Acc. sg.</td><td>τον</td><td>τη(ν)</td><td>το</td></tr>
-                <tr><td>Nom. pl.</td><td>οι</td><td>οι</td><td>τα</td></tr>
-                <tr><td>Gen. pl.</td><td>των</td><td>των</td><td>των</td></tr>
-                <tr><td>Acc. pl.</td><td>τους</td><td>τις</td><td>τα</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('nom-sg')" (click)="toggleHint('nom-sg', $event)">Nom. sg.</button></td><td>ο</td><td>η</td><td>το</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('gen-sg')" (click)="toggleHint('gen-sg', $event)">Gen. sg.</button></td><td>του</td><td>της</td><td>του</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('acc-sg')" (click)="toggleHint('acc-sg', $event)">Acc. sg.</button></td><td>τον</td><td>τη(ν)</td><td>το</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('nom-pl')" (click)="toggleHint('nom-pl', $event)">Nom. pl.</button></td><td>οι</td><td>οι</td><td>τα</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('gen-pl')" (click)="toggleHint('gen-pl', $event)">Gen. pl.</button></td><td>των</td><td>των</td><td>των</td></tr>
+                <tr><td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('acc-pl')" (click)="toggleHint('acc-pl', $event)">Acc. pl.</button></td><td>τους</td><td>τις</td><td>τα</td></tr>
               </tbody>
             </table>
           </div>
@@ -205,5 +247,292 @@
         </div>
       }
     </section>
+    }
+
+    @if (selectedLang() === 'german') {
+    <section class="vocabulist-grammar-block">
+      <button
+        type="button"
+        class="vocabulist-grammar-block-toggle"
+        [attr.aria-expanded]="isExpanded('verb')"
+        (click)="toggleSection('verb')"
+      >
+        <h3 class="vocabulist-grammar-block-title">Tenses &amp; moods</h3>
+        <span class="vocabulist-grammar-chevron" [class.vocabulist-grammar-chevron--open]="isExpanded('verb')" aria-hidden="true">▼</span>
+      </button>
+      @if (isExpanded('verb')) {
+        <div class="vocabulist-grammar-block-content">
+          <p class="vocabulist-grammar-intro">
+            A verb’s <strong>tense</strong> relates to time; its <strong>mood</strong> to reality. In German, Präsens and Perfekt account for most everyday speech; Perfekt is used for most past events.
+          </p>
+          <div class="vocabulist-grammar-table-wrap">
+            <table class="vocabulist-grammar-table" aria-label="German tenses and moods">
+              <thead>
+                <tr>
+                  <th>Tense</th>
+                  <th>Indikativ</th>
+                  <th>Konjunktiv I</th>
+                  <th>Konjunktiv II</th>
+                  <th>Imperativ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-prasens')" (click)="toggleHint('de-prasens', $event)">Präsens</button></td>
+                  <td>Er tut es</td>
+                  <td><em>Er tue es</em></td>
+                  <td>Er würde es tun</td>
+                  <td>Tu(e) es!</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-prateritum')" (click)="toggleHint('de-prateritum', $event)">Präteritum</button></td>
+                  <td>Er tat es</td>
+                  <td><em>Er habe es getan</em></td>
+                  <td>Er hätte es getan</td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-perfekt')" (click)="toggleHint('de-perfekt', $event)">Perfekt</button></td>
+                  <td>Er hat es getan</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-plusquamperfekt')" (click)="toggleHint('de-plusquamperfekt', $event)">Plusquamperfekt</button></td>
+                  <td>Er hatte es getan</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-futur1')" (click)="toggleHint('de-futur1', $event)">Futur I</button></td>
+                  <td>Er wird es tun</td>
+                  <td><em>Er werde es tun</em></td>
+                  <td>—</td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-futur2')" (click)="toggleHint('de-futur2', $event)">Futur II</button></td>
+                  <td>Er wird es getan haben</td>
+                  <td><em>Er werde es getan haben</em></td>
+                  <td>—</td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ul class="vocabulist-grammar-list">
+            <li><button type="button" class="vocabulist-grammar-hint vocabulist-grammar-hint-inline" [class.vocabulist-grammar-hint--active]="isHintActive('de-indikativ')" (click)="toggleHint('de-indikativ', $event)">Indikativ</button> — statements of fact</li>
+            <li><button type="button" class="vocabulist-grammar-hint vocabulist-grammar-hint-inline" [class.vocabulist-grammar-hint--active]="isHintActive('de-konjunktiv1')" (click)="toggleHint('de-konjunktiv1', $event)">Konjunktiv I</button> — reported speech</li>
+            <li><button type="button" class="vocabulist-grammar-hint vocabulist-grammar-hint-inline" [class.vocabulist-grammar-hint--active]="isHintActive('de-konjunktiv2')" (click)="toggleHint('de-konjunktiv2', $event)">Konjunktiv II</button> — hypothetical/conditional (“would”)</li>
+            <li><button type="button" class="vocabulist-grammar-hint vocabulist-grammar-hint-inline" [class.vocabulist-grammar-hint--active]="isHintActive('de-imperativ')" (click)="toggleHint('de-imperativ', $event)">Imperativ</button> — commands</li>
+          </ul>
+        </div>
+      }
+    </section>
+
+    <section class="vocabulist-grammar-block">
+      <button
+        type="button"
+        class="vocabulist-grammar-block-toggle"
+        [attr.aria-expanded]="isExpanded('declension1')"
+        (click)="toggleSection('declension1')"
+      >
+        <h3 class="vocabulist-grammar-block-title">Type 1: Definite articles</h3>
+        <span class="vocabulist-grammar-chevron" [class.vocabulist-grammar-chevron--open]="isExpanded('declension1')" aria-hidden="true">▼</span>
+      </button>
+      @if (isExpanded('declension1')) {
+        <div class="vocabulist-grammar-block-content">
+          <p class="vocabulist-grammar-intro">“The nice man / woman / child / children” — definite article + adjective. Hard case endings in the table.</p>
+          <div class="vocabulist-grammar-table-wrap">
+            <table class="vocabulist-grammar-table" aria-label="German Type 1 definite articles with adjective">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Masculine</th>
+                  <th>Feminine</th>
+                  <th>Neuter</th>
+                  <th>Plural</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-nom')" (click)="toggleHint('de-nom', $event)">NOM</button></td>
+                  <td>de<strong>r</strong> <strong>nette</strong> Mann</td>
+                  <td>di<strong>e</strong> <strong>nette</strong> Frau</td>
+                  <td>da<strong>s</strong> <strong>nette</strong> Kind</td>
+                  <td>di<strong>e</strong> <strong>netten</strong> Kinder</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-acc')" (click)="toggleHint('de-acc', $event)">ACC</button></td>
+                  <td>de<strong>n</strong> <strong>netten</strong> Mann</td>
+                  <td>di<strong>e</strong> <strong>nette</strong> Frau</td>
+                  <td>da<strong>s</strong> <strong>nette</strong> Kind</td>
+                  <td>di<strong>e</strong> <strong>netten</strong> Kinder</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-dat')" (click)="toggleHint('de-dat', $event)">DAT</button></td>
+                  <td>de<strong>m</strong> <strong>netten</strong> Mann</td>
+                  <td>de<strong>r</strong> <strong>netten</strong> Frau</td>
+                  <td>de<strong>m</strong> <strong>netten</strong> Kind</td>
+                  <td>de<strong>n</strong> <strong>netten</strong> Kinder<strong>n</strong></td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-gen')" (click)="toggleHint('de-gen', $event)">GEN</button></td>
+                  <td>de<strong>s</strong> <strong>netten</strong> Manne<strong>s</strong></td>
+                  <td>de<strong>r</strong> <strong>netten</strong> Frau</td>
+                  <td>de<strong>s</strong> <strong>netten</strong> Kinde<strong>s</strong></td>
+                  <td>de<strong>r</strong> <strong>netten</strong> Kinder</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="vocabulist-grammar-block">
+      <button
+        type="button"
+        class="vocabulist-grammar-block-toggle"
+        [attr.aria-expanded]="isExpanded('declension2')"
+        (click)="toggleSection('declension2')"
+      >
+        <h3 class="vocabulist-grammar-block-title">Type 2: Indefinite &amp; possessive</h3>
+        <span class="vocabulist-grammar-chevron" [class.vocabulist-grammar-chevron--open]="isExpanded('declension2')" aria-hidden="true">▼</span>
+      </button>
+      @if (isExpanded('declension2')) {
+        <div class="vocabulist-grammar-block-content">
+          <p class="vocabulist-grammar-intro">“My little dog / cat / bunny / birds” — indefinite or possessive article + adjective.</p>
+          <div class="vocabulist-grammar-table-wrap">
+            <table class="vocabulist-grammar-table" aria-label="German Type 2 indefinite possessive">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Masculine</th>
+                  <th>Feminine</th>
+                  <th>Neuter</th>
+                  <th>Plural</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-nom')" (click)="toggleHint('de-nom', $event)">NOM</button></td>
+                  <td>mein <strong>kleiner</strong> Hund</td>
+                  <td>meine <strong>kleine</strong> Katze</td>
+                  <td>mein <strong>kleines</strong> Kaninchen</td>
+                  <td>meine <strong>kleinen</strong> Vögel</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-acc')" (click)="toggleHint('de-acc', $event)">ACC</button></td>
+                  <td>meinen <strong>kleinen</strong> Hund</td>
+                  <td>meine <strong>kleine</strong> Katze</td>
+                  <td>mein <strong>kleines</strong> Kaninchen</td>
+                  <td>meine <strong>kleinen</strong> Vögel</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-dat')" (click)="toggleHint('de-dat', $event)">DAT</button></td>
+                  <td>meinem <strong>kleinen</strong> Hund</td>
+                  <td>meiner <strong>kleinen</strong> Katze</td>
+                  <td>meinem <strong>kleinen</strong> Kaninchen</td>
+                  <td>meinen <strong>kleinen</strong> Vögeln</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-gen')" (click)="toggleHint('de-gen', $event)">GEN</button></td>
+                  <td>meines <strong>kleinen</strong> Hundes</td>
+                  <td>meiner <strong>kleinen</strong> Katze</td>
+                  <td>meines <strong>kleinen</strong> Kaninchens</td>
+                  <td>meiner <strong>kleinen</strong> Vögel</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="vocabulist-grammar-block">
+      <button
+        type="button"
+        class="vocabulist-grammar-block-toggle"
+        [attr.aria-expanded]="isExpanded('declension3')"
+        (click)="toggleSection('declension3')"
+      >
+        <h3 class="vocabulist-grammar-block-title">Type 3: No article</h3>
+        <span class="vocabulist-grammar-chevron" [class.vocabulist-grammar-chevron--open]="isExpanded('declension3')" aria-hidden="true">▼</span>
+      </button>
+      @if (isExpanded('declension3')) {
+        <div class="vocabulist-grammar-block-content">
+          <p class="vocabulist-grammar-intro">“Hot coffee / cold milk / fresh bread / warm rolls” — adjective only (no article).</p>
+          <div class="vocabulist-grammar-table-wrap">
+            <table class="vocabulist-grammar-table" aria-label="German Type 3 no article">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Masculine</th>
+                  <th>Feminine</th>
+                  <th>Neuter</th>
+                  <th>Plural</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-nom')" (click)="toggleHint('de-nom', $event)">NOM</button></td>
+                  <td><strong>heißer</strong> Kaffee</td>
+                  <td><strong>kalte</strong> Milch</td>
+                  <td><strong>frisches</strong> Brot</td>
+                  <td><strong>warme</strong> Brötchen</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-acc')" (click)="toggleHint('de-acc', $event)">ACC</button></td>
+                  <td><strong>heißen</strong> Kaffee</td>
+                  <td><strong>kalte</strong> Milch</td>
+                  <td><strong>frisches</strong> Brot</td>
+                  <td><strong>warme</strong> Brötchen</td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-dat')" (click)="toggleHint('de-dat', $event)">DAT</button></td>
+                  <td><strong>heißem</strong> Kaffee</td>
+                  <td><strong>kalter</strong> Milch</td>
+                  <td><strong>frischem</strong> Brot</td>
+                  <td><strong>warmen</strong> Brötche<strong>n</strong></td>
+                </tr>
+                <tr>
+                  <td><button type="button" class="vocabulist-grammar-hint" [class.vocabulist-grammar-hint--active]="isHintActive('de-gen')" (click)="toggleHint('de-gen', $event)">GEN</button></td>
+                  <td><strong>heißen</strong> Kaffee<strong>s</strong></td>
+                  <td><strong>kalter</strong> Milch</td>
+                  <td><strong>frischen</strong> Brotes</td>
+                  <td><strong>warmer</strong> Brötchen</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="vocabulist-grammar-block">
+      <button
+        type="button"
+        class="vocabulist-grammar-block-toggle"
+        [attr.aria-expanded]="isExpanded('patterns')"
+        (click)="toggleSection('patterns')"
+      >
+        <h3 class="vocabulist-grammar-block-title">Key points</h3>
+        <span class="vocabulist-grammar-chevron" [class.vocabulist-grammar-chevron--open]="isExpanded('patterns')" aria-hidden="true">▼</span>
+      </button>
+      @if (isExpanded('patterns')) {
+        <div class="vocabulist-grammar-block-content">
+          <ul class="vocabulist-grammar-list">
+            <li><strong>Präsens</strong> and <strong>Perfekt</strong> cover most everyday German; Perfekt is used for most past events (unlike English, where simple past is common).</li>
+            <li><strong>Präteritum</strong> is used more in writing and narrative.</li>
+            <li><strong>Futur I</strong> uses <em>werden</em> + infinitive; the present tense is also often used for future.</li>
+            <li>German has four cases: <strong>NOM</strong> (subject), <strong>ACC</strong> (direct object), <strong>DAT</strong> (indirect object, many prepositions), <strong>GEN</strong> (possession).</li>
+          </ul>
+        </div>
+      }
+    </section>
+    }
   </div>
 </section>
