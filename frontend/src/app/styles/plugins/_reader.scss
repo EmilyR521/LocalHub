@@ -1,3 +1,24 @@
+// Book form – series multiselect
+.book-form-series-existing {
+  margin-bottom: 0.35rem;
+}
+.book-form-series-label {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+.book-form-series-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+
+  .series-chip {
+    cursor: pointer;
+    font: inherit;
+  }
+}
+
 // Stats view – rows of stat cards
 .reader-stats {
   margin-bottom: 1.5rem;
@@ -60,6 +81,55 @@
 
 .reader-stats-genres-card {
   flex: 1 1 32rem;
+}
+
+.reader-books-search-input {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9375rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  min-width: 12rem;
+  max-width: 20rem;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+  }
+}
+
+.reader-books-active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.reader-books-active-filters-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.reader-books-active-filters-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.reader-books-active-filter-chip {
+  cursor: pointer;
+  font: inherit;
 }
 
 .reader-books-table-filter-cell {
@@ -319,11 +389,23 @@
   margin: 0 auto;
 }
 
-.timeline-header-section {
+.timeline-top-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 1.5rem;
   padding-bottom: 1.25rem;
   border-bottom: 2px solid var(--border);
   border-image: linear-gradient(90deg, transparent, var(--accent), transparent) 1;
+
+  .timeline-header-section {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+    border-image: none;
+  }
 }
 
 .timeline-stats {

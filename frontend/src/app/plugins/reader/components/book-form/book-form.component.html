@@ -10,6 +10,36 @@
       <input id="book-author" type="text" [(ngModel)]="author" name="author" placeholder="Author" required />
     </div>
     <div class="field">
+      <label for="book-series">Series</label>
+      @if (allSeries().length > 0) {
+        <div class="book-form-series-existing">
+          <span class="book-form-series-label">Quick-add:</span>
+          <div class="book-form-series-chips">
+            @for (s of allSeries(); track s) {
+              <button
+                type="button"
+                class="tag-chip series-chip"
+                [class.tag-chip--selected]="isSeriesSelected(s)"
+                (click)="toggleSeries(s)">
+                {{ s }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+      <div class="plugin-actions" style="margin-top: 0.35rem;">
+        <input id="book-series" type="text" [(ngModel)]="newSeries" name="newSeries" placeholder="Add series" (keyup.enter)="addSeries(); $event.preventDefault()" />
+        <button type="button" class="btn secondary" (click)="addSeries()">Add</button>
+      </div>
+      @if (series.length > 0) {
+        <div class="plugin-list" style="margin-top: 0.5rem;">
+          @for (s of series; track s) {
+            <span class="tag-chip">{{ s }} <button type="button" class="tag-remove" (click)="removeSeries(s)">×</button></span>
+          }
+        </div>
+      }
+    </div>
+    <div class="field">
       <label for="book-status">Status</label>
       <select id="book-status" class="form-select" [(ngModel)]="status" name="status">
         @for (s of statusOptions; track s) {

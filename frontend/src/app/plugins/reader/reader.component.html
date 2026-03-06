@@ -19,7 +19,7 @@
       <app-reader-stats (navigateToBooks)="navigateToBooksWithFilter($any($event))" />
     } @else {
       <section class="card card-table-scroll">
-        <app-reader-timeline (viewBook)="openEdit($event)" />
+        <app-reader-timeline (viewBook)="openEdit($event)" (addBook)="openAdd()" />
       </section>
     }
 

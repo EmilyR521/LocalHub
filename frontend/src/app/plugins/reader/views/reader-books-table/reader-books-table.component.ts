@@ -40,6 +40,8 @@ export class ReaderBooksTableComponent {
   readonly authorFilter = signal<string | null>(null);
   /** Selected tags for filter (multiselect). Empty = show all. */
   readonly selectedTags = signal<Set<string>>(new Set());
+  /** Search query for partial/whole match on title or author. */
+  readonly searchQuery = signal<string>('');
   readonly filtersOpen = signal(false);
 
   readonly statusOptions: BookStatus[] = Object.values(BookStatus);
@@ -56,8 +58,15 @@ export class ReaderBooksTableComponent {
   });
 
   readonly activeFilterCount = computed(() => {
-    return this.selectedTags().size + (this.authorFilter() != null ? 1 : 0) + this.selectedStatuses().size;
+    const searchActive = (this.searchQuery() ?? '').trim().length > 0;
+    return this.selectedTags().size + (this.authorFilter() != null ? 1 : 0) + this.selectedStatuses().size + (searchActive ? 1 : 0);
   });
+
+  /** Selected tags as array for template iteration. */
+  readonly selectedTagsArray = computed(() => [...this.selectedTags()]);
+
+  /** Selected statuses as array for template iteration. */
+  readonly selectedStatusesArray = computed(() => [...this.selectedStatuses()]);
 
   readonly filteredAndSortedBooks = computed(() => {
     let list = filterBooksByStatusSet(
@@ -75,6 +84,18 @@ export class ReaderBooksTableComponent {
       list = list.filter((b) =>
         (b.tags ?? []).some((t) => tagLower.has((t ?? '').toLowerCase().trim()))
       );
+    }
+    const search = (this.searchQuery() ?? '').trim().toLowerCase();
+    if (search.length > 0) {
+      list = list.filter((b) => {
+        const raw: string | string[] | undefined = b.series;
+        const seriesList: string[] = Array.isArray(raw) ? raw : typeof raw === 'string' ? [(raw as string).trim()].filter(Boolean) : [];
+        return (
+          (b.title ?? '').toLowerCase().includes(search) ||
+          (b.author ?? '').toLowerCase().includes(search) ||
+          seriesList.some((s) => (s ?? '').toLowerCase().includes(search))
+        );
+      });
     }
     return sortBooks(list, this.sortField(), this.sortDir());
   });
@@ -149,6 +170,10 @@ export class ReaderBooksTableComponent {
 
   clearAuthorFilter(): void {
     this.authorFilter.set(null);
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set('');
   }
 
   formatDate(iso: string | undefined): string {

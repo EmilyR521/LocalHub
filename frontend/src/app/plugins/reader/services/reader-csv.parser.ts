@@ -4,6 +4,7 @@ import { BookStatus } from '../models/book-status.model';
 export const CSV_HEADERS = [
   'Title',
   'Author',
+  'Series',
   'Status',
   'Published Date',
   'Reading Start Date',
@@ -15,6 +16,7 @@ export const CSV_HEADERS = [
 export interface ParsedBookRow {
   title: string;
   author: string;
+  series?: string[];
   status: BookStatus;
   readingStartDate?: string;
   readingEndDate?: string;
@@ -28,6 +30,7 @@ export function bookToCsvRow(book: Book): string {
   const row = [
     escapeCsv(book.title),
     escapeCsv(book.author),
+    escapeCsv(Array.isArray(book.series) ? book.series.join(';') : (book.series ?? '')),
     escapeCsv(book.status),
     dateToCsv(book.publishedDate),
     dateToCsv(book.readingStartDate),
@@ -113,9 +116,11 @@ export function parseCsvRow(
   if (!title || !author) throw new Error('Title and Author are required');
   const status = normalizeStatus(row['Status']) ?? BookStatus.ToRead;
   const tags = parseTags(row['Tags']);
+  const seriesArr = parseTags(row['Series']);
   return {
     title,
     author,
+    series: seriesArr.length ? seriesArr : undefined,
     status,
     publishedDate: parseDate(row['Published Date']),
     readingStartDate: parseDate(row['Reading Start Date']),

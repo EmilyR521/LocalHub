@@ -11,7 +11,35 @@
     </button>
   <button type="button" class="btn primary" (click)="onAddBook()"> + Add book</button>
   </div>
-   
+
+  @if (activeFilterCount() > 0) {
+    <div class="reader-books-active-filters" aria-label="Active filters">
+      <span class="reader-books-active-filters-label">Active:</span>
+      <div class="reader-books-active-filters-chips">
+        @if (searchQuery().trim(); as q) {
+          <button type="button" class="vocabulist-tag-chip vocabulist-tag-chip--selected reader-books-active-filter-chip" (click)="clearSearch()" title="Clear search">
+            Search: {{ q }} ×
+          </button>
+        }
+        @for (s of selectedStatusesArray(); track s) {
+          <button type="button" class="vocabulist-tag-chip vocabulist-tag-chip--selected reader-books-active-filter-chip" (click)="toggleStatus(s)" [title]="'Remove status filter: ' + s">
+            {{ s }} ×
+          </button>
+        }
+        @if (authorFilter(); as author) {
+          <button type="button" class="vocabulist-tag-chip vocabulist-tag-chip--selected reader-books-active-filter-chip" (click)="clearAuthorFilter()" title="Clear author filter">
+            Author: {{ author }} ×
+          </button>
+        }
+        @for (tag of selectedTagsArray(); track tag) {
+          <button type="button" class="vocabulist-tag-chip vocabulist-tag-chip--selected reader-books-active-filter-chip" (click)="toggleTag(tag)" [title]="'Remove tag filter: ' + tag">
+            {{ tag }} ×
+          </button>
+        }
+      </div>
+    </div>
+  }
+
     <div
       id="reader-books-tag-filters-panel"
       class="vocabulist-filter-panel"
@@ -19,6 +47,17 @@
       [hidden]="!filtersOpen()"
     >
       <div class="vocabulist-filter">
+        <div class="vocabulist-filter-group">
+          <span class="vocabulist-filter-label">Search:</span>
+          <input
+            type="search"
+            class="reader-books-search-input"
+            placeholder="Title, author or series..."
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+            aria-label="Search books by title, author or series"
+          />
+        </div>
         <div class="vocabulist-filter-group">
           <span class="vocabulist-filter-label">Status:</span>
           <div class="vocabulist-tag-multiselect">

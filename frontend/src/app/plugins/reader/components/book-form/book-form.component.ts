@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BookStatus } from '../../models/book-status.model';
 import { BookRating } from '../../models/book-rating.model';
 import type { Book } from '../../models/book.model';
 import { ReaderLookupService } from '../../services/reader-lookup.service';
+import { ReaderService } from '../../services/reader.service';
 
 @Component({
   selector: 'app-book-form',
@@ -18,9 +19,12 @@ export class BookFormComponent implements OnChanges {
   @Output() delete = new EventEmitter<void>();
 
   private lookup = inject(ReaderLookupService);
+  private reader = inject(ReaderService);
 
   title = '';
   author = '';
+  series: string[] = [];
+  newSeries = '';
   status: BookStatus = BookStatus.ToRead;
   rating: BookRating = BookRating.None;
   readingStartDate = '';
@@ -31,6 +35,24 @@ export class BookFormComponent implements OnChanges {
   tags: string[] = [];
   newTag = '';
   isLookingUp = false;
+
+  /** Unique series names from all books (for quick-add). */
+  readonly allSeries = computed(() => {
+    const set = new Set<string>();
+    for (const book of this.reader.books()) {
+      const raw: string | string[] | undefined = book.series;
+      if (Array.isArray(raw)) {
+        for (const s of raw) {
+          const t = (s ?? '').trim();
+          if (t) set.add(t);
+        }
+      } else if (typeof raw === 'string') {
+        const s = (raw as string).trim();
+        if (s) set.add(s);
+      }
+    }
+    return [...set].sort();
+  });
 
   readonly BookStatus = BookStatus;
   readonly BookRating = BookRating;
@@ -44,6 +66,8 @@ export class BookFormComponent implements OnChanges {
     if (this.book) {
       this.title = this.book.title;
       this.author = this.book.author;
+      const raw: string | string[] | undefined = this.book.series;
+      this.series = Array.isArray(raw) ? [...raw] : typeof raw === 'string' ? [(raw as string).trim()].filter(Boolean) : [];
       this.status = this.book.status;
       this.rating = this.book.rating ?? BookRating.None;
       this.readingStartDate = this.book.readingStartDate?.slice(0, 10) ?? '';
@@ -55,6 +79,7 @@ export class BookFormComponent implements OnChanges {
     } else {
       this.title = '';
       this.author = '';
+      this.series = [];
       this.status = BookStatus.ToRead;
       this.rating = BookRating.None;
       this.readingStartDate = '';
@@ -65,6 +90,33 @@ export class BookFormComponent implements OnChanges {
       this.tags = [];
     }
     this.newTag = '';
+    this.newSeries = '';
+  }
+
+  toggleSeries(name: string): void {
+    const t = name.trim();
+    if (!t) return;
+    if (this.series.includes(t)) {
+      this.series = this.series.filter((s) => s !== t);
+    } else {
+      this.series = [...this.series, t];
+    }
+  }
+
+  isSeriesSelected(name: string): boolean {
+    return this.series.includes(name.trim());
+  }
+
+  addSeries(): void {
+    const t = this.newSeries.trim();
+    if (t && !this.series.includes(t)) {
+      this.series = [...this.series, t];
+      this.newSeries = '';
+    }
+  }
+
+  removeSeries(name: string): void {
+    this.series = this.series.filter((s) => s !== name);
   }
 
   lookupMetadata(): void {
@@ -105,6 +157,7 @@ export class BookFormComponent implements OnChanges {
     this.save.emit({
       title: this.title.trim(),
       author: this.author.trim(),
+      series: this.series.length ? this.series : undefined,
       status: this.status,
       rating: this.rating,
       readingStartDate: this.readingStartDate || undefined,

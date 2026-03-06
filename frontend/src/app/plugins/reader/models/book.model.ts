@@ -6,6 +6,7 @@ export interface Book {
   id: string;
   title: string;
   author: string;
+  series?: string[];
   addedDate: string;
   status: BookStatus;
   readingStartDate?: string;

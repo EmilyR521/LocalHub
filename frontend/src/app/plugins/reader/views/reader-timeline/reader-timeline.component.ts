@@ -18,6 +18,7 @@ export class ReaderTimelineComponent implements OnInit {
   );
 
   @Output() viewBook = new EventEmitter<Book>();
+  @Output() addBook = new EventEmitter<void>();
 
   constructor(
     private reader: ReaderService,
@@ -30,5 +31,9 @@ export class ReaderTimelineComponent implements OnInit {
 
   onViewBook(book: Book): void {
     this.viewBook.emit(book);
+  }
+
+  onAddBook(): void {
+    this.addBook.emit();
   }
 }

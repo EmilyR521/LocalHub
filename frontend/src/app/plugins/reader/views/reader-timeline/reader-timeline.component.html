@@ -1,5 +1,8 @@
 <div class="timeline-container">
-  <app-reader-timeline-header [books]="books()" />
+  <div class="timeline-top-bar">
+    <app-reader-timeline-header [books]="books()" />
+    <button type="button" class="btn primary" (click)="onAddBook()">+ Add book</button>
+  </div>
 
   @if (timelineGroups().length > 0) {
     <div class="timeline-list">

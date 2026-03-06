@@ -100,6 +100,12 @@
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+
+  &.tag-chip--selected {
+    border-color: var(--accent);
+    background: rgba(88, 166, 255, 0.12);
+    color: var(--accent);
+  }
 }
 
 .tag-remove {
